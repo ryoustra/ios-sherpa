@@ -79,6 +79,7 @@ public class SherpaViewController: UITableViewController, UISearchControllerDele
 		} else {
 			self.searchController.dimsBackgroundDuringPresentation = false
 		}
+		self.searchController.searchBar.tintColor = self.tintColor
 		self.tableView.tableHeaderView = self.searchController.searchBar
 
 		self.definesPresentationContext = true;
@@ -110,7 +111,7 @@ public class SherpaViewController: UITableViewController, UISearchControllerDele
 
 	override public func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
 		if cell.accessoryType != .None {
-			cell.textLabel?.textColor = self.tintColor
+			cell.textLabel!.textColor = self.tintColor
 		}
 	}
 	
