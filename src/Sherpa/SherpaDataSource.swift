@@ -38,8 +38,6 @@ internal class SherpaDataSource: NSObject, UITableViewDataSource {
 
 	// MARK: Retrieving content
 
-	internal var sections: [Section] = []
-
 	internal func section(index: Int) -> Section? {
 		if index < 0 || index >= self.sections.count { return nil }
 
@@ -69,6 +67,10 @@ internal class SherpaDataSource: NSObject, UITableViewDataSource {
 
 	private var articles: [Article]?
 
+	internal var sections: [Section] = []
+
+	private var filteredSections: [Section] = []
+
 	internal var query: String? {
 		didSet {
 			if let query = self.query {
@@ -80,93 +82,69 @@ internal class SherpaDataSource: NSObject, UITableViewDataSource {
 		}
 	}
 
-	internal var filter: ((Article) -> Bool)? {
-		didSet {
-			if let filter = self.filter {
-				self.articles = self.sections.flatMap({ $0.articles }).filter(filter)
-			}
-			else {
-				self.articles = nil
-			}
-		}
-	}
+	internal var filter: ((Article) -> Bool)?
+
+	internal var flattenSections: Bool = false
 
 	@objc func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-		if let _ = self.articles {
-			return 1
+		if self.flattenSections, let filter = self.filter {
+			let articles = self.sections.flatMap({ $0.articles }).filter(filter)
+			self.filteredSections = [ Section(title: nil, detail: nil, articles: articles) ]
+		}
+		else if let filter = self.filter {
+			self.filteredSections = self.sections.map({ $0.section(filter) }).flatMap({ $0 })
+		}
+		else {
+			self.filteredSections = self.sections
 		}
 
-		else {
-			return self.sections.count
-		}
+		return self.filteredSections.count
 	}
 
 	@objc func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "_SherpaCell")
 
-		if let articles = self.articles {
-			return articles.count
-		}
-
-		else {
-			return self.section(section)?.articles.count ?? 0
-		}
+		return self.filteredSections[section].articles.count ?? 0
 	}
 
 	@objc func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		if let _ = self.articles {
-			return nil
-		}
-
-		else if let sect = self.section(section) {
-			return sect.title
-		}
-
-		return nil
+		return self.filteredSections[section].title
 	}
 
 	@objc func tableView(tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-		if let _ = self.articles {
-			return nil
-		}
-
-		else if let sect = self.section(section) {
-			return sect.detail
-		}
-
-		return nil
+		return self.filteredSections[section].detail
 	}
 
 	@objc func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCellWithIdentifier("_SherpaCell", forIndexPath: indexPath)
 
-		if let article = self.article(indexPath) {
-			cell.accessoryType = .DisclosureIndicator
-			cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCallout)
-			cell.textLabel!.numberOfLines = 0
+		let article = self.filteredSections[indexPath.section].articles[indexPath.row]
 
-			cell.textLabel!.text = article.title
-			if let query = self.query {
-				let attributedTitle = cell.textLabel?.attributedText as! NSMutableAttributedString
+		cell.accessoryType = .DisclosureIndicator
+		cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCallout)
+		cell.textLabel!.numberOfLines = 0
+		cell.textLabel!.text = article.title
 
-				let bold = cell.textLabel!.font.fontDescriptor().fontDescriptorWithSymbolicTraits(.TraitBold)
+		if let query = self.query {
+			let attributedTitle = cell.textLabel?.attributedText as! NSMutableAttributedString
 
-				var i = 0
-				while true {
-					let searchRange = NSMakeRange(i, article.title.characters.count-i)
-					let range = (article.title as NSString).rangeOfString(query, options: .CaseInsensitiveSearch, range: searchRange, locale: NSLocale.currentLocale())
+			let bold = cell.textLabel!.font.fontDescriptor().fontDescriptorWithSymbolicTraits(.TraitBold)
 
-					if range.location == NSNotFound { break }
+			var i = 0
+			while true {
+				let searchRange = NSMakeRange(i, article.title.characters.count-i)
+				let range = (article.title as NSString).rangeOfString(query, options: .CaseInsensitiveSearch, range: searchRange, locale: NSLocale.currentLocale())
 
-					attributedTitle.addAttribute(NSFontAttributeName, value: UIFont(descriptor: bold, size: 0.0), range: range)
+				if range.location == NSNotFound { break }
 
-					i = range.location + range.length
-				}
+				attributedTitle.addAttribute(NSFontAttributeName, value: UIFont(descriptor: bold, size: 0.0), range: range)
 
-				cell.textLabel?.attributedText = attributedTitle
+				i = range.location + range.length
 			}
+
+			cell.textLabel?.attributedText = attributedTitle
 		}
-		
+
 		return cell
 	}
 
@@ -202,9 +180,23 @@ internal struct Section {
 	let articles: [Article]!
 
 	init(dictionary: [String: AnyObject]) {
-		title = dictionary["title"] as? String
-		detail = dictionary["detail"] as? String
-		articles = (dictionary["articles"] as? [[String: AnyObject]])?.map({ Article(dictionary: $0) }).flatMap({ $0 }) ?? []
+		self.title = dictionary["title"] as? String
+		self.detail = dictionary["detail"] as? String
+		self.articles = (dictionary["articles"] as? [[String: AnyObject]])?.map({ Article(dictionary: $0) }).flatMap({ $0 }) ?? []
+	}
+
+	private init(title: String?, detail: String?, articles: [Article]!) {
+		self.title = title
+		self.detail = detail
+		self.articles = articles
+	}
+
+	func section(@noescape filter: (Article) -> Bool) -> Section? {
+		let articles = self.articles.filter(filter)
+
+		if articles.count == 0 { return nil }
+
+		return Section(title: self.title, detail: self.detail, articles: articles)
 	}
 
 }

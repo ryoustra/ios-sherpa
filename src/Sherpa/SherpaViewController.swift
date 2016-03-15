@@ -30,12 +30,22 @@ public class SherpaViewController: UITableViewController, UISearchControllerDele
 
 	private let _dataSource: SherpaDataSource
 
+	private let _articleKey: String?
+
 	public init( fileAtURL fileURL: NSURL ) {
 		_dataSource = SherpaDataSource(fileAtURL: fileURL)
+		_articleKey = nil
 
 		super.init(style: .Grouped)
 	}
+	
+	public init( fileAtURL fileURL: NSURL, articleKey: String ) {
+		_dataSource = SherpaDataSource(fileAtURL: fileURL)
+		_articleKey = articleKey
 
+		super.init(style: .Grouped)
+	}
+	
 	public required init?(coder aDecoder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
@@ -74,6 +84,15 @@ public class SherpaViewController: UITableViewController, UISearchControllerDele
 		self.definesPresentationContext = true;
 	}
 
+	public override func viewWillAppear(animated: Bool) {
+		super.viewWillAppear(animated)
+
+		if let key = self._articleKey, let article = self._dataSource.article(key) {
+			let viewController = self._viewController(article)
+			self.navigationController?.pushViewController(viewController, animated: false)
+		}
+	}
+
 	// MARK: Table view delegate
 
 	override public func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -98,7 +117,12 @@ public class SherpaViewController: UITableViewController, UISearchControllerDele
 	// MARK: Search results updating
 
 	public func updateSearchResultsForSearchController(searchController: UISearchController) {
-		self._dataSource.query = searchController.active ? searchController.searchBar.text : nil
+		if searchController.active, let query = searchController.searchBar.text where query.characters.count > 0 {
+			self._dataSource.query = query
+		}
+		else {
+			self._dataSource.query = nil
+		}
 		self.tableView.reloadData()
 	}
 
