@@ -75,20 +75,12 @@ public class ListViewController: UITableViewController, UISearchControllerDelega
 		self._searchController.searchResultsUpdater = self
 		self._searchController.searchBar.tintColor = self.tintColor
 
-		self.tableView.tableHeaderView = self._searchController.searchBar
+		// Sticking the searchBar inside a wrapper stops the tableview trying to be clever with the content size.
+		let headerView = UIView(frame: self._searchController.searchBar.frame)
+		headerView.addSubview(self._searchController.searchBar)
+		self.tableView.tableHeaderView = headerView
+
 		self.tableView.dataSource = self._dataSource
-	}
-
-	override public func viewWillAppear(animated: Bool) {
-		super.viewWillAppear(animated)
-
-		self.tableView.tableHeaderView = self._searchController.searchBar
-	}
-
-	override public func viewDidDisappear(animated: Bool) {
-		super.viewDidDisappear(animated)
-
-		self.tableView.tableHeaderView = nil
 	}
 
 	// MARK: Table view delegate
