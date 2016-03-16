@@ -51,6 +51,8 @@ internal class ArticleViewController: ListViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
+		self.navigationItem.title = nil
+
 		self.dataSource.sectionTitle = "Related Articles"
 		self.dataSource.filter = { (article: Article) -> Bool in return article.key != nil && self.article.relatedKeys.contains(article.key!)  }
 

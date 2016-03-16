@@ -168,7 +168,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 			return
 		}
 
-		self.document._didSelect(article)
+		self.document.didSelect(article)
 	}
 
 	func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {

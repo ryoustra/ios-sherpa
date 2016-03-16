@@ -44,11 +44,11 @@ internal class Document {
 
 	// MARK: Instance life cycle
 
-	private let fileURL: NSURL
+	internal let fileURL: NSURL
 
-	private var sections: [Section] = []
+	internal var sections: [Section] = []
 
-	internal init( fileAtURL fileURL: NSURL ) {
+	internal init(fileAtURL fileURL: NSURL) {
 		self.fileURL = fileURL
 		self._loadFromFile()
 	}
@@ -71,7 +71,7 @@ internal class Document {
 
 	// MARK: Utilities
 
-	private func _didSelect(article: Article) {
+	internal func didSelect(article: Article) {
 		if let delegate = self.delegate {
 			delegate.document(self, didSelectArticle: article)
 		}
@@ -112,13 +112,13 @@ internal struct Section {
 		self.articles = (dictionary["articles"] as? [[String: AnyObject]])?.map({ Article(dictionary: $0) }).flatMap({ $0 }) ?? []
 	}
 
-	private init(title: String?, detail: String?, articles: [Article]!) {
+	internal init(title: String?, detail: String?, articles: [Article]!) {
 		self.title = title
 		self.detail = detail
 		self.articles = articles
 	}
 
-	private func section(@noescape filter: (Article) -> Bool) -> Section? {
+	internal func section(@noescape filter: (Article) -> Bool) -> Section? {
 		let articles = self.articles.filter(filter)
 
 		if articles.count == 0 { return nil }
@@ -126,7 +126,7 @@ internal struct Section {
 		return Section(title: self.title, detail: self.detail, articles: articles)
 	}
 
-	private func section(query: String) -> Section? {
+	internal func section(query: String) -> Section? {
 		return self.section({ return $0.matches(query) })
 	}
 
@@ -165,7 +165,7 @@ internal struct Article {
 		}
 	}
 
-	private func matches(query: String) -> Bool {
+	internal func matches(query: String) -> Bool {
 		if query.isEmpty {
 			return true
 		}
