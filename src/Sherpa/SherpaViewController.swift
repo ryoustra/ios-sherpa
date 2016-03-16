@@ -165,7 +165,8 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 	internal func document(document: Document, didSelectArticle article: Article) {
 		let dataSource = self._document.dataSource()
 		let articleViewController = ArticleViewController(dataSource:dataSource, article: article)
-		self._listViewController.navigationController?.pushViewController(articleViewController, animated: true)
+		let navigationController = self._navigationController ?? self.navigationController
+		navigationController!.pushViewController(articleViewController, animated: true)
 	}
 
 	// MARK: Utilities
