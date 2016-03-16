@@ -36,14 +36,24 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 
 	//! Text color for article pages.
 	public var articleTextColor: UIColor! = UIColor.darkTextColor()
-	
+
+	// MARK: Deep-linking
+
+	/// Key matching an article to be displayed.
+	public var articleKey: String? = nil
+
 	// MARK: Instance life cycle
 
+	private let _dataSource: SherpaDataSource
+
 	private let _listViewController: ListViewController
+
+	private var _articleViewController: ArticleViewController?
 
 	private var _navigationController: UINavigationController?
 
 	public init( fileAtURL fileURL: NSURL ) {
+		_dataSource = SherpaDataSource(fileAtURL: fileURL)
 		_listViewController = ListViewController(fileAtURL: fileURL)
 		super.init(nibName: nil, bundle: nil)
 	}
@@ -62,25 +72,51 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 		self._listViewController.articleTextColor = self.articleTextColor
 
 		if self.isBeingPresented() {
-			let navigationController = UINavigationController(rootViewController: self._listViewController)
+			let navigationController = UINavigationController()
 			self._navigationController = navigationController
+
+			self.addChildViewController(navigationController)
+			self.view.addSubview(navigationController.view)
 
 			navigationController.delegate = self
 			navigationController.view.frame = CGRect(origin: CGPointZero, size: self.view.frame.size)
 			navigationController.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
 			navigationController.view.preservesSuperviewLayoutMargins = true
+			navigationController.setViewControllers([self._listViewController], animated: false)
 
-			self.addChildViewController(navigationController)
-			self.view.addSubview(navigationController.view)
+			if let key = articleKey, let article = self._dataSource.article(key) {
+				self._listViewController.selectRowForArticle(article)
+
+				let articleViewController = ArticleViewController(article: article)
+				articleViewController.tintColor = self.tintColor
+				articleViewController.backgroundColor = self.articleBackgroundColor
+				articleViewController.textColor = self.articleTextColor
+				navigationController.pushViewController(articleViewController, animated: false)
+			}
+		}
+
+		else if let key = articleKey, let article = self._dataSource.article(key) {
+			let articleViewController = ArticleViewController(article: article)
+			articleViewController.tintColor = self.tintColor
+			articleViewController.backgroundColor = self.articleBackgroundColor
+			articleViewController.textColor = self.articleTextColor
+			self._articleViewController = articleViewController
+
+			self.addChildViewController(articleViewController)
+			self.view.addSubview(articleViewController.view)
+
+			articleViewController.view.frame = CGRect(origin: CGPointZero, size: self.view.frame.size)
+			articleViewController.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+			articleViewController.view.preservesSuperviewLayoutMargins = true
 		}
 
 		else {
+			self.addChildViewController(self._listViewController)
+			self.view.addSubview(self._listViewController.view)
+
 			self._listViewController.view.frame = CGRect(origin: CGPointZero, size: self.view.frame.size)
 			self._listViewController.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
 			self._listViewController.view.preservesSuperviewLayoutMargins = true
-
-			self.addChildViewController(self._listViewController)
-			self.view.addSubview(self._listViewController.view)
 		}
 	}
 
@@ -92,12 +128,13 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 		activeViewController.view.removeFromSuperview()
 		activeViewController.removeFromParentViewController()
 
+		self._articleViewController = nil
 		self._navigationController = nil
 	}
 
 	public override var navigationItem: UINavigationItem {
 		get {
-			return self._listViewController.navigationItem
+			return self.sherpa_activeViewController().navigationItem
 		}
 	}
 
@@ -120,7 +157,13 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 	// MARK: Utilities
 
 	private func sherpa_activeViewController() -> UIViewController {
-		return self._navigationController ?? self._listViewController
+		if let viewController = self._navigationController {
+			return viewController
+		}
+		else if let viewController = self._articleViewController {
+			return viewController
+		}
+		return self._listViewController
 	}
 
 	public func sherpa_dismiss() {

@@ -51,28 +51,44 @@ public class ListViewController: UITableViewController, UISearchControllerDelega
 		fatalError("init(coder:) has not been implemented")
 	}
 
+	deinit{
+		self._searchController.view.removeFromSuperview()
+	}
+
 	// MARK: View life cycle
 
-	private let searchController = UISearchController(searchResultsController: nil)
+	private let _searchController = UISearchController(searchResultsController: nil)
 
 	override public func viewDidLoad() {
 		super.viewDidLoad()
 
 		self.navigationItem.title = "User Guide"
 
-		self.tableView.dataSource = self._dataSource
-
-		self.searchController.delegate = self
-		self.searchController.searchResultsUpdater = self
-		if #available(iOSApplicationExtension 9.1, *) {
-			self.searchController.obscuresBackgroundDuringPresentation = false
-		} else {
-			self.searchController.dimsBackgroundDuringPresentation = false
-		}
-		self.searchController.searchBar.tintColor = self.tintColor
-		self.tableView.tableHeaderView = self.searchController.searchBar
-
 		self.definesPresentationContext = true;
+
+		if #available(iOSApplicationExtension 9.1, *) {
+			self._searchController.obscuresBackgroundDuringPresentation = false
+		} else {
+			self._searchController.dimsBackgroundDuringPresentation = false
+		}
+		self._searchController.delegate = self
+		self._searchController.searchResultsUpdater = self
+		self._searchController.searchBar.tintColor = self.tintColor
+
+		self.tableView.tableHeaderView = self._searchController.searchBar
+		self.tableView.dataSource = self._dataSource
+	}
+
+	override public func viewWillAppear(animated: Bool) {
+		super.viewWillAppear(animated)
+
+		self.tableView.tableHeaderView = self._searchController.searchBar
+	}
+
+	override public func viewDidDisappear(animated: Bool) {
+		super.viewDidDisappear(animated)
+
+		self.tableView.tableHeaderView = nil
 	}
 
 	// MARK: Table view delegate
@@ -109,6 +125,15 @@ public class ListViewController: UITableViewController, UISearchControllerDelega
 	}
 
 	// MARK: Utilities
+
+	var _selectedIndexPath: NSIndexPath?
+
+	internal func selectRowForArticle(article: Article) {
+		if let indexPath = self._dataSource.indexPath(article) {
+			_selectedIndexPath = indexPath
+			self.tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .Middle)
+		}
+	}
 
 	private func _viewController(article: Article) -> ArticleViewController {
 		let viewController = ArticleViewController(article: article)

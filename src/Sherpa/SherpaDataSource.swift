@@ -44,21 +44,6 @@ internal class SherpaDataSource: NSObject, UITableViewDataSource {
 		return self.sections[index]
 	}
 
-	internal func article(indexPath: NSIndexPath) -> Article? {
-		let articles: [Article]
-		if let filtered = self.articles {
-			articles = indexPath.section == 0 ? filtered : []
-		}
-
-		else {
-			articles = self.section(indexPath.section)?.articles ?? []
-		}
-
-		if indexPath.row < 0 || indexPath.row >= articles.count { return nil }
-
-		return articles[indexPath.row]
-	}
-
 	internal func article(key: String) -> Article? {
 		return self.sections.flatMap({ $0.articles }).filter({ key == $0.key }).first
 	}
@@ -85,6 +70,28 @@ internal class SherpaDataSource: NSObject, UITableViewDataSource {
 	internal var filter: ((Article) -> Bool)?
 
 	internal var flattenSections: Bool = false
+
+	internal func article(indexPath: NSIndexPath) -> Article? {
+		if indexPath.section < 0 || indexPath.section >= self.filteredSections.count { return nil }
+
+		let section = self.filteredSections[indexPath.section]
+
+		if indexPath.row < 0 || indexPath.row >= section.articles.count { return nil }
+
+		return section.articles[indexPath.row]
+	}
+
+	internal func indexPath(article: Article) -> NSIndexPath? {
+		for (x, s) in self.filteredSections.enumerate() {
+			for (y, a) in s.articles.enumerate() {
+				if a.key == article.key && a.title == article.title && a.body == article.body {
+					return NSIndexPath(forRow: y, inSection: x)
+				}
+			}
+		}
+
+		return nil
+	}
 
 	@objc func numberOfSectionsInTableView(tableView: UITableView) -> Int {
 		if self.flattenSections, let filter = self.filter {
@@ -213,12 +220,14 @@ internal struct Article {
 
 	let buildMax: Int!
 
+	var section: Section?
+
 	private init?(dictionary: [String: AnyObject]) {
-		key = dictionary["key"] as? String
-		title = dictionary["title"] as? String ?? ""
-		body = dictionary["body"] as? String ?? ""
-		buildMin = dictionary["build_min"] as? Int ?? 0
-		buildMax = dictionary["build_max"] as? Int ?? Int.max
+		self.key = dictionary["key"] as? String
+		self.title = dictionary["title"] as? String ?? ""
+		self.body = dictionary["body"] as? String ?? ""
+		self.buildMin = dictionary["build_min"] as? Int ?? 0
+		self.buildMax = dictionary["build_max"] as? Int ?? Int.max
 
 		// Require both a title and a body
 		if title.isEmpty || body.isEmpty {
