@@ -25,6 +25,7 @@
 		A1E665FA1C978ACD0005CE51 /* ArticleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E665F91C978ACD0005CE51 /* ArticleViewController.swift */; };
 		A1E665FC1C978ADF0005CE51 /* SherpaDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E665FB1C978ADF0005CE51 /* SherpaDataSource.swift */; };
 		A1E666151C9793700005CE51 /* Sherpa.h in Headers */ = {isa = PBXBuildFile; fileRef = A1E666141C9793700005CE51 /* Sherpa.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A1E666321C98F0360005CE51 /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E666311C98F0360005CE51 /* ListViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +38,7 @@
 		A1E665F91C978ACD0005CE51 /* ArticleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArticleViewController.swift; sourceTree = "<group>"; };
 		A1E665FB1C978ADF0005CE51 /* SherpaDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SherpaDataSource.swift; sourceTree = "<group>"; };
 		A1E666141C9793700005CE51 /* Sherpa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sherpa.h; sourceTree = "<group>"; };
+		A1E666311C98F0360005CE51 /* ListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +76,7 @@
 			children = (
 				A1E666141C9793700005CE51 /* Sherpa.h */,
 				A1E665F71C978ABB0005CE51 /* SherpaViewController.swift */,
+				A1E666311C98F0360005CE51 /* ListViewController.swift */,
 				A1E665F91C978ACD0005CE51 /* ArticleViewController.swift */,
 				A1E665FB1C978ADF0005CE51 /* SherpaDataSource.swift */,
 				A1A7873C1C7BED9C0095A0EF /* Info.plist */,
@@ -180,6 +183,7 @@
 			files = (
 				A1E665FC1C978ADF0005CE51 /* SherpaDataSource.swift in Sources */,
 				A1E665FA1C978ACD0005CE51 /* ArticleViewController.swift in Sources */,
+				A1E666321C98F0360005CE51 /* ListViewController.swift in Sources */,
 				A1E665F81C978ABB0005CE51 /* SherpaViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -179,7 +179,7 @@ internal struct Section {
 
 	let articles: [Article]!
 
-	init(dictionary: [String: AnyObject]) {
+	private init(dictionary: [String: AnyObject]) {
 		self.title = dictionary["title"] as? String
 		self.detail = dictionary["detail"] as? String
 		self.articles = (dictionary["articles"] as? [[String: AnyObject]])?.map({ Article(dictionary: $0) }).flatMap({ $0 }) ?? []
@@ -191,7 +191,7 @@ internal struct Section {
 		self.articles = articles
 	}
 
-	func section(@noescape filter: (Article) -> Bool) -> Section? {
+	private func section(@noescape filter: (Article) -> Bool) -> Section? {
 		let articles = self.articles.filter(filter)
 
 		if articles.count == 0 { return nil }
@@ -213,7 +213,7 @@ internal struct Article {
 
 	let buildMax: Int!
 
-	init?(dictionary: [String: AnyObject]) {
+	private init?(dictionary: [String: AnyObject]) {
 		key = dictionary["key"] as? String
 		title = dictionary["title"] as? String ?? ""
 		body = dictionary["body"] as? String ?? ""
@@ -231,7 +231,7 @@ internal struct Article {
 		}
 	}
 
-	func matches(query: String) -> Bool {
+	private func matches(query: String) -> Bool {
 		if query.isEmpty {
 			return true
 		}

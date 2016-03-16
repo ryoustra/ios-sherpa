@@ -24,33 +24,9 @@
 
 import UIKit
 
-public class SherpaViewController: UITableViewController, UISearchControllerDelegate, UISearchResultsUpdating {
+public class SherpaViewController: UIViewController, UINavigationControllerDelegate {
 
-	// MARK: Appearance
-
-	private let _dataSource: SherpaDataSource
-
-	private let _articleKey: String?
-
-	public init( fileAtURL fileURL: NSURL ) {
-		_dataSource = SherpaDataSource(fileAtURL: fileURL)
-		_articleKey = nil
-
-		super.init(style: .Grouped)
-	}
-	
-	public init( fileAtURL fileURL: NSURL, articleKey: String ) {
-		_dataSource = SherpaDataSource(fileAtURL: fileURL)
-		_articleKey = articleKey
-
-		super.init(style: .Grouped)
-	}
-	
-	public required init?(coder aDecoder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
-	}
-
-	// MARK: Appearance
+	// MARK: Customising appearance
 
 	//! Tint color used for indicating links.
 	public var tintColor: UIColor! = UINavigationBar.appearance().tintColor
@@ -60,81 +36,95 @@ public class SherpaViewController: UITableViewController, UISearchControllerDele
 
 	//! Text color for article pages.
 	public var articleTextColor: UIColor! = UIColor.darkTextColor()
+	
+	// MARK: Instance life cycle
 
-	// MARK: View life cycle
+	private let _listViewController: ListViewController
 
-	private let searchController = UISearchController(searchResultsController: nil)
+	private var _navigationController: UINavigationController?
 
-	override public func viewDidLoad() {
-		super.viewDidLoad()
-
-		self.navigationItem.title = "User Guide"
-
-		self.tableView.dataSource = self._dataSource
-
-		self.searchController.delegate = self
-		self.searchController.searchResultsUpdater = self
-		if #available(iOSApplicationExtension 9.1, *) {
-			self.searchController.obscuresBackgroundDuringPresentation = false
-		} else {
-			self.searchController.dimsBackgroundDuringPresentation = false
-		}
-		self.searchController.searchBar.tintColor = self.tintColor
-		self.tableView.tableHeaderView = self.searchController.searchBar
-
-		self.definesPresentationContext = true;
+	public init( fileAtURL fileURL: NSURL ) {
+		_listViewController = ListViewController(fileAtURL: fileURL)
+		super.init(nibName: nil, bundle: nil)
 	}
+
+	public required init?(coder aDecoder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+
+	// MARK: View controller
 
 	public override func viewWillAppear(animated: Bool) {
 		super.viewWillAppear(animated)
 
-		if let key = self._articleKey, let article = self._dataSource.article(key) {
-			let viewController = self._viewController(article)
-			self.navigationController?.pushViewController(viewController, animated: false)
+		self._listViewController.tintColor = self.tintColor
+		self._listViewController.articleBackgroundColor = self.articleBackgroundColor
+		self._listViewController.articleTextColor = self.articleTextColor
+
+		if self.isBeingPresented() {
+			let navigationController = UINavigationController(rootViewController: self._listViewController)
+			self._navigationController = navigationController
+
+			navigationController.delegate = self
+			navigationController.view.frame = CGRect(origin: CGPointZero, size: self.view.frame.size)
+			navigationController.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+			navigationController.view.preservesSuperviewLayoutMargins = true
+
+			self.addChildViewController(navigationController)
+			self.view.addSubview(navigationController.view)
 		}
-	}
 
-	// MARK: Table view delegate
-
-	override public func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-		return 44
-	}
-
-	override public func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-		guard let article = self._dataSource.article(indexPath) else {
-			return
-		}
-
-		let viewController = self._viewController(article)
-		self.navigationController?.pushViewController(viewController, animated: true)
-	}
-
-	override public func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-		if cell.accessoryType != .None {
-			cell.textLabel!.textColor = self.tintColor
-		}
-	}
-	
-	// MARK: Search results updating
-
-	public func updateSearchResultsForSearchController(searchController: UISearchController) {
-		if searchController.active, let query = searchController.searchBar.text where query.characters.count > 0 {
-			self._dataSource.query = query
-		}
 		else {
-			self._dataSource.query = nil
+			self._listViewController.view.frame = CGRect(origin: CGPointZero, size: self.view.frame.size)
+			self._listViewController.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+			self._listViewController.view.preservesSuperviewLayoutMargins = true
+
+			self.addChildViewController(self._listViewController)
+			self.view.addSubview(self._listViewController.view)
 		}
-		self.tableView.reloadData()
+	}
+
+	public override func viewDidDisappear(animated: Bool) {
+		super.viewDidDisappear(animated)
+
+		let activeViewController = self.sherpa_activeViewController()
+
+		activeViewController.view.removeFromSuperview()
+		activeViewController.removeFromParentViewController()
+
+		self._navigationController = nil
+	}
+
+	public override var navigationItem: UINavigationItem {
+		get {
+			return self._listViewController.navigationItem
+		}
+	}
+
+	public override func childViewControllerForStatusBarHidden() -> UIViewController? {
+		return self.sherpa_activeViewController()
+	}
+
+	public override func childViewControllerForStatusBarStyle() -> UIViewController? {
+		return self.sherpa_activeViewController()
+	}
+
+	// MARK: Navigation controller delegate
+
+	public func navigationController(navigationController: UINavigationController, willShowViewController viewController: UIViewController, animated: Bool) {
+		if viewController.navigationItem.rightBarButtonItem == nil {
+			viewController.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Done, target: self, action: "sherpa_dismiss")
+		}
 	}
 
 	// MARK: Utilities
 
-	private func _viewController(article: Article) -> ArticleViewController {
-		let viewController = ArticleViewController(article: article)
-		viewController.tintColor = self.tintColor
-		viewController.backgroundColor = self.articleBackgroundColor
-		viewController.textColor = self.articleTextColor
-		return viewController
+	private func sherpa_activeViewController() -> UIViewController {
+		return self._navigationController ?? self._listViewController
+	}
+
+	public func sherpa_dismiss() {
+		self.dismissViewControllerAnimated(true, completion: nil)
 	}
 
 }
