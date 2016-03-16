@@ -80,42 +80,49 @@ internal class ArticleViewController: UIViewController {
 		self.bodyLabel.numberOfLines = 0
 		self.contentView.addSubview(self.bodyLabel)
 
-		let views = [ "scroll": scrollView, "content": self.contentView, "title": self.titleLabel, "body": self.bodyLabel ]
-
-		self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-(0)-[scroll]-(0)-|", options: [], metrics: nil, views: views))
-		self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-(0)-[scroll]-(0)-|", options: [], metrics: nil, views: views))
-		scrollView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-(0)-[content(==scroll)]-(0)-|", options: [], metrics: nil, views: views))
-		scrollView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-(0)-[content]-(0)-|", options: [], metrics: nil, views: views))
-		self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-[title]-|", options: [], metrics: nil, views: views))
-		self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-[body]-|", options: [], metrics: nil, views: views))
-		self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-(20)-[title]-(30)-[body]-(20)-|", options: [], metrics: nil, views: views))
-
 		if let title = self._article.title {
 			self.titleLabel.text = title
 		}
 
-		if let body = self._article.body {
-			self.bodyLabel.text = body
-
-			var mutableBody = body
-
-			while let range = mutableBody.rangeOfString("\n") {
-				mutableBody.replaceRange(range, with: "<br />")
+		if var body = self.article.body {
+			while let range = body.rangeOfString("\n") {
+				body.replaceRange(range, with: "<br />")
 			}
 
-			let fontFamily = self.bodyLabel.font.fontName
-			let fontSize = Int(self.bodyLabel.font.pointSize)
-			var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0
-			self.bodyLabel.textColor.getRed(&red, green: &green, blue: &blue, alpha: nil)
-			mutableBody = "<div style=\"font-family: '\(fontFamily)'; font-size: \(fontSize)px; color: rgb(\(Int(red*255)),\(Int(green*255)),\(Int(blue*255)))\">\(mutableBody)</div>"
-
-			if let data = mutableBody.dataUsingEncoding(NSUnicodeStringEncoding, allowLossyConversion: true) {
+			if let data = body.dataUsingEncoding(NSUnicodeStringEncoding, allowLossyConversion: false) {
 				do {
-					self.bodyLabel.attributedText = try NSAttributedString(data: data, options: [NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType], documentAttributes: nil)
+					let attributedText = try NSMutableAttributedString(data: data, options: [NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType], documentAttributes: nil)
+					attributedText.enumerateAttributesInRange(NSMakeRange(0,attributedText.length), options: [], usingBlock: { attributes, range, stop in
+						var mutable = attributes
+						let symbolicTraits = (mutable[NSFontAttributeName] as! UIFont).fontDescriptor().symbolicTraits
+						let descriptor = self.bodyLabel.font.fontDescriptor().fontDescriptorWithSymbolicTraits(symbolicTraits)
+						mutable[NSFontAttributeName] = UIFont(descriptor: descriptor, size: self.bodyLabel.font.pointSize)
+						mutable[NSForegroundColorAttributeName] = self.bodyLabel.textColor
+						attributedText.setAttributes(mutable, range: range)
+					})
+					self.bodyLabel.attributedText = attributedText
 				}
 				catch {}
 			}
 		}
 	}
-	
+
+	override func viewDidLayoutSubviews() {
+		let header = self.contentView
+		if header.superview == nil || CGRectGetWidth(header.frame) != CGRectGetWidth(header.superview!.frame) {
+			let margins = self.tableView.layoutMargins
+			let width = CGRectGetWidth(self.tableView.frame)
+
+			let maxSize = CGSize(width: width - margins.left - margins.right, height: CGFloat.max)
+			let titleSize = self.titleLabel.sizeThatFits(maxSize)
+			let bodySize = self.bodyLabel.sizeThatFits(maxSize)
+
+			self.titleLabel.frame = CGRect(x: margins.left, y: 30, width: maxSize.width, height: titleSize.height)
+			self.bodyLabel.frame = CGRect(x: margins.left, y: CGRectGetMaxY(self.titleLabel.frame) + 15, width: maxSize.width, height: bodySize.height)
+			header.frame = CGRect(x: 0, y: 0, width: width, height: CGRectGetMaxY(self.bodyLabel.frame))
+
+			self.tableView.tableHeaderView = header
+		}
+	}
+
 }
