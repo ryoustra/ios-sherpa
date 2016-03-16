@@ -24,27 +24,21 @@
 
 import UIKit
 
-internal class ArticleViewController: UIViewController {
+internal class ArticleViewController: ListViewController {
 
-	let _article: Article!
+	// MARK: Instance life cycle
 
-	init( article: Article! ) {
-		_article = article
+	internal let article: Article!
 
-		super.init(nibName: nil, bundle: nil)
+	init(dataSource: DataSource!, article: Article!) {
+		self.article = article
+		super.init(dataSource: dataSource)
+		self.allowSearch = false
 	}
 
 	required init?(coder aDecoder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
-
-	// MARK: Appearance
-
-	internal var tintColor: UIColor! = UINavigationBar.appearance().tintColor
-
-	internal var textColor: UIColor! = UIColor.darkTextColor()
-
-	internal var backgroundColor: UIColor! = UIColor.whiteColor()
 
 	// MARK: View life cycle
 
@@ -57,32 +51,27 @@ internal class ArticleViewController: UIViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		self.view.backgroundColor = self.backgroundColor
-
-		let scrollView = UIScrollView()
-		scrollView.preservesSuperviewLayoutMargins = true
-		scrollView.translatesAutoresizingMaskIntoConstraints = false
-		self.view.addSubview(scrollView)
+		self.dataSource.sectionTitle = "Related Articles"
+		self.dataSource.filter = { (article: Article) -> Bool in return article.key != nil && self.article.relatedKeys.contains(article.key!)  }
 
 		self.contentView.preservesSuperviewLayoutMargins = true
 		self.contentView.translatesAutoresizingMaskIntoConstraints = false
-		scrollView.addSubview(self.contentView)
 
 		self.titleLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleTitle2)
+		self.titleLabel.textColor = self.dataSource.document.articleTextColor
 		self.titleLabel.translatesAutoresizingMaskIntoConstraints = false
-		self.titleLabel.textColor = self.textColor
 		self.titleLabel.numberOfLines = 0
 		self.contentView.addSubview(self.titleLabel)
 
-		self.bodyLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
-		self.bodyLabel.translatesAutoresizingMaskIntoConstraints = false
-		self.bodyLabel.textColor = self.textColor
-		self.bodyLabel.numberOfLines = 0
-		self.contentView.addSubview(self.bodyLabel)
-
-		if let title = self._article.title {
+		if let title = self.article.title {
 			self.titleLabel.text = title
 		}
+
+		self.bodyLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
+		self.bodyLabel.textColor = self.dataSource.document.articleTextColor
+		self.bodyLabel.translatesAutoresizingMaskIntoConstraints = false
+		self.bodyLabel.numberOfLines = 0
+		self.contentView.addSubview(self.bodyLabel)
 
 		if var body = self.article.body {
 			while let range = body.rangeOfString("\n") {

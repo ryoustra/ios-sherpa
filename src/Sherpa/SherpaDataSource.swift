@@ -24,15 +24,32 @@
 
 import UIKit
 
-internal class SherpaDataSource: NSObject, UITableViewDataSource {
+internal protocol DocumentDelegate {
 
-	private let _fileURL: NSURL
+	func document(document: Document, didSelectArticle article: Article)
+
+}
+
+internal class Document {
+
+	internal var delegate: DocumentDelegate?
+
+	// MARK: Customising appearance
+
+	internal var tintColor: UIColor! = UINavigationBar.appearance().tintColor
+
+	internal var articleBackgroundColor: UIColor! = UIColor.whiteColor()
+
+	internal var articleTextColor: UIColor! = UIColor.darkTextColor()
+
+	// MARK: Instance life cycle
+	
+	private let fileURL: NSURL
+
+	private var sections: [Section] = []
 
 	internal init( fileAtURL fileURL: NSURL ) {
-		_fileURL = fileURL
-
-		super.init()
-
+		self.fileURL = fileURL
 		self._loadFromFile()
 	}
 
@@ -48,33 +65,101 @@ internal class SherpaDataSource: NSObject, UITableViewDataSource {
 		return self.sections.flatMap({ $0.articles }).filter({ key == $0.key }).first
 	}
 
-	// MARK: Table view data source
+	internal func dataSource() -> DataSource! {
+		return DataSource(document: self)
+	}
 
-	private var articles: [Article]?
+	// MARK: Utilities
 
-	internal var sections: [Section] = []
-
-	private var filteredSections: [Section] = []
-
-	internal var query: String? {
-		didSet {
-			if let query = self.query {
-				self.filter = { (article: Article) in return article.matches(query) }
-			}
-			else {
-				self.filter = nil
-			}
+	private func _didSelect(article: Article) {
+		if let delegate = self.delegate {
+			delegate.document(self, didSelectArticle: article)
 		}
 	}
 
-	internal var filter: ((Article) -> Bool)?
+	private func _loadFromFile() {
+		do {
+			guard let data = NSData(contentsOfURL: self.fileURL) else {
+				return
+			}
 
-	internal var flattenSections: Bool = false
+			let json = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(rawValue: 0))
+
+			guard let array = json as? [[String:AnyObject]] else {
+				return
+			}
+
+			sections = array.map({ Section(dictionary: $0) }).flatMap({ $0 }) ?? []
+		}
+		catch {
+			return
+		}
+	}
+
+}
+
+internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate {
+
+	// MARK: Instance life cycle
+
+	internal var document: Document!
+
+	internal init(document: Document!) {
+		self.document = document
+		super.init()
+		self.applyFilter()
+	}
+
+	private var sections: [Section]! {
+		get { return self.document.sections }
+	}
+
+	// MARK: Altering the visible data
+
+	internal var sectionTitle: String? {
+		didSet{ self.applyFilter() }
+	}
+
+	internal var query: String? {
+		didSet{ self.applyFilter() }
+	}
+
+	internal var filter: ((Article) -> Bool)? {
+		didSet{ self.applyFilter() }
+	}
+
+	private var filteredSections: [Section] = []
+
+	private func applyFilter() {
+		var sections = self.sections
+
+		if let query = self.query {
+			sections = sections.map({ $0.section(query) }).flatMap({ $0 })
+		}
+
+		if let filter = self.filter {
+			sections = sections.map({ $0.section(filter) }).flatMap({ $0 })
+		}
+
+		if let sectionTitle = self.sectionTitle {
+			let articles = sections.flatMap({ $0.articles }).flatMap({ $0 })
+			let title: String? = articles.count > 0 ? sectionTitle : nil
+			sections = [ Section(title: title, detail: nil, articles: articles) ]
+		}
+
+		self.filteredSections = sections
+	}
+
+	// MARK: Accessing data
+
+	internal func section(index: Int) -> Section? {
+		if index < 0 || index >= self.filteredSections.count { return nil }
+
+		return self.filteredSections[index]
+	}
 
 	internal func article(indexPath: NSIndexPath) -> Article? {
-		if indexPath.section < 0 || indexPath.section >= self.filteredSections.count { return nil }
-
-		let section = self.filteredSections[indexPath.section]
+		guard let section = self.section(indexPath.section) else { return nil }
 
 		if indexPath.row < 0 || indexPath.row >= section.articles.count { return nil }
 
@@ -93,39 +178,30 @@ internal class SherpaDataSource: NSObject, UITableViewDataSource {
 		return nil
 	}
 
-	@objc func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-		if self.flattenSections, let filter = self.filter {
-			let articles = self.sections.flatMap({ $0.articles }).filter(filter)
-			self.filteredSections = [ Section(title: nil, detail: nil, articles: articles) ]
-		}
-		else if let filter = self.filter {
-			self.filteredSections = self.sections.map({ $0.section(filter) }).flatMap({ $0 })
-		}
-		else {
-			self.filteredSections = self.sections
-		}
+	// MARK: Table view data source
 
+	@objc func numberOfSectionsInTableView(tableView: UITableView) -> Int {
 		return self.filteredSections.count
 	}
 
 	@objc func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "_SherpaCell")
 
-		return self.filteredSections[section].articles.count ?? 0
+		return self.section(section)?.articles.count ?? 0
 	}
 
 	@objc func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		return self.filteredSections[section].title
+		return self.section(section)?.title
 	}
 
 	@objc func tableView(tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-		return self.filteredSections[section].detail
+		return self.section(section)?.detail
 	}
 
 	@objc func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCellWithIdentifier("_SherpaCell", forIndexPath: indexPath)
 
-		let article = self.filteredSections[indexPath.section].articles[indexPath.row]
+		guard let article = self.article(indexPath) else { return cell }
 
 		cell.accessoryType = .DisclosureIndicator
 		cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCallout)
@@ -149,33 +225,32 @@ internal class SherpaDataSource: NSObject, UITableViewDataSource {
 				i = range.location + range.length
 			}
 
-			cell.textLabel?.attributedText = attributedTitle
+			cell.textLabel!.attributedText = attributedTitle
 		}
 
 		return cell
 	}
 
-	// MARK: Utilities
+	// MARK: Table view delegate
 
-	private func _loadFromFile() {
-		do {
-			guard let data = NSData(contentsOfURL: _fileURL) else {
-				return
-			}
-
-			let json = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(rawValue: 0))
-
-			guard let array = json as? [[String:AnyObject]] else {
-				return
-			}
-
-			sections = array.map({ Section(dictionary: $0) }).flatMap({ $0 }) ?? []
-		}
-		catch {
-			return
-		}
+	func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+		return 44
 	}
 
+	func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+		guard let article = self.article(indexPath) else {
+			return
+		}
+
+		self.document._didSelect(article)
+	}
+
+	func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+		if cell.accessoryType != .None {
+			cell.textLabel!.textColor = self.document.tintColor
+		}
+	}
+	
 }
 
 internal struct Section {
@@ -206,6 +281,10 @@ internal struct Section {
 		return Section(title: self.title, detail: self.detail, articles: articles)
 	}
 
+	private func section(query: String) -> Section? {
+		return self.section({ return $0.matches(query) })
+	}
+
 }
 
 internal struct Article {
@@ -220,7 +299,7 @@ internal struct Article {
 
 	let buildMax: Int!
 
-	var section: Section?
+	let relatedKeys: [String]!
 
 	private init?(dictionary: [String: AnyObject]) {
 		self.key = dictionary["key"] as? String
@@ -228,6 +307,7 @@ internal struct Article {
 		self.body = dictionary["body"] as? String ?? ""
 		self.buildMin = dictionary["build_min"] as? Int ?? 0
 		self.buildMax = dictionary["build_max"] as? Int ?? Int.max
+		self.relatedKeys = dictionary["related_articles"] as? [String] ?? []
 
 		// Require both a title and a body
 		if title.isEmpty || body.isEmpty {

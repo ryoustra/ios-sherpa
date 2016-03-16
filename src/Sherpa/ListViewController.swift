@@ -24,115 +24,81 @@
 
 import UIKit
 
-public class ListViewController: UITableViewController, UISearchControllerDelegate, UISearchResultsUpdating {
+internal class ListViewController: UITableViewController, UISearchControllerDelegate, UISearchResultsUpdating {
 
-	// MARK: Customising appearance
+	internal var allowSearch: Bool = true
 
-	//! Tint color used for indicating links.
-	public var tintColor: UIColor! = UINavigationBar.appearance().tintColor
-
-	//! Background color for article pages.
-	public var articleBackgroundColor: UIColor! = UIColor.whiteColor()
-
-	//! Text color for article pages.
-	public var articleTextColor: UIColor! = UIColor.darkTextColor()
-	
 	// MARK: Instance life cycle
 
-	private let _dataSource: SherpaDataSource
+	internal let dataSource: DataSource!
 
-	public init( fileAtURL fileURL: NSURL ) {
-		_dataSource = SherpaDataSource(fileAtURL: fileURL)
-
+	internal init(dataSource: DataSource!) {
+		self.dataSource = dataSource
 		super.init(style: .Grouped)
 	}
 
-	public required init?(coder aDecoder: NSCoder) {
+	internal required init?(coder aDecoder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 
 	deinit{
-		self._searchController.view.removeFromSuperview()
+		self.searchController?.view.removeFromSuperview()
 	}
 
 	// MARK: View life cycle
 
-	private let _searchController = UISearchController(searchResultsController: nil)
+	private var searchController: UISearchController?
 
-	override public func viewDidLoad() {
+	override internal func viewDidLoad() {
 		super.viewDidLoad()
 
 		self.navigationItem.title = "User Guide"
 
-		self.definesPresentationContext = true;
+		if self.allowSearch {
+			let searchController = UISearchController(searchResultsController: nil)
+			if #available(iOSApplicationExtension 9.1, *) {
+				searchController.obscuresBackgroundDuringPresentation = false
+			} else {
+				searchController.dimsBackgroundDuringPresentation = false
+			}
+			searchController.delegate = self
+			searchController.searchResultsUpdater = self
+			searchController.searchBar.tintColor = self.dataSource.document.tintColor
+			self.searchController = searchController
 
-		if #available(iOSApplicationExtension 9.1, *) {
-			self._searchController.obscuresBackgroundDuringPresentation = false
-		} else {
-			self._searchController.dimsBackgroundDuringPresentation = false
-		}
-		self._searchController.delegate = self
-		self._searchController.searchResultsUpdater = self
-		self._searchController.searchBar.tintColor = self.tintColor
+			// Sticking the searchBar inside a wrapper stops the tableview trying to be clever with the content size.
+			let headerView = UIView(frame: searchController.searchBar.frame)
+			headerView.addSubview(searchController.searchBar)
+			self.tableView.tableHeaderView = headerView
 
-		// Sticking the searchBar inside a wrapper stops the tableview trying to be clever with the content size.
-		let headerView = UIView(frame: self._searchController.searchBar.frame)
-		headerView.addSubview(self._searchController.searchBar)
-		self.tableView.tableHeaderView = headerView
-
-		self.tableView.dataSource = self._dataSource
-	}
-
-	// MARK: Table view delegate
-
-	override public func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-		return 44
-	}
-
-	override public func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-		guard let article = self._dataSource.article(indexPath) else {
-			return
+			self.definesPresentationContext = true;
 		}
 
-		let viewController = self._viewController(article)
-		self.navigationController?.pushViewController(viewController, animated: true)
-	}
-
-	override public func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-		if cell.accessoryType != .None {
-			cell.textLabel!.textColor = self.tintColor
-		}
+		self.tableView.dataSource = self.dataSource
+		self.tableView.delegate = self.dataSource
 	}
 
 	// MARK: Search results updating
 
-	public func updateSearchResultsForSearchController(searchController: UISearchController) {
+	internal func updateSearchResultsForSearchController(searchController: UISearchController) {
+		if !self.allowSearch { return }
+
 		if searchController.active, let query = searchController.searchBar.text where query.characters.count > 0 {
-			self._dataSource.query = query
+			self.dataSource.query = query
 		}
 		else {
-			self._dataSource.query = nil
+			self.dataSource.query = nil
 		}
+
 		self.tableView.reloadData()
 	}
 
 	// MARK: Utilities
 
-	var _selectedIndexPath: NSIndexPath?
-
 	internal func selectRowForArticle(article: Article) {
-		if let indexPath = self._dataSource.indexPath(article) {
-			_selectedIndexPath = indexPath
+		if let indexPath = self.dataSource.indexPath(article) {
 			self.tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .Middle)
 		}
 	}
 
-	private func _viewController(article: Article) -> ArticleViewController {
-		let viewController = ArticleViewController(article: article)
-		viewController.tintColor = self.tintColor
-		viewController.backgroundColor = self.articleBackgroundColor
-		viewController.textColor = self.articleTextColor
-		return viewController
-	}
-	
 }

@@ -24,18 +24,27 @@
 
 import UIKit
 
-public class SherpaViewController: UIViewController, UINavigationControllerDelegate {
+public class SherpaViewController: UIViewController, UINavigationControllerDelegate, DocumentDelegate {
 
 	// MARK: Customising appearance
 
 	//! Tint color used for indicating links.
-	public var tintColor: UIColor! = UINavigationBar.appearance().tintColor
+	public var tintColor: UIColor! {
+		get { return self._document.tintColor }
+		set(tintColor) { self._document.tintColor = tintColor }
+	}
 
 	//! Background color for article pages.
-	public var articleBackgroundColor: UIColor! = UIColor.whiteColor()
+	public var articleBackgroundColor: UIColor! {
+		get { return self._document.articleBackgroundColor }
+		set(articleBackgroundColor) { self._document.articleBackgroundColor = articleBackgroundColor }
+	}
 
 	//! Text color for article pages.
-	public var articleTextColor: UIColor! = UIColor.darkTextColor()
+	public var articleTextColor: UIColor! {
+		get { return self._document.articleTextColor }
+		set(articleTextColor) { self._document.articleTextColor = articleTextColor }
+	}
 
 	// MARK: Deep-linking
 
@@ -44,7 +53,7 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 
 	// MARK: Instance life cycle
 
-	private let _dataSource: SherpaDataSource
+	private let _document: Document
 
 	private let _listViewController: ListViewController
 
@@ -53,9 +62,14 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 	private var _navigationController: UINavigationController?
 
 	public init( fileAtURL fileURL: NSURL ) {
-		_dataSource = SherpaDataSource(fileAtURL: fileURL)
-		_listViewController = ListViewController(fileAtURL: fileURL)
+		let document = Document(fileAtURL: fileURL)
+
+		_document = document
+		_listViewController = ListViewController(dataSource: document.dataSource())
+
 		super.init(nibName: nil, bundle: nil)
+
+		document.delegate = self
 	}
 
 	public required init?(coder aDecoder: NSCoder) {
@@ -66,10 +80,6 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 
 	public override func viewWillAppear(animated: Bool) {
 		super.viewWillAppear(animated)
-
-		self._listViewController.tintColor = self.tintColor
-		self._listViewController.articleBackgroundColor = self.articleBackgroundColor
-		self._listViewController.articleTextColor = self.articleTextColor
 
 		if self.isBeingPresented() {
 			let navigationController = UINavigationController()
@@ -84,22 +94,18 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 			navigationController.view.preservesSuperviewLayoutMargins = true
 			navigationController.setViewControllers([self._listViewController], animated: false)
 
-			if let key = articleKey, let article = self._dataSource.article(key) {
+			if let key = articleKey, let article = self._document.article(key) {
 				self._listViewController.selectRowForArticle(article)
 
-				let articleViewController = ArticleViewController(article: article)
-				articleViewController.tintColor = self.tintColor
-				articleViewController.backgroundColor = self.articleBackgroundColor
-				articleViewController.textColor = self.articleTextColor
+				let dataSource = self._document.dataSource()
+				let articleViewController = ArticleViewController(dataSource:dataSource, article: article)
 				navigationController.pushViewController(articleViewController, animated: false)
 			}
 		}
 
-		else if let key = articleKey, let article = self._dataSource.article(key) {
-			let articleViewController = ArticleViewController(article: article)
-			articleViewController.tintColor = self.tintColor
-			articleViewController.backgroundColor = self.articleBackgroundColor
-			articleViewController.textColor = self.articleTextColor
+		else if let key = articleKey, let article = self._document.article(key) {
+			let dataSource = self._document.dataSource()
+			let articleViewController = ArticleViewController(dataSource:dataSource, article: article)
 			self._articleViewController = articleViewController
 
 			self.addChildViewController(articleViewController)
@@ -152,6 +158,14 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 		if viewController.navigationItem.rightBarButtonItem == nil {
 			viewController.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Done, target: self, action: "sherpa_dismiss")
 		}
+	}
+
+	// MARK: Document controller delegate
+
+	internal func document(document: Document, didSelectArticle article: Article) {
+		let dataSource = self._document.dataSource()
+		let articleViewController = ArticleViewController(dataSource:dataSource, article: article)
+		self._listViewController.navigationController?.pushViewController(articleViewController, animated: true)
 	}
 
 	// MARK: Utilities
