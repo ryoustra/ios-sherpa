@@ -99,11 +99,17 @@ internal class Document {
 
 			let json = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(rawValue: 0))
 
-			guard let array = json as? [[String:AnyObject]] else {
-				return
+			if let dictionary = json as? [String:AnyObject] {
+				feedbackEmail = dictionary["feedback_email"] as? String
+				feedbackTwitter = dictionary["feedback_twitter"] as? String
+
+				let entries = dictionary["entries"] as? [[String:AnyObject]] ?? []
+				sections = entries.map({ Section(dictionary: $0) }).flatMap({ $0 }) ?? []
 			}
 
-			sections = array.map({ Section(dictionary: $0) }).flatMap({ $0 }) ?? []
+			else if let array = json as? [[String:AnyObject]] {
+				sections = array.map({ Section(dictionary: $0) }).flatMap({ $0 }) ?? []
+			}
 		}
 		catch {
 			return
