@@ -53,7 +53,7 @@ internal class ArticleViewController: ListViewController {
 
 		self.navigationItem.title = nil
 
-		self.dataSource.sectionTitle = "Related Articles"
+		self.dataSource.sectionTitle = NSLocalizedString("Related", comment: "Title for table view section containing one or more related articles.")
 		self.dataSource.filter = { (article: Article) -> Bool in return article.key != nil && self.article.relatedKeys.contains(article.key!)  }
 
 		self.contentView.preservesSuperviewLayoutMargins = true

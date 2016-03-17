@@ -26,46 +26,57 @@ import UIKit
 
 public class SherpaViewController: UIViewController, UINavigationControllerDelegate, DocumentDelegate {
 
+	// MARK: Deep-linking
+
+	//! Key matching an article to be displayed.
+	public var articleKey: String? = nil
+
+	// MARK: Allowing feedback
+
+	//! Email address for receiving feedback.
+	public var feedbackEmail: String? {
+		get { return self.document.feedbackEmail }
+		set(feedbackEmail) { self.document.feedbackEmail = feedbackEmail }
+	}
+
+	//! Twitter account handle for receiving feedback.
+	public var feedbackTwitter: String? {
+		get { return self.document.feedbackTwitter }
+		set(feedbackTwitter) { self.document.feedbackTwitter = feedbackTwitter }
+	}
+
 	// MARK: Customising appearance
 
 	//! Tint color used for indicating links.
 	public var tintColor: UIColor! {
-		get { return self._document.tintColor }
-		set(tintColor) { self._document.tintColor = tintColor }
+		get { return self.document.tintColor }
+		set(tintColor) { self.document.tintColor = tintColor }
 	}
 
 	//! Background color for article pages.
 	public var articleBackgroundColor: UIColor! {
-		get { return self._document.articleBackgroundColor }
-		set(articleBackgroundColor) { self._document.articleBackgroundColor = articleBackgroundColor }
+		get { return self.document.articleBackgroundColor }
+		set(articleBackgroundColor) { self.document.articleBackgroundColor = articleBackgroundColor }
 	}
 
 	//! Text color for article pages.
 	public var articleTextColor: UIColor! {
-		get { return self._document.articleTextColor }
-		set(articleTextColor) { self._document.articleTextColor = articleTextColor }
+		get { return self.document.articleTextColor }
+		set(articleTextColor) { self.document.articleTextColor = articleTextColor }
 	}
-
-	// MARK: Deep-linking
-
-	/// Key matching an article to be displayed.
-	public var articleKey: String? = nil
 
 	// MARK: Instance life cycle
 
-	private let _document: Document
+	//! The Sherpa document.
+	private let document: Document
 
-	private let _listViewController: ListViewController
-
-	private var _articleViewController: ArticleViewController?
-
-	private var _navigationController: UINavigationController?
-
-	public init( fileAtURL fileURL: NSURL ) {
+	/// Creates a `SherpaViewController` instance for the file at the given file URL.
+	/// @param fileURL The local URL for the underlying JSON document containing the content.
+	public init(fileAtURL fileURL: NSURL) {
 		let document = Document(fileAtURL: fileURL)
 
-		_document = document
-		_listViewController = ListViewController(dataSource: document.dataSource())
+		self.document = document
+		self.listViewController = ListViewController(dataSource: document.dataSource())
 
 		super.init(nibName: nil, bundle: nil)
 
@@ -78,12 +89,22 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 
 	// MARK: View controller
 
-	public override func viewWillAppear(animated: Bool) {
-		super.viewWillAppear(animated)
+	//! View controller for displaying the list of available articles.
+	private let listViewController: ListViewController
 
-		if self.isBeingPresented() {
+	//! View controller for displaying a deep-linked article.
+	private var articleViewController: ArticleViewController?
+
+	//! Embedded navigation controller for modal presentation.
+	private var embeddedNavigationController: UINavigationController?
+	
+	public override func viewDidLoad() {
+		super.viewDidLoad()
+
+		// Presenting modally, sans-UINavigationController
+		if self.navigationController == nil {
 			let navigationController = UINavigationController()
-			self._navigationController = navigationController
+			self.embeddedNavigationController = navigationController
 
 			self.addChildViewController(navigationController)
 			self.view.addSubview(navigationController.view)
@@ -92,21 +113,22 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 			navigationController.view.frame = CGRect(origin: CGPointZero, size: self.view.frame.size)
 			navigationController.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
 			navigationController.view.preservesSuperviewLayoutMargins = true
-			navigationController.setViewControllers([self._listViewController], animated: false)
+			navigationController.setViewControllers([self.listViewController], animated: false)
 
-			if let key = articleKey, let article = self._document.article(key) {
-				self._listViewController.selectRowForArticle(article)
+			if let key = articleKey, let article = self.document.article(key) {
+				self.listViewController.selectRowForArticle(article)
 
-				let dataSource = self._document.dataSource()
+				let dataSource = self.document.dataSource()
 				let articleViewController = ArticleViewController(dataSource:dataSource, article: article)
 				navigationController.pushViewController(articleViewController, animated: false)
 			}
 		}
 
-		else if let key = articleKey, let article = self._document.article(key) {
-			let dataSource = self._document.dataSource()
+		// Pushing a deep-linked article into a navigation stack
+		else if let key = articleKey, let article = self.document.article(key) {
+			let dataSource = self.document.dataSource()
 			let articleViewController = ArticleViewController(dataSource:dataSource, article: article)
-			self._articleViewController = articleViewController
+			self.articleViewController = articleViewController
 
 			self.addChildViewController(articleViewController)
 			self.view.addSubview(articleViewController.view)
@@ -116,26 +138,15 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 			articleViewController.view.preservesSuperviewLayoutMargins = true
 		}
 
+		// Pushing into a navigation stack
 		else {
-			self.addChildViewController(self._listViewController)
-			self.view.addSubview(self._listViewController.view)
+			self.addChildViewController(self.listViewController)
+			self.view.addSubview(self.listViewController.view)
 
-			self._listViewController.view.frame = CGRect(origin: CGPointZero, size: self.view.frame.size)
-			self._listViewController.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-			self._listViewController.view.preservesSuperviewLayoutMargins = true
+			self.listViewController.view.frame = CGRect(origin: CGPointZero, size: self.view.frame.size)
+			self.listViewController.view.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+			self.listViewController.view.preservesSuperviewLayoutMargins = true
 		}
-	}
-
-	public override func viewDidDisappear(animated: Bool) {
-		super.viewDidDisappear(animated)
-
-		let activeViewController = self.sherpa_activeViewController()
-
-		activeViewController.view.removeFromSuperview()
-		activeViewController.removeFromParentViewController()
-
-		self._articleViewController = nil
-		self._navigationController = nil
 	}
 
 	public override var navigationItem: UINavigationItem {
@@ -163,22 +174,27 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 	// MARK: Document controller delegate
 
 	internal func document(document: Document, didSelectArticle article: Article) {
-		let dataSource = self._document.dataSource()
+		let dataSource = self.document.dataSource()
 		let articleViewController = ArticleViewController(dataSource:dataSource, article: article)
-		let navigationController = self._navigationController ?? self.navigationController
+		let navigationController = self.embeddedNavigationController ?? self.navigationController
 		navigationController!.pushViewController(articleViewController, animated: true)
+	}
+
+	internal func document(document: Document, didSelectViewController viewController: UIViewController) {
+		let navigationController = self.embeddedNavigationController ?? self.navigationController
+		navigationController!.presentViewController(viewController, animated: true, completion: nil)
 	}
 
 	// MARK: Utilities
 
 	private func sherpa_activeViewController() -> UIViewController {
-		if let viewController = self._navigationController {
+		if let viewController = self.embeddedNavigationController {
 			return viewController
 		}
-		else if let viewController = self._articleViewController {
+		else if let viewController = self.articleViewController {
 			return viewController
 		}
-		return self._listViewController
+		return self.listViewController
 	}
 
 	public func sherpa_dismiss() {

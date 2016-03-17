@@ -28,6 +28,8 @@ internal protocol DocumentDelegate {
 
 	func document(document: Document, didSelectArticle article: Article)
 
+	func document(document: Document, didSelectViewController viewController: UIViewController)
+
 }
 
 internal class Document {
@@ -42,6 +44,12 @@ internal class Document {
 
 	internal var articleTextColor: UIColor! = UIColor.darkTextColor()
 
+	// MARK: Feedback points.
+
+	internal var feedbackEmail: String? = nil
+
+	internal var feedbackTwitter: String? = nil
+	
 	// MARK: Instance life cycle
 
 	internal let fileURL: NSURL
@@ -74,6 +82,12 @@ internal class Document {
 	internal func didSelect(article: Article) {
 		if let delegate = self.delegate {
 			delegate.document(self, didSelectArticle: article)
+		}
+	}
+
+	internal func shouldPresent(viewController: UIViewController) {
+		if let delegate = self.delegate {
+			delegate.document(self, didSelectViewController: viewController)
 		}
 	}
 
@@ -182,5 +196,6 @@ internal struct Article {
 		
 		return false
 	}
-	
+
 }
+

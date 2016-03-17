@@ -23,8 +23,11 @@
 //
 
 import UIKit
+import MessageUI
+import Social
+import SafariServices
 
-internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate {
+internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate, MFMailComposeViewControllerDelegate {
 
 	// MARK: Instance life cycle
 
@@ -104,54 +107,137 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 		return nil
 	}
 
+	// MARK: Feedback
+
+	private var allowFeedback: Bool {
+		get{ return self.sectionTitle == nil && self.feedbackKeys.count > 0 }
+	}
+
+	private var indexOfFeedbackSection: Int? {
+		get{ return self.allowFeedback ? self.filteredSections.count : nil }
+	}
+
+	private var feedbackKeys: [String] = []
+
+	private func generateFeedbackSection() {
+		var feedbackKeys: [String] = []
+
+		if self.document.feedbackEmail != nil {
+			feedbackKeys.append("__email")
+		}
+
+		if self.document.feedbackTwitter != nil {
+			feedbackKeys.append("__twitter")
+		}
+
+		self.feedbackKeys = feedbackKeys
+	}
+
 	// MARK: Table view data source
 
 	@objc func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+		self.generateFeedbackSection()
+
+		if self.allowFeedback {
+			return self.filteredSections.count + 1
+		}
+
 		return self.filteredSections.count
 	}
 
 	@objc func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "_SherpaCell")
+		if section == self.indexOfFeedbackSection {
+			return self.feedbackKeys.count
+		}
 
 		return self.section(section)?.articles.count ?? 0
 	}
 
 	@objc func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+		if section == self.indexOfFeedbackSection {
+			return "Feedback"
+		}
+
 		return self.section(section)?.title
 	}
 
 	@objc func tableView(tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+		if section == self.indexOfFeedbackSection {
+			return nil
+		}
+
 		return self.section(section)?.detail
 	}
 
 	@objc func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("_SherpaCell", forIndexPath: indexPath)
+		let cell: UITableViewCell
 
-		guard let article = self.article(indexPath) else { return cell }
+		if indexPath.section == self.indexOfFeedbackSection {
+			let reuseIdentifier = "_SherpaFeedbackCell";
+			cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) ?? UITableViewCell(style: .Value1, reuseIdentifier: reuseIdentifier)
 
-		cell.accessoryType = .DisclosureIndicator
-		cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCallout)
-		cell.textLabel!.numberOfLines = 0
-		cell.textLabel!.text = article.title
+			let key = self.feedbackKeys[indexPath.row]
+			if key == "__email" {
+				var email = self.document.feedbackEmail!
 
-		if let query = self.query {
-			let attributedTitle = cell.textLabel?.attributedText as! NSMutableAttributedString
+				do {
+					let regex = try NSRegularExpression(pattern: "<([^>]+)>", options: [])
+					if let match = regex.firstMatchInString(email, options: [], range: NSMakeRange(0,email.characters.count)) {
+						email = (email as NSString).substringWithRange(match.rangeAtIndex(1))
+					}
+				}
+				catch {}
 
-			let bold = cell.textLabel!.font.fontDescriptor().fontDescriptorWithSymbolicTraits(.TraitBold)
+				cell.textLabel!.text = NSLocalizedString("Email", comment: "Label for email feedback button.")
+				cell.detailTextLabel!.text = email
 
-			var i = 0
-			while true {
-				let searchRange = NSMakeRange(i, article.title.characters.count-i)
-				let range = (article.title as NSString).rangeOfString(query, options: .CaseInsensitiveSearch, range: searchRange, locale: NSLocale.currentLocale())
-
-				if range.location == NSNotFound { break }
-
-				attributedTitle.addAttribute(NSFontAttributeName, value: UIFont(descriptor: bold, size: 0.0), range: range)
-
-				i = range.location + range.length
+				if MFMailComposeViewController.canSendMail() {
+					cell.textLabel!.textColor = self.document.tintColor
+				}
+				else {
+					cell.selectionStyle = .None
+				}
 			}
 
-			cell.textLabel!.attributedText = attributedTitle
+			else if key == "__twitter" {
+				cell.textLabel!.text = NSLocalizedString("Twitter", comment: "Label for Twitter feedback button.")
+				cell.detailTextLabel!.text = "@\(self.document.feedbackTwitter!)".stringByReplacingOccurrencesOfString("@@", withString: "@")
+
+				cell.textLabel!.textColor = self.document.tintColor
+			}
+		}
+
+		else {
+			let reuseIdentifier = "_SherpaArticleCell";
+			cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) ?? UITableViewCell(style: .Default, reuseIdentifier: reuseIdentifier)
+
+			guard let article = self.article(indexPath) else { return cell }
+
+			cell.accessoryType = .DisclosureIndicator
+			cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCallout)
+			cell.textLabel!.text = article.title
+			cell.textLabel!.textColor = self.document.tintColor
+			cell.textLabel!.numberOfLines = 0
+
+			if let query = self.query {
+				let attributedTitle = cell.textLabel?.attributedText as! NSMutableAttributedString
+
+				let bold = cell.textLabel!.font.fontDescriptor().fontDescriptorWithSymbolicTraits(.TraitBold)
+
+				var i = 0
+				while true {
+					let searchRange = NSMakeRange(i, article.title.characters.count-i)
+					let range = (article.title as NSString).rangeOfString(query, options: .CaseInsensitiveSearch, range: searchRange, locale: NSLocale.currentLocale())
+
+					if range.location == NSNotFound { break }
+
+					attributedTitle.addAttribute(NSFontAttributeName, value: UIFont(descriptor: bold, size: 0.0), range: range)
+
+					i = range.location + range.length
+				}
+
+				cell.textLabel!.attributedText = attributedTitle
+			}
 		}
 
 		return cell
@@ -164,17 +250,48 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 	}
 
 	func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-		guard let article = self.article(indexPath) else {
-			return
+		if indexPath.section == self.indexOfFeedbackSection {
+			let key = self.feedbackKeys[indexPath.row]
+
+			if key == "__email" && MFMailComposeViewController.canSendMail() {
+				let bundle = NSBundle.mainBundle()
+				let name = bundle.objectForInfoDictionaryKey("CFBundleDisplayName") ?? bundle.objectForInfoDictionaryKey("CFBundleName") ?? ""
+				let version = bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") ?? ""
+				let build = bundle.objectForInfoDictionaryKey("CFBundleVersion") ?? ""
+				let subject = "Feedback for \(name!) v\(version!) (\(build!))"
+
+				let viewController = MFMailComposeViewController()
+				viewController.mailComposeDelegate = self
+				viewController.setToRecipients([self.document.feedbackEmail!])
+				viewController.setSubject(subject)
+				self.document.shouldPresent(viewController)
+			}
+
+			else if key == "__twitter" {
+				let handle = self.document.feedbackTwitter!.stringByReplacingOccurrencesOfString("@", withString: "")
+
+				if SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter) {
+					let viewController = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
+					viewController.setInitialText("@\(handle) ")
+					self.document.shouldPresent(viewController)
+				}
+
+				else if let url = NSURL(string: "https://twitter.com/\(handle)") {
+					let viewController = SFSafariViewController(URL: url)
+					self.document.shouldPresent(viewController)
+				}
+			}
 		}
 
-		self.document.didSelect(article)
+		else if let article = self.article(indexPath) {
+			self.document.didSelect(article)
+		}
 	}
 
-	func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-		if cell.accessoryType != .None {
-			cell.textLabel!.textColor = self.document.tintColor
-		}
+	// MARK: Mail compose controller delegate
+
+	func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
+		controller.dismissViewControllerAnimated(true, completion: nil)
 	}
 
 }

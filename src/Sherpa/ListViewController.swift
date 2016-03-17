@@ -52,11 +52,11 @@ internal class ListViewController: UITableViewController, UISearchControllerDele
 	override internal func viewDidLoad() {
 		super.viewDidLoad()
 
-		self.navigationItem.title = "User Guide"
+		self.navigationItem.title = NSLocalizedString("User Guide", comment: "Title for view controller listing user guide articles.")
 
 		if self.allowSearch {
 			let searchController = UISearchController(searchResultsController: nil)
-			if #available(iOSApplicationExtension 9.1, *) {
+			if #available(iOS 9.1, *) {
 				searchController.obscuresBackgroundDuringPresentation = false
 			} else {
 				searchController.dimsBackgroundDuringPresentation = false
