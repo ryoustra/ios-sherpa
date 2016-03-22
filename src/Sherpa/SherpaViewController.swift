@@ -167,7 +167,7 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 
 	public func navigationController(navigationController: UINavigationController, willShowViewController viewController: UIViewController, animated: Bool) {
 		if viewController.navigationItem.rightBarButtonItem == nil {
-			viewController.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Done, target: self, action: "sherpa_dismiss")
+			viewController.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Done, target: self, action: #selector(SherpaViewController.sherpa_dismiss))
 		}
 	}
 
