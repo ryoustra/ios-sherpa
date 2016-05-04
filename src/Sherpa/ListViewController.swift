@@ -64,10 +64,12 @@ internal class ListViewController: UITableViewController, UISearchControllerDele
 			searchController.delegate = self
 			searchController.searchResultsUpdater = self
 			searchController.searchBar.tintColor = self.dataSource.document.tintColor
+			searchController.searchBar.autoresizingMask = [.FlexibleWidth]
 			self.searchController = searchController
 
 			// Sticking the searchBar inside a wrapper stops the tableview trying to be clever with the content size.
 			let headerView = UIView(frame: searchController.searchBar.frame)
+			headerView.autoresizingMask = [.FlexibleWidth]
 			headerView.addSubview(searchController.searchBar)
 			self.tableView.tableHeaderView = headerView
 
