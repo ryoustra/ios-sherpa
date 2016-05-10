@@ -203,7 +203,12 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 				cell.textLabel!.text = NSLocalizedString("Twitter", comment: "Label for Twitter feedback button.")
 				cell.detailTextLabel!.text = "@\(self.document.feedbackTwitter!)".stringByReplacingOccurrencesOfString("@@", withString: "@")
 
-				cell.textLabel!.textColor = self.document.tintColor
+				if #available(iOSApplicationExtension 9.0, *) {
+					cell.textLabel!.textColor = self.document.tintColor
+				}
+				else {
+					cell.selectionStyle = .None
+				}
 			}
 		}
 
@@ -214,7 +219,11 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 			guard let article = self.article(indexPath) else { return cell }
 
 			cell.accessoryType = .DisclosureIndicator
-			cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCallout)
+			if #available(iOSApplicationExtension 9.0, *) {
+				cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCallout)
+			} else {
+				cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
+			}
 			cell.textLabel!.text = article.title
 			cell.textLabel!.textColor = self.document.tintColor
 			cell.textLabel!.numberOfLines = 0
@@ -277,8 +286,10 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 				}
 
 				else if let url = NSURL(string: "https://twitter.com/\(handle)") {
-					let viewController = SFSafariViewController(URL: url)
-					self.document.shouldPresent(viewController)
+					if #available(iOSApplicationExtension 9.0, *) {
+						let viewController = SFSafariViewController(URL: url)
+						self.document.shouldPresent(viewController)
+					}
 				}
 			}
 		}

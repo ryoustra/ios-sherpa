@@ -24,7 +24,7 @@
 
 import UIKit
 
-internal class ListViewController: UITableViewController, UISearchControllerDelegate, UISearchResultsUpdating {
+internal class ListViewController: UIViewController, UISearchControllerDelegate, UISearchResultsUpdating {
 
 	internal var allowSearch: Bool = true
 
@@ -34,7 +34,7 @@ internal class ListViewController: UITableViewController, UISearchControllerDele
 
 	internal init(dataSource: DataSource!) {
 		self.dataSource = dataSource
-		super.init(style: .Grouped)
+		super.init(nibName: nil, bundle: nil)
 	}
 
 	internal required init?(coder aDecoder: NSCoder) {
@@ -48,6 +48,12 @@ internal class ListViewController: UITableViewController, UISearchControllerDele
 	// MARK: View life cycle
 
 	private var searchController: UISearchController?
+
+	internal let tableView = UITableView(frame: CGRectZero, style: .Grouped)
+
+	override func loadView() {
+		self.view = self.tableView
+	}
 
 	override internal func viewDidLoad() {
 		super.viewDidLoad()
@@ -63,6 +69,7 @@ internal class ListViewController: UITableViewController, UISearchControllerDele
 			}
 			searchController.delegate = self
 			searchController.searchResultsUpdater = self
+			searchController.searchBar.frame = CGRect(x: 0, y: 0, width: self.tableView.frame.width, height: 44.0)
 			searchController.searchBar.tintColor = self.dataSource.document.tintColor
 			searchController.searchBar.autoresizingMask = [.FlexibleWidth]
 			self.searchController = searchController

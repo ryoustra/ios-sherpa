@@ -59,7 +59,11 @@ internal class ArticleViewController: ListViewController {
 		self.contentView.preservesSuperviewLayoutMargins = true
 		self.contentView.translatesAutoresizingMaskIntoConstraints = false
 
-		self.titleLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleTitle2)
+		if #available(iOSApplicationExtension 9.0, *) {
+			self.titleLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleTitle2)
+		} else {
+			self.titleLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleHeadline)
+		}
 		self.titleLabel.textColor = self.dataSource.document.articleTextColor
 		self.titleLabel.translatesAutoresizingMaskIntoConstraints = false
 		self.titleLabel.numberOfLines = 0
