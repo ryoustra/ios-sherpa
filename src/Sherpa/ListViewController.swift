@@ -102,8 +102,11 @@ internal class ListViewController: UIViewController, UISearchControllerDelegate,
 		self.tableView.reloadData()
 	}
 
-	// MARK: Utilities
+	// MARK: Customising the table view
+	
 
+	// MARK: Utilities
+	
 	internal func selectRowForArticle(article: Article) {
 		if let indexPath = self.dataSource.indexPath(article) {
 			self.tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .Middle)

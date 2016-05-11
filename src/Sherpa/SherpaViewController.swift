@@ -65,6 +65,18 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 		set(articleTextColor) { self.document.articleTextColor = articleTextColor }
 	}
 
+	//! Register the class used to display article rows in the table view.
+	@objc(registerTableViewCellClassForArticleRows:)
+	public func registerTableViewCellClass(forArticleRows cellClass: UITableViewCell.Type) {
+		self.document.articleCellClass = cellClass
+	}
+	
+	//! Register the class used to display feedback rows in the table view.
+	@objc(registerTableViewCellClassForFeedbackRows:)
+	public func registerTableViewCellClass(forFeedbackRows cellClass: UITableViewCell.Type) {
+		self.document.feedbackCellClass = cellClass
+	}
+	
 	// MARK: Instance life cycle
 
 	//! The Sherpa document.

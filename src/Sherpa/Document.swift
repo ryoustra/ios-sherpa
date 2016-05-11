@@ -44,6 +44,10 @@ internal class Document {
 
 	internal var articleTextColor: UIColor! = UIColor.darkTextColor()
 
+	internal var articleCellClass = UITableViewCell.self
+
+	internal var feedbackCellClass = UITableViewCell.self
+
 	// MARK: Feedback points.
 
 	internal var feedbackEmail: String? = nil

@@ -174,7 +174,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 
 		if indexPath.section == self.indexOfFeedbackSection {
 			let reuseIdentifier = "_SherpaFeedbackCell";
-			cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) ?? UITableViewCell(style: .Value1, reuseIdentifier: reuseIdentifier)
+			cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) ?? self.document.feedbackCellClass.init(style: .Value1, reuseIdentifier: reuseIdentifier)
 
 			let key = self.feedbackKeys[indexPath.row]
 			if key == "__email" {
@@ -192,7 +192,9 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 				cell.detailTextLabel!.text = email
 
 				if MFMailComposeViewController.canSendMail() {
-					cell.textLabel!.textColor = self.document.tintColor
+					if self.document.feedbackCellClass === UITableViewCell.self {
+						cell.textLabel!.textColor = self.document.tintColor
+					}
 				}
 				else {
 					cell.selectionStyle = .None
@@ -204,7 +206,9 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 				cell.detailTextLabel!.text = "@\(self.document.feedbackTwitter!)".stringByReplacingOccurrencesOfString("@@", withString: "@")
 
 				if #available(iOSApplicationExtension 9.0, *) {
-					cell.textLabel!.textColor = self.document.tintColor
+					if self.document.feedbackCellClass === UITableViewCell.self {
+						cell.textLabel!.textColor = self.document.tintColor
+					}
 				}
 				else {
 					cell.selectionStyle = .None
@@ -214,19 +218,22 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 
 		else {
 			let reuseIdentifier = "_SherpaArticleCell";
-			cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) ?? UITableViewCell(style: .Default, reuseIdentifier: reuseIdentifier)
+			cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) ?? self.document.articleCellClass.init(style: .Default, reuseIdentifier: reuseIdentifier)
 
 			guard let article = self.article(indexPath) else { return cell }
 
 			cell.accessoryType = .DisclosureIndicator
-			if #available(iOSApplicationExtension 9.0, *) {
-				cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCallout)
-			} else {
-				cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
-			}
 			cell.textLabel!.text = article.title
-			cell.textLabel!.textColor = self.document.tintColor
 			cell.textLabel!.numberOfLines = 0
+
+			if self.document.articleCellClass === UITableViewCell.self {
+				if #available(iOSApplicationExtension 9.0, *) {
+					cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCallout)
+				} else {
+					cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
+				}
+				cell.textLabel!.textColor = self.document.tintColor
+			}
 
 			if let query = self.query {
 				let attributedTitle = cell.textLabel?.attributedText as! NSMutableAttributedString
