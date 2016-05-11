@@ -6,6 +6,6 @@ Pod::Spec.new do |s|
   s.license      = { :type => 'BSD', :file => 'LICENSE' }
   s.author       = { "Daniel Farrelly" => "daniel@jellystyle.com" }
   s.source       = { :git => "https://github.com/jellybeansoup/ios-sherpa.git", :tag => "v#{spec.version}" }
-  s.platform     = :ios, '9.0'
+  s.platform     = :ios, '8.4'
   s.source_files = 'src/Sherpa/*.{swift,h}'
 end
