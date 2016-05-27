@@ -90,6 +90,10 @@ internal class ListViewController: UIViewController, UISearchControllerDelegate,
 	override func viewWillAppear(animated: Bool) {
 		super.viewWillAppear(animated)
 
+		if let indexPath = self.tableView.indexPathForSelectedRow {
+			self.tableView.deselectRowAtIndexPath(indexPath, animated: animated)
+		}
+
 		if let searchController = self.searchController where searchController.active {
 			self.navigationController?.setNavigationBarHidden(true, animated: false)
 		}
