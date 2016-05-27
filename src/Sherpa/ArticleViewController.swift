@@ -102,6 +102,12 @@ internal class ArticleViewController: ListViewController {
 		}
 	}
 
+	override func viewWillAppear(animated: Bool) {
+		super.viewWillAppear(animated)
+
+		self.navigationController?.setNavigationBarHidden(false, animated: false)
+	}
+
 	override func viewDidLayoutSubviews() {
 		let header = self.contentView
 		if header.superview == nil || CGRectGetWidth(header.frame) != CGRectGetWidth(header.superview!.frame) {
