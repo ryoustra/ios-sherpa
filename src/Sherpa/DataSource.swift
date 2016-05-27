@@ -222,10 +222,6 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 
 			guard let article = self.article(indexPath) else { return cell }
 
-			cell.accessoryType = .DisclosureIndicator
-			cell.textLabel!.text = article.title
-			cell.textLabel!.numberOfLines = 0
-
 			if self.document.articleCellClass === UITableViewCell.self {
 				if #available(iOSApplicationExtension 9.0, *) {
 					cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCallout)
@@ -235,9 +231,12 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 				cell.textLabel!.textColor = self.document.tintColor
 			}
 
-			if let query = self.query {
-				let attributedTitle = cell.textLabel?.attributedText as! NSMutableAttributedString
+			cell.accessoryType = .DisclosureIndicator
+			cell.textLabel!.numberOfLines = 0
 
+			let attributedTitle = NSMutableAttributedString(string: article.title)
+
+			if let query = self.query {
 				let bold = cell.textLabel!.font.fontDescriptor().fontDescriptorWithSymbolicTraits(.TraitBold)
 
 				var i = 0
@@ -251,9 +250,9 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 
 					i = range.location + range.length
 				}
-
-				cell.textLabel!.attributedText = attributedTitle
 			}
+
+			cell.textLabel!.attributedText = attributedTitle
 		}
 
 		return cell
