@@ -237,7 +237,12 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 			let attributedTitle = NSMutableAttributedString(string: article.title)
 
 			if let query = self.query {
+				var foregroundColor = cell.textLabel!.textColor
 				let bold = cell.textLabel!.font.fontDescriptor().fontDescriptorWithSymbolicTraits(.TraitBold)
+
+				var alpha: CGFloat = 0
+				foregroundColor.getRed(nil, green: nil, blue: nil, alpha: &alpha)
+				attributedTitle.addAttribute(NSForegroundColorAttributeName, value: foregroundColor.colorWithAlphaComponent(0.85), range: NSMakeRange(0, attributedTitle.length))
 
 				var i = 0
 				while true {
@@ -247,6 +252,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 					if range.location == NSNotFound { break }
 
 					attributedTitle.addAttribute(NSFontAttributeName, value: UIFont(descriptor: bold, size: 0.0), range: range)
+					attributedTitle.addAttribute(NSForegroundColorAttributeName, value: foregroundColor, range: range)
 
 					i = range.location + range.length
 				}
