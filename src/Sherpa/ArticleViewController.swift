@@ -46,7 +46,7 @@ internal class ArticleViewController: ListViewController {
 
 	internal let titleLabel: UILabel! = UILabel()
 
-	internal let bodyLabel: UILabel! = UILabel()
+	internal let bodyView: UITextView! = UITextView()
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -73,33 +73,17 @@ internal class ArticleViewController: ListViewController {
 			self.titleLabel.text = title
 		}
 
-		self.bodyLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
-		self.bodyLabel.textColor = self.dataSource.document.articleTextColor
-		self.bodyLabel.translatesAutoresizingMaskIntoConstraints = false
-		self.bodyLabel.numberOfLines = 0
-		self.contentView.addSubview(self.bodyLabel)
+		self.bodyView.backgroundColor = UIColor.clearColor()
+		self.bodyView.editable = false
+		self.bodyView.font = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
+		self.bodyView.textColor = self.dataSource.document.articleTextColor
+		self.bodyView.tintColor = self.dataSource.document.tintColor
+		self.bodyView.translatesAutoresizingMaskIntoConstraints = false
+		self.bodyView.textContainer.lineFragmentPadding = 0
+		self.bodyView.textContainerInset = UIEdgeInsetsZero
+		self.contentView.addSubview(self.bodyView)
 
-		if var body = self.article.body {
-			while let range = body.rangeOfString("\n") {
-				body.replaceRange(range, with: "<br />")
-			}
-
-			if let data = body.dataUsingEncoding(NSUnicodeStringEncoding, allowLossyConversion: false) {
-				do {
-					let attributedText = try NSMutableAttributedString(data: data, options: [NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType], documentAttributes: nil)
-					attributedText.enumerateAttributesInRange(NSMakeRange(0,attributedText.length), options: [], usingBlock: { attributes, range, stop in
-						var mutable = attributes
-						let symbolicTraits = (mutable[NSFontAttributeName] as! UIFont).fontDescriptor().symbolicTraits
-						let descriptor = self.bodyLabel.font.fontDescriptor().fontDescriptorWithSymbolicTraits(symbolicTraits)
-						mutable[NSFontAttributeName] = UIFont(descriptor: descriptor, size: self.bodyLabel.font.pointSize)
-						mutable[NSForegroundColorAttributeName] = self.bodyLabel.textColor
-						attributedText.setAttributes(mutable, range: range)
-					})
-					self.bodyLabel.attributedText = attributedText
-				}
-				catch {}
-			}
-		}
+		self.bodyView.attributedText = self._applyAttributes(toString: self.article.body)
 	}
 
 	override func viewWillAppear(animated: Bool) {
@@ -116,13 +100,71 @@ internal class ArticleViewController: ListViewController {
 
 			let maxSize = CGSize(width: width - margins.left - margins.right, height: CGFloat.max)
 			let titleSize = self.titleLabel.sizeThatFits(maxSize)
-			let bodySize = self.bodyLabel.sizeThatFits(maxSize)
+			let bodySize = self.bodyView.sizeThatFits(maxSize)
 
 			self.titleLabel.frame = CGRect(x: margins.left, y: 30, width: maxSize.width, height: titleSize.height)
-			self.bodyLabel.frame = CGRect(x: margins.left, y: CGRectGetMaxY(self.titleLabel.frame) + 15, width: maxSize.width, height: bodySize.height)
-			header.frame = CGRect(x: 0, y: 0, width: width, height: CGRectGetMaxY(self.bodyLabel.frame))
+			self.bodyView.frame = CGRect(x: margins.left, y: CGRectGetMaxY(self.titleLabel.frame) + 15, width: maxSize.width, height: bodySize.height)
+			header.frame = CGRect(x: 0, y: 0, width: width, height: CGRectGetMaxY(self.bodyView.frame))
 
 			self.tableView.tableHeaderView = header
+		}
+	}
+
+	@_semantics("optimize.sil.never")
+	private func _applyAttributes(toString string: String?) -> NSAttributedString? {
+		guard let string = string else {
+			return nil
+		}
+
+		var mutable = string
+
+		while let range = mutable.rangeOfString("\n") {
+			mutable.replaceRange(range, with: "<br />")
+		}
+
+		guard let data = mutable.dataUsingEncoding(NSUnicodeStringEncoding, allowLossyConversion: false) else {
+			return nil
+		}
+
+		do {
+			let attributedText = try NSMutableAttributedString(data: data, options: [NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType], documentAttributes: nil)
+
+			attributedText.beginEditing()
+			attributedText.enumerateAttributesInRange(NSMakeRange(0,attributedText.length), options: [], usingBlock: { attributes, range, stop in
+				var mutable = attributes
+
+				if let font = mutable[NSFontAttributeName] as? UIFont {
+					let symbolicTraits = font.fontDescriptor().symbolicTraits
+					let descriptor = self.bodyView.font!.fontDescriptor().fontDescriptorWithSymbolicTraits(symbolicTraits)
+
+					if font.familyName == "Times New Roman" {
+						mutable[NSFontAttributeName] = UIFont(descriptor: descriptor, size: self.bodyView.font!.pointSize)
+					}
+
+					else {
+						mutable[NSFontAttributeName] = font.fontWithSize(self.bodyView.font!.pointSize)
+					}
+				}
+
+
+				if let link = mutable[NSLinkAttributeName] {
+					mutable[NSForegroundColorAttributeName] = self.bodyView.tintColor
+					mutable[NSStrokeColorAttributeName] = self.bodyView.tintColor
+				}
+
+				else {
+					mutable[NSForegroundColorAttributeName] = self.bodyView.textColor
+				}
+
+				attributedText.setAttributes(mutable, range: range)
+			})
+			attributedText.endEditing()
+
+			return attributedText
+		}
+
+		catch {
+			return nil
 		}
 	}
 
