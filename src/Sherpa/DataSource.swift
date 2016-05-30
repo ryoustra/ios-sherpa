@@ -237,7 +237,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 			let attributedTitle = NSMutableAttributedString(string: article.title)
 
 			if let query = self.query {
-				var foregroundColor = cell.textLabel!.textColor
+				let foregroundColor = cell.textLabel!.textColor
 				let bold = cell.textLabel!.font.fontDescriptor().fontDescriptorWithSymbolicTraits(.TraitBold)
 
 				var alpha: CGFloat = 0

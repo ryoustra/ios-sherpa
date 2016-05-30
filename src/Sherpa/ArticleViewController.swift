@@ -147,7 +147,7 @@ internal class ArticleViewController: ListViewController {
 				}
 
 
-				if let link = mutable[NSLinkAttributeName] {
+				if mutable[NSLinkAttributeName] != nil {
 					mutable[NSForegroundColorAttributeName] = self.bodyView.tintColor
 					mutable[NSStrokeColorAttributeName] = self.bodyView.tintColor
 				}
