@@ -138,7 +138,7 @@ internal class ArticleViewController: ListViewController {
 					let descriptor = self.bodyView.font!.fontDescriptor().fontDescriptorWithSymbolicTraits(symbolicTraits)
 
 					if font.familyName == "Times New Roman" {
-						mutable[NSFontAttributeName] = UIFont(descriptor: descriptor, size: self.bodyView.font!.pointSize)
+						mutable[NSFontAttributeName] = UIFont(descriptor: descriptor!, size: self.bodyView.font!.pointSize)
 					}
 
 					else {

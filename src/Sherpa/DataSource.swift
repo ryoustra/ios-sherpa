@@ -251,7 +251,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 
 					if range.location == NSNotFound { break }
 
-					attributedTitle.addAttribute(NSFontAttributeName, value: UIFont(descriptor: bold, size: 0.0), range: range)
+					attributedTitle.addAttribute(NSFontAttributeName, value: UIFont(descriptor: bold!, size: 0.0), range: range)
 					attributedTitle.addAttribute(NSForegroundColorAttributeName, value: foregroundColor, range: range)
 
 					i = range.location + range.length
