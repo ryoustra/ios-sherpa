@@ -97,9 +97,33 @@ internal class ListViewController: UIViewController, UISearchControllerDelegate,
 		if let searchController = self.searchController where searchController.active {
 			self.navigationController?.setNavigationBarHidden(true, animated: false)
 		}
-	}
 
-	// MARK: Search results updating
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(onKeyboard(_:)), name: UIKeyboardWillShowNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(onKeyboard(_:)), name: UIKeyboardWillHideNotification, object: nil)
+    }
+
+    @objc private func onKeyboard(notification: NSNotification) {
+        UIView.beginAnimations(nil, context: nil)
+
+        if let rawValue = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey]?.integerValue, let curve = UIViewAnimationCurve(rawValue: rawValue) {
+            UIView.setAnimationCurve(curve)
+        }
+
+        if let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey]?.doubleValue {
+            UIView.setAnimationDuration(duration)
+        }
+
+        let keyboardOrigin = notification.userInfo?[UIKeyboardFrameEndUserInfoKey]?.CGRectValue.origin.y ?? 0
+        
+        let contentInset = self.tableView.contentInset
+        let bottomInset = max(contentInset.bottom, self.tableView.frame.size.height - keyboardOrigin)
+        
+        self.tableView.contentInset = UIEdgeInsets(top: contentInset.top, left: contentInset.left, bottom: bottomInset, right: contentInset.right)
+
+        UIView.commitAnimations()
+    }
+
+    // MARK: Search results updating
 
 	internal func updateSearchResultsForSearchController(searchController: UISearchController) {
 		if !self.allowSearch { return }
