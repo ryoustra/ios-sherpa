@@ -1,0 +1,6 @@
+language: swift
+osx_image: xcode8.1
+xcode_project: Sherpa.xcodeproj
+xcode_scheme: SherpaTests
+xcode_sdk:
+- iphonesimulator

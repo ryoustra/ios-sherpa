@@ -28,7 +28,26 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A1CF09F91DF8D65400D13E21"
+               BuildableName = "SherpaTests.xctest"
+               BlueprintName = "SherpaTests"
+               ReferencedContainer = "container:Sherpa.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "A1A787371C7BED9C0095A0EF"
+            BuildableName = "Sherpa.framework"
+            BlueprintName = "Sherpa"
+            ReferencedContainer = "container:Sherpa.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>

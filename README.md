@@ -2,6 +2,8 @@
 
 A drop-in solution for displaying a user guide in an iOS app, based on a JSON template.
 
+[![Build Status](https://travis-ci.org/jellybeansoup/ios-sherpa.svg?branch=master)](https://travis-ci.org/jellybeansoup/ios-sherpa)
+
 ## Released under the BSD License
 
 Copyright © 2016 Daniel Farrelly

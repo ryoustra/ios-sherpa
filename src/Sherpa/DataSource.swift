@@ -57,7 +57,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 		didSet{ self.applyFilter() }
 	}
 
-	private var filteredSections: [Section] = []
+	internal var filteredSections: [Section] = []
 
 	private func applyFilter() {
 		var sections = self.sections

@@ -56,15 +56,25 @@ internal class Document {
 	
 	// MARK: Instance life cycle
 
-	internal let fileURL: NSURL
+	internal let fileURL: NSURL?
 
 	internal var sections: [Section] = []
 
-	internal init(fileAtURL fileURL: NSURL) {
-		self.fileURL = fileURL
-		self._loadFromFile()
-	}
-
+    internal init(fileAtURL fileURL: NSURL) {
+        self.fileURL = fileURL
+        self._loadFromFile()
+    }
+    
+    internal init(dictionary: [String: AnyObject]) {
+        self.fileURL = nil
+        self._load(from: dictionary)
+    }
+    
+    internal init(array: [[String: AnyObject]]) {
+        self.fileURL = nil
+        self._load(from: array)
+    }
+    
 	// MARK: Retrieving content
 
 	internal func section(index: Int) -> Section? {
@@ -97,115 +107,35 @@ internal class Document {
 
 	private func _loadFromFile() {
 		do {
-			guard let data = NSData(contentsOfURL: self.fileURL) else {
+			guard let fileURL = self.fileURL, let data = NSData(contentsOfURL: fileURL) else {
 				return
 			}
 
 			let json = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(rawValue: 0))
 
 			if let dictionary = json as? [String:AnyObject] {
-				feedbackEmail = dictionary["feedback_email"] as? String
-				feedbackTwitter = dictionary["feedback_twitter"] as? String
-
-				let entries = dictionary["entries"] as? [[String:AnyObject]] ?? []
-				sections = entries.map({ Section(dictionary: $0) }).flatMap({ $0 }) ?? []
+                self._load(from: dictionary)
 			}
 
 			else if let array = json as? [[String:AnyObject]] {
-				sections = array.map({ Section(dictionary: $0) }).flatMap({ $0 }) ?? []
+                self._load(from: array)
 			}
 		}
 		catch {
 			return
 		}
-	}
-
+    }
+    
+    private func _load(from dictionary: [String:AnyObject]) {
+        feedbackEmail = dictionary["feedback_email"] as? String
+        feedbackTwitter = dictionary["feedback_twitter"] as? String
+        
+        let entries = dictionary["entries"] as? [[String:AnyObject]] ?? []
+        self._load(from: entries)
+    }
+    
+    private func _load(from array: [[String:AnyObject]]) {
+        sections = array.map({ Section(dictionary: $0) }).flatMap({ $0 }) ?? []
+    }
+    
 }
-
-internal struct Section {
-
-	let title: String?
-
-	let detail: String?
-
-	let articles: [Article]!
-
-	private init(dictionary: [String: AnyObject]) {
-		self.title = dictionary["title"] as? String
-		self.detail = dictionary["detail"] as? String
-		self.articles = (dictionary["articles"] as? [[String: AnyObject]])?.map({ Article(dictionary: $0) }).flatMap({ $0 }) ?? []
-	}
-
-	internal init(title: String?, detail: String?, articles: [Article]!) {
-		self.title = title
-		self.detail = detail
-		self.articles = articles
-	}
-
-	internal func section(@noescape filter: (Article) -> Bool) -> Section? {
-		let articles = self.articles.filter(filter)
-
-		if articles.count == 0 { return nil }
-
-		return Section(title: self.title, detail: self.detail, articles: articles)
-	}
-
-	internal func section(query: String) -> Section? {
-		return self.section({ return $0.matches(query) })
-	}
-
-}
-
-internal struct Article {
-
-	let key: String?
-
-	let title: String!
-
-	let body: String!
-
-	let buildMin: Int!
-
-	let buildMax: Int!
-
-	let relatedKeys: [String]!
-
-	private init?(dictionary: [String: AnyObject]) {
-		self.key = dictionary["key"] as? String
-		self.title = dictionary["title"] as? String ?? ""
-		self.body = dictionary["body"] as? String ?? ""
-		self.buildMin = dictionary["build_min"] as? Int ?? 0
-		self.buildMax = dictionary["build_max"] as? Int ?? Int.max
-		self.relatedKeys = dictionary["related_articles"] as? [String] ?? []
-
-		// Require both a title and a body
-		if title.isEmpty || body.isEmpty {
-			return nil
-		}
-
-		// Compare to the build number
-		if let build = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleVersion") as? String where Int(build) < buildMin && Int(build) > buildMax {
-			return nil
-		}
-	}
-
-	internal func matches(query: String) -> Bool {
-		if query.isEmpty {
-			return true
-		}
-
-		let lowercaseQuery = query.lowercaseString
-
-		if self.title.lowercaseString.rangeOfString(lowercaseQuery) != nil {
-			return true
-		}
-			
-		else if self.body.lowercaseString.rangeOfString(lowercaseQuery) != nil {
-			return true
-		}
-		
-		return false
-	}
-
-}
-
