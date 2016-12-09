@@ -128,15 +128,15 @@ class DocumentTests: XCTestCase {
         
         let article = document.sections[0].articles[0]
         document.didSelect(article)
-        XCTAssertNotNil(delegate.document, "")
-        XCTAssertNotNil(delegate.article, "")
-        XCTAssertNil(delegate.viewController, "")
+        XCTAssertNotNil(delegate.document, "Document provided to delegate should match the calling document.")
+        XCTAssertNotNil(delegate.article, "Article provided to the delegate should match the one provided to `didSelect`.")
+        XCTAssertNil(delegate.viewController, "View controller should not be present after call to `didSelect`.")
 
         let viewController = UIViewController()
         document.shouldPresent(viewController)
-        XCTAssertNotNil(delegate.document, "")
-        XCTAssertNotNil(delegate.viewController, "")
-        XCTAssertNil(delegate.article, "")
+        XCTAssertNotNil(delegate.document, "Document provided to delegate should match the calling document.")
+        XCTAssertNotNil(delegate.viewController, "View controller provided to the delegate should match the one provided to `shouldPresent`.")
+        XCTAssertNil(delegate.article, "Article should not be present after call to `shouldPresent`.")
     }
     
     private class DocumentTestDelegate: DocumentDelegate {
