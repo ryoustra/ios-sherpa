@@ -2,7 +2,8 @@
 
 A drop-in solution for displaying a user guide in an iOS app, based on a JSON template.
 
-[![Build Status](https://travis-ci.org/jellybeansoup/ios-sherpa.svg?branch=master)](https://travis-ci.org/jellybeansoup/ios-sherpa)
+[![Build Status](https://travis-ci.org/jellybeansoup/ios-sherpa.svg?branch=master)](https://travis-ci.org/jellybeansoup/ios-sherpa) [![codecov](https://codecov.io/gh/jellybeansoup/ios-sherpa/branch/master/graph/badge.svg)](https://codecov.io/gh/jellybeansoup/ios-sherpa)
+
 
 ## Released under the BSD License
 
