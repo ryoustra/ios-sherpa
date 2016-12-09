@@ -1,57 +1,92 @@
-[
-	{
-		"title": "General",
-		"detail": null,
-		"articles": [
-			{
-				"key": "setting-up",
-				"title": "How do I set up Other?",
-				"body": "The main thing you need to do is select a contact from your address book. Once that's done, the app swings into action using some basic defaults, such as the first available phone number, and some simple messages.\n\nTo change the numbers used by the call or messaging shortcuts, tap the corresponding item in Settings, and then select the number you want to use.\n\nIf you have a valid number selected for the messages option, you'll also be able to customise the message shortcuts, which can be edited, re-ordered and removed completely, should you feel the need.\n\nThese simple settings manage all of the interactions the app has to offer, and all changes are saved as soon as you make them.",
-				"build_min": null,
-				"build_max": null
-			},
-		]
-	},
-	{
-		"title": "Messages",
-		"detail": null,
-		"articles": [
-			{
-				"title": "Why isn't the number I use to message my other available as an option?",
-				"body": "The options available for the Message number are limited to numbers on the contact labelled as either mobile/cell numbers, iPhone numbers, or email addresses associated with Apple IDs. If the number you wish to use isn't available as an option, you may need to go to Contacts.app and change the label for the number you wish to use to one of these options.",
-				"build_min": null,
-				"build_max": null
-			},
-			{
-				"title": "Why do I still have to press Send when I use one of the message shortcuts?",
-				"body": "Apple limits third-party access to certain functionality in iOS for security purposes. One such limitation is that in order to send an iMessage, apps must present a screen that allows the user to send the message.\n\nSadly, this means that using the message shortcuts in Other is a two step process, and after selecting one in the app, you'll need to press Send to instruct Messages to actually send the message.",
-				"build_min": null,
-				"build_max": null
-			},
-		]
-	},
-	{
-		"title": "Extensions",
-		"detail": null,
-		"articles": [
-			{
-				"title": "How do I find the share extension?",
-				"body": "When sharing an item, scroll the second row of icons to the far right until you reach the \"More\" option.\n\nTap this, and then find \"Send to Other\" in the list that appears. Switch the toggle beside it to the on position to enable the share extension.\n\nWhen you are finished, press the \"Done\" button at the top of the screen, and you'll be returned to the sharing screen thet you started with.",
-				"build_min": null,
-				"build_max": null
-			},
-		]
-	},
-	{
-		"title": "3D Touch",
-		"detail": null,
-		"articles": [
-			{
-				"title": "Why are my 3D touch shortcuts showing in the opposite order to how I've set them up?",
-				"body": "If you've placed the icon for Other in the lower half of your home screen, the menu opens in reverse so that the top most item is closest to the icon.\n\nTo work around this, you can either place the icon in the top half of the screen, or arrange your messages so they appear in the reverse order in-app.",
-				"build_min": null,
-				"build_max": null
-			}
-		]
-	}
-]
+{
+	"feedback_email": "Example Support <support@example.com>",
+	"feedback_twitter": "@example_support",
+	"entries": [
+		{
+			"title": "Sections",
+			"detail": "Sections will not be displayed if they don't have at least one valid article defined (see below), but section titles and detail text are optional.",
+			"articles": [
+				{
+					"key": "section-title",
+					"title": "Title",
+					"body": "A section's title may be a string of any length. These are displayed to the user in the article list, at the top of the section itself.",
+					"related_articles": ["detail", "articles"]
+				},
+				{
+					"key": "detail",
+					"title": "Detail",
+					"body": "A section's detail string may be a string of any length. These are displayed to the user in the article list, at the bottom of the section itself.",
+					"related_articles": ["section-title", "articles"]
+				},
+				{
+					"key": "articles",
+					"title": "Articles",
+					"body": "Sections are groups of articles, which are defined as part of the section itself within the JSON as an array of dictionary values. They are displayed to the user as rows within the article list (which just display the title), and can be opened to show more information (by way of the body text), as well as related articles.",
+					"related_articles": ["detail", "section-title"]
+				}
+			]
+		},
+		{
+			"title": "Articles",
+			"detail": "For articles to be considered valid, they must contain both a title and body value. If these are not present, the article will be ignored. All other properties are optional.",
+			"articles": [
+				{
+					"key": "key",
+					"title": "Keys",
+					"body": "Keys are used to deep-link to articles with <code>SherpaViewController</code>, and to identify related articles. They may be strings of any length. Empty, null, or invalid values (such as numbers) will result in no key being applied to the article.\n\nThis article has a key of \"key\", but any string value should result in a key that can be used to identify the article.",
+					"related_articles": ["article-title", "body", "minimum-build", "maximum-build", "related-articles"]
+				},
+				{
+					"key": "article-title",
+					"title": "Titles",
+					"body": "An article's title may be a string of any length. These are displayed to the user in the article list, at the top of the article itself, and are used to match against queries when the user searches for a specific term.",
+					"related_articles": ["key", "body", "minimum-build", "maximum-build", "related-articles"]
+				},
+				{
+					"key": "body",
+					"title": "Body Content",
+					"body": "The body of an article may be a string of any length, and can contain basic HTML markup (such as <code>&lt;a&gt;</code>, <code>&lt;strong&gt;</code> or <code>&lt;em&gt;</code>) which is converted for display when viewing the article.",
+					"related_articles": ["key", "article-title", "minimum-build", "maximum-build", "related-articles"]
+				},
+				{
+					"key": "minimum-build",
+					"title": "Build Numbers",
+					"body": "The minimum and maximum build numbers are used to automatically ignore articles when an app's build number (<code>CFBundleVersion</code> in its Info.plist) does not match the article's provide values. They must be specified as integer values (or numeric strings, if necessary), and will be automatically ignored, regardless of user queries.\n\nIf an article has a maximum build set, it will be ignored unless the container app's build number is set to a number <em>less than or equal to</em> the specified value.\n\nThis article has a minimum build of \"10\", which will cause it to be ignored unless the container app's build number is set to a number <em>greater than or equal to</em> 10.",
+					"build_min": 10,
+					"related_articles": ["key", "article-title", "body", "maximum-build", "related-articles"]
+				},
+				{
+					"key": "maximum-build",
+					"title": "Build Numbers",
+					"body": "The minimum and maximum build numbers are used to automatically ignore articles when an app's build number (<code>CFBundleVersion</code> in its Info.plist) does not match the article's provide values. They must be specified as integer values (or numeric strings, if necessary), and will be automatically ignored, regardless of user queries.\n\nIf an article has a minimum build set, it will be ignored unless the container app's build number is set to a number <em>greater than or equal to</em> the specified value.\n\nThis article has a maximum build of \"9\", which will cause it to be ignored unless the container app's build number is set to a number <em>less than or equal to</em> 9.",
+					"build_max": 9,
+					"related_articles": ["key", "article-title", "body", "minimum-build", "related-articles"]
+				},
+				{
+					"key": "related-articles",
+					"title": "Related Articles",
+					"body": "Articles can have one or more related articles, which are linked at the bottom of the article view. To specify these, an array containing keys for each article to be linked can be provided (or a single article's key maybe provided as a string). These will automatically be displayed in a \"Related Articles\" section, as seen below, and on all of the other articles within this section.",
+					"related_articles": ["key", "article-title", "body", "minimum-build", "maximum-build"]
+				}
+			]
+		},
+		{
+			"title": "Enabling Feedback",
+			"detail": "To enable the feedback section (as seen below), one or both of these properties must be set within the JSON used for the content source.",
+			"articles": [
+				{
+					"key": "feedback-email",
+					"title": "Email",
+					"body": "The feedback email is displayed to the user at the bottom of the article list, in a dedicated \"Feedback\" section. If sending email is enabled on their device, the user can tap to automatically open a compose screen, with the app's name, marketing version and build number pre-filled in the subject line of the email.\n\nThe provided values are lightly filtered, allowing an email address on its own (i.e. \"support@example.com\"), and can also support a display name (i.e. \"Example Support &lt;support@example.com&gt;\", as seen in the example JSON). Other values will cause the setting to be ignored.",
+					"related_articles": ["feedback-twitter"]
+				},
+				{
+					"key": "feedback-twitter",
+					"title": "Twitter",
+					"body": "The feedback Twitter handle is displayed to the user at the bottom of the article list, in a dedicated \"Feedback\" section. If their Twitter account is enabled on their device, the user can tap to automatically open the \"tweet sheet\", with the Twitter handle automatically specified.\n\nThe provided values are lightly filtered, and should allow any valid mention string (letters, numbers and underscores), which can optionally begin with the @ symbol (i.e. \"@example_support\", as seen in the example JSON). Other values will cause the setting to be ignored.",
+					"related_articles": ["feedback-email"]
+				}
+			]
+		}
+	]
+}
