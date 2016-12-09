@@ -42,10 +42,30 @@ internal struct Article {
         self.key = dictionary["key"] as? String
         self.title = dictionary["title"] as? String ?? ""
         self.body = dictionary["body"] as? String ?? ""
-        self.buildMin = dictionary["build_min"] as? Int ?? 0
-        self.buildMax = dictionary["build_max"] as? Int ?? Int.max
         self.relatedKeys = dictionary["related_articles"] as? [String] ?? []
         
+        // Parse the minimum build
+        if let int = dictionary["build_min"] as? Int {
+            self.buildMin = int
+        }
+        else if let string = dictionary["build_min"] as? String, let int = Int(string) {
+            self.buildMin = int
+        }
+        else {
+            self.buildMin = 0
+        }
+
+        // Parse the maximum build
+        if let int = dictionary["build_max"] as? Int {
+            self.buildMax = int
+        }
+        else if let string = dictionary["build_max"] as? String, let int = Int(string) {
+            self.buildMax = int
+        }
+        else {
+            self.buildMax = Int.max
+        }
+
         // Require both a title and a body
         if title.isEmpty || body.isEmpty {
             return nil

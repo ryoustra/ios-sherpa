@@ -67,13 +67,59 @@ class ArticleTests: XCTestCase {
         guard let article = Sherpa.Article(dictionary: ArticleTests.dictionary) else {
             return
         }
-
+        
         XCTAssertEqual(article.key, ArticleTests.dictionary["key"], "Article key should match the 'key' value in the provided dictionary.")
         XCTAssertEqual(article.title, ArticleTests.dictionary["title"], "Article title should match the 'title' value in the provided dictionary.")
         XCTAssertEqual(article.body, ArticleTests.dictionary["body"], "Article body should match the 'body' value in the provided dictionary.")
-        XCTAssertEqual(article.buildMin, ArticleTests.dictionary["build_min"], "Minimum build should match the 'build_min' value in the provided dictionary.")
-        XCTAssertEqual(article.buildMax, ArticleTests.dictionary["build_max"], "Maximum build should match the 'build_max' value in the provided dictionary.")
         XCTAssertEqual(article.relatedKeys, ArticleTests.dictionary["related_articles"], "Related article keys should match the 'related_articles' value in the provided dictionary.")
+    }
+    
+    func testBuildMin() {
+        var dictionary = ArticleTests.dictionary
+        
+        dictionary["build_min"] = 42
+        let buildAsInt = Sherpa.Article(dictionary: dictionary)!
+        XCTAssertEqual(buildAsInt.buildMin, 42, "Minimum build should match the 'build_min' value in the provided dictionary.")
+
+        dictionary["build_min"] = "88"
+        let buildAsString = Sherpa.Article(dictionary: dictionary)!
+        XCTAssertEqual(buildAsString.buildMin, 88, "Minimum build should match the 'build_min' value in the provided dictionary.")
+        
+        dictionary["build_min"] = ""
+        let buildAsEmptyString = Sherpa.Article(dictionary: dictionary)!
+        XCTAssertLessThan(buildAsEmptyString.buildMin, 1, "An empty 'build_min' string should result in a build number matching any integer greater than zero.")
+        
+        dictionary["build_min"] = "invalid build number"
+        let buildAsInvalidString = Sherpa.Article(dictionary: dictionary)!
+        XCTAssertLessThan(buildAsInvalidString.buildMin, 1, "An invalid 'build_min' string should result in a build number matching any integer greater than zero.")
+        
+        dictionary.removeValueForKey("build_min")
+        let buildAsDefault = Sherpa.Article(dictionary: dictionary)!
+        XCTAssertLessThan(buildAsDefault.buildMin, 1, "A missing 'build_min' value should result in a build number matching any integer greater than zero.")
+    }
+    
+    func testBuildMax() {
+        var dictionary = ArticleTests.dictionary
+        
+        dictionary["build_max"] = 42
+        let buildAsInt = Sherpa.Article(dictionary: dictionary)!
+        XCTAssertEqual(buildAsInt.buildMax, 42, "Minimum build should match the 'build_max' value in the provided dictionary.")
+        
+        dictionary["build_max"] = "88"
+        let buildAsString = Sherpa.Article(dictionary: dictionary)!
+        XCTAssertEqual(buildAsString.buildMax, 88, "Minimum build should match the 'build_max' value in the provided dictionary.")
+        
+        dictionary["build_max"] = ""
+        let buildAsEmptyString = Sherpa.Article(dictionary: dictionary)!
+        XCTAssertGreaterThan(buildAsEmptyString.buildMax, Int.max - 1, "An empty 'build_max' string should result in a build number matching any integer less than Int.max.")
+        
+        dictionary["build_max"] = "invalid build number"
+        let buildAsInvalidString = Sherpa.Article(dictionary: dictionary)!
+        XCTAssertGreaterThan(buildAsInvalidString.buildMax, Int.max - 1, "An invalid 'build_max' string should result in a build number matching any integer less than Int.max.")
+
+        dictionary.removeValueForKey("build_max")
+        let buildAsDefault = Sherpa.Article(dictionary: dictionary)!
+        XCTAssertGreaterThan(buildAsDefault.buildMax, Int.max - 1, "A missing 'build_max' value should result in a build number matching any integer less than Int.max.")
     }
     
     func testMatches() {
