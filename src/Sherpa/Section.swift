@@ -33,11 +33,25 @@ internal struct Section {
     let articles: [Article]
     
     internal init?(dictionary: [String: AnyObject]) {
-        self.title = dictionary["title"] as? String
-        self.detail = dictionary["detail"] as? String
-        self.articles = (dictionary["articles"] as? [[String: AnyObject]])?.map({ Article(dictionary: $0) }).flatMap({ $0 }) ?? []
-        
-        if self.articles.count == 0 {
+		// Title
+		if let string = dictionary["title"] as? String where !string.isEmpty {
+			title = string
+		}
+		else {
+			title = nil
+		}
+		
+		// Detail
+		if let string = dictionary["detail"] as? String where !string.isEmpty {
+			detail = string
+		}
+		else {
+			detail = nil
+		}
+		
+		// Articles
+        articles = (dictionary["articles"] as? [[String: AnyObject]])?.map({ Article(dictionary: $0) }).flatMap({ $0 }) ?? []
+        if articles.count == 0 {
             return nil
         }
     }

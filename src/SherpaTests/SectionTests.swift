@@ -47,84 +47,122 @@ class SectionTests: XCTestCase {
         ]
     ]
     
-    func testInitWithDictionary() {
+    func testInit() {
         XCTAssertNotNil(Sherpa.Section(dictionary: SectionTests.dictionary), "Section should successfully initialize with valid dictionary.")
         
         var minimal = SectionTests.dictionary
         minimal.removeValueForKey("title")
         minimal.removeValueForKey("details")
         XCTAssertNotNil(Sherpa.Section(dictionary: minimal), "Section should successfully initialize with only articles.")
-        
-        var emptyArticles = SectionTests.dictionary
-        emptyArticles["articles"] = []
-        XCTAssertNil(Sherpa.Section(dictionary: emptyArticles), "Section should not initialize with empty articles value.")
-        
-        var missingArticles = SectionTests.dictionary
-        missingArticles.removeValueForKey("articles")
-        XCTAssertNil(Sherpa.Section(dictionary: missingArticles), "Section should not initialize with missing articles value.")
     }
-    
-    func testKeys() {
-        guard let section = Sherpa.Section(dictionary: SectionTests.dictionary) else {
-            return
-        }
-        
-        XCTAssertEqual(section.title, SectionTests.dictionary["title"], "Section title should match the 'title' value in the provided dictionary.")
-        XCTAssertEqual(section.detail, SectionTests.dictionary["detail"], "Section detail text should match the 'detail' value in the provided dictionary.")
-        XCTAssertEqual(section.articles.count, 2, "Article count should match the number of articles in the provided dictionary, minus any invalid articles.")
-        
-        let articles = SectionTests.dictionary["articles"] as! [[String: AnyObject]]
-        XCTAssertEqual(section.articles[0].title, articles[0]["title"] as? String, "Articles should match those in the provided dictionary, minus any invalid articles.")
-        XCTAssertEqual(section.articles[1].title, articles[2]["title"] as? String, "Articles should match those in the provided dictionary, minus any invalid articles.")
-    }
-    
-    func testSectionByFilteringArticles() {
-        guard let section = Sherpa.Section(dictionary: SectionTests.dictionary) else {
-            return
-        }
-        
-        let nonMatching = section.section { return $0.key == "example-key" }
-        XCTAssertNil(nonMatching, "Filter that do not match at least one article should return nil.")
-        
-        let matching = section.section { $0.buildMin >= 400 }
-        XCTAssertNotNil(matching, "Filter that matches at least one article should not return nil.")
-
-        if let matching = matching {
-            XCTAssertEqual(matching.title, section.title, "Filter that matches at least one article should return section with same title.")
-            XCTAssertEqual(matching.detail, section.detail, "Filter that matches at least one article should return section with same detail text.")
-            XCTAssertEqual(matching.articles.count, 1, "Filter that matches at least one article should only contain filtered articles.")
-            XCTAssertEqual(matching.articles[0].title, section.articles[1].title, "Filter that matches at least one article should only contain filtered articles.")
-        }
-    }
-    
-    func testSectionMatchingQuery() {
-        guard let section = Sherpa.Section(dictionary: SectionTests.dictionary) else {
-            return
-        }
-        
-		let empty = section.section("")
-		XCTAssertNotNil(empty, "An empty query should always return a section.")
-
-		if let empty = empty {
-			XCTAssertEqual(empty.title, section.title, "An empty query should always return section with same title.")
-			XCTAssertEqual(empty.detail, section.detail, "An empty query should always return section with same detail text.")
-			XCTAssertEqual(empty.articles.count, section.articles.count, "An empty query should always return all articles.")
-			XCTAssertEqual(empty.articles[0].title, section.articles[0].title, "An empty query should always return section containing the same articles.")
-			XCTAssertEqual(empty.articles[1].title, section.articles[1].title, "An empty query should always return section containing the same articles.")
+	
+	func testTitle() {
+		var dictionary = SectionTests.dictionary
+		
+		dictionary["title"] = "Section Title"
+		let validTitle = Sherpa.Section(dictionary: dictionary)
+		XCTAssertNotNil(validTitle, "Section should successfully init from dictionary with a valid 'title' value.")
+		if let section = validTitle {
+			XCTAssertEqual(section.title, dictionary["title"], "Section title should match the 'title' value in the provided dictionary.")
 		}
 		
-		let nonMatching = section.section("example")
-		XCTAssertNil(nonMatching, "Filter that do not (case-insensitively) match at least one article should return nil.")
+		dictionary["title"] = ""
+		let emptyTitle = Sherpa.Section(dictionary: dictionary)
+		XCTAssertNotNil(emptyTitle, "Section should successfully init from dictionary with an empty 'title' value.")
+		if let section = emptyTitle {
+			XCTAssertNil(section.title, "Section should translate an empty 'title' value to nil.")
+		}
 		
-        let matching = section.section("Element")
-        XCTAssertNotNil(matching, "Filter that (case-insensitively) matches at least one article should not return nil.")
-        
-        if let matching = matching {
-            XCTAssertEqual(matching.title, section.title, "Filter that matches at least one article should return section with same title.")
-            XCTAssertEqual(matching.detail, section.detail, "Filter that matches at least one article should return section with same detail text.")
-            XCTAssertEqual(matching.articles.count, 1, "Filter that matches at least one article should only contain filtered articles.")
-            XCTAssertEqual(matching.articles[0].title, section.articles[0].title, "Filter that matches at least one article should only contain filtered articles.")
+		dictionary["title"] = [23]
+		let titleAsInvalidType = Sherpa.Section(dictionary: dictionary)
+		XCTAssertNotNil(titleAsInvalidType, "Section should successfully init from dictionary with an invalid 'title' value.")
+		if let section = titleAsInvalidType {
+			XCTAssertNil(section.title, "Section should translate an invalid 'title' value to nil.")
+		}
+		
+		dictionary.removeValueForKey("title")
+		let missingTitle = Sherpa.Section(dictionary: dictionary)
+		XCTAssertNotNil(missingTitle, "Section should successfully init from dictionary without a 'title' value.")
+		if let section = missingTitle {
+			XCTAssertNil(section.title, "Section title should match the 'title' value in the provided dictionary.")
+		}
+	}
+	
+	func testDetail() {
+		var dictionary = SectionTests.dictionary
+		
+		dictionary["detail"] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc lacinia, nibh in rutrum placerat, augue risus convallis enim, eget elementum metus odio ut arcu. Phasellus ultricies sollicitudin arcu, at lacinia sem convallis sit amet. Suspendisse ac mauris elementum, eleifend est in, placerat urna. Donec elementum dignissim elit sed tempor."
+		let validDetail = Sherpa.Section(dictionary: dictionary)
+		XCTAssertNotNil(validDetail, "Section should successfully init from dictionary with a valid 'detail' value.")
+		if let section = validDetail {
+			XCTAssertEqual(section.detail, dictionary["detail"], "Section detail should match the 'detail' value in the provided dictionary.")
+		}
+		
+		dictionary["detail"] = ""
+		let emptyDetail = Sherpa.Section(dictionary: dictionary)
+		XCTAssertNotNil(emptyDetail, "Section should successfully init from dictionary with an empty 'detail' value.")
+		if let section = emptyDetail {
+			XCTAssertNil(section.detail, "Section should translate an empty 'detail' value to nil.")
+		}
+		
+		dictionary["detail"] = [23]
+		let detailAsInvalidType = Sherpa.Section(dictionary: dictionary)
+		XCTAssertNotNil(detailAsInvalidType, "Section should successfully init from dictionary with an invalid 'detail' value.")
+		if let section = detailAsInvalidType {
+			XCTAssertNil(section.detail, "Section should translate an invalid 'detail' value to nil.")
+		}
+		
+		dictionary.removeValueForKey("detail")
+		let missingDetail = Sherpa.Section(dictionary: dictionary)
+		XCTAssertNotNil(missingDetail, "Section should successfully init from dictionary without a 'detail' value.")
+		if let section = missingDetail {
+			XCTAssertNil(section.detail, "Section detail should match the 'detail' value in the provided dictionary.")
+		}
+	}
+
+	func testSectionByFilteringArticles() {
+        if let section = Sherpa.Section(dictionary: SectionTests.dictionary) {
+			let nonMatching = section.section { return $0.key == "example-key" }
+			XCTAssertNil(nonMatching, "Filter that do not match at least one article should return nil.")
+			
+			let matching = section.section { $0.buildMin >= 400 }
+			XCTAssertNotNil(matching, "Filter that matches at least one article should not return nil.")
+			
+			if let matching = matching {
+				XCTAssertEqual(matching.title, section.title, "Filter that matches at least one article should return section with same title.")
+				XCTAssertEqual(matching.detail, section.detail, "Filter that matches at least one article should return section with same detail text.")
+				XCTAssertEqual(matching.articles.count, 1, "Filter that matches at least one article should only contain filtered articles.")
+				XCTAssertEqual(matching.articles[0].title, section.articles[1].title, "Filter that matches at least one article should only contain filtered articles.")
+			}
         }
     }
-    
+	
+    func testSectionMatchingQuery() {
+        if let section = Sherpa.Section(dictionary: SectionTests.dictionary) {
+			let empty = section.section("")
+			XCTAssertNotNil(empty, "An empty query should always return a section.")
+			
+			if let empty = empty {
+				XCTAssertEqual(empty.title, section.title, "An empty query should always return section with same title.")
+				XCTAssertEqual(empty.detail, section.detail, "An empty query should always return section with same detail text.")
+				XCTAssertEqual(empty.articles.count, section.articles.count, "An empty query should always return all articles.")
+				XCTAssertEqual(empty.articles[0].title, section.articles[0].title, "An empty query should always return section containing the same articles.")
+				XCTAssertEqual(empty.articles[1].title, section.articles[1].title, "An empty query should always return section containing the same articles.")
+			}
+			
+			let nonMatching = section.section("example")
+			XCTAssertNil(nonMatching, "Filter that do not (case-insensitively) match at least one article should return nil.")
+			
+			let matching = section.section("Element")
+			XCTAssertNotNil(matching, "Filter that (case-insensitively) matches at least one article should not return nil.")
+			
+			if let matching = matching {
+				XCTAssertEqual(matching.title, section.title, "Filter that matches at least one article should return section with same title.")
+				XCTAssertEqual(matching.detail, section.detail, "Filter that matches at least one article should return section with same detail text.")
+				XCTAssertEqual(matching.articles.count, 1, "Filter that matches at least one article should only contain filtered articles.")
+				XCTAssertEqual(matching.articles[0].title, section.articles[0].title, "Filter that matches at least one article should only contain filtered articles.")
+			}
+        }
+    }
+	
 }

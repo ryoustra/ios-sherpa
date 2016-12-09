@@ -35,38 +35,54 @@ internal struct Article {
     let buildMin: Int
     
     let buildMax: Int
-    
+	
     let relatedKeys: [String]
     
     internal init?(dictionary: [String: AnyObject]) {
-        self.key = dictionary["key"] as? String
-        self.title = dictionary["title"] as? String ?? ""
-        self.body = dictionary["body"] as? String ?? ""
-        self.relatedKeys = dictionary["related_articles"] as? [String] ?? []
-        
-        // Parse the minimum build
-        if let int = dictionary["build_min"] as? Int {
-            self.buildMin = int
-        }
-        else if let string = dictionary["build_min"] as? String, let int = Int(string) {
-            self.buildMin = int
-        }
-        else {
-            self.buildMin = 0
-        }
+		// Key
+		if let string = dictionary["key"] as? String where !string.isEmpty {
+			key = string
+		}
+		else {
+			key = nil
+		}
 
-        // Parse the maximum build
+		// Minimum build
+		if let int = dictionary["build_min"] as? Int {
+			buildMin = int
+		}
+		else if let string = dictionary["build_min"] as? String, let int = Int(string) {
+			buildMin = int
+		}
+		else {
+			buildMin = 0
+		}
+
+        // Maximum build
         if let int = dictionary["build_max"] as? Int {
-            self.buildMax = int
+            buildMax = int
         }
         else if let string = dictionary["build_max"] as? String, let int = Int(string) {
-            self.buildMax = int
+            buildMax = int
         }
         else {
-            self.buildMax = Int.max
+            buildMax = Int.max
         }
+		
+		// Related articles
+		if let array = dictionary["related_articles"] as? [String] {
+			relatedKeys = array
+		}
+		else if let string = dictionary["related_articles"] as? String where !string.isEmpty {
+			relatedKeys = [string]
+		}
+		else {
+			relatedKeys = []
+		}
 
-        // Require both a title and a body
+        // Title and body
+		title = dictionary["title"] as? String ?? ""
+		body = dictionary["body"] as? String ?? ""
         if title.isEmpty || body.isEmpty {
             return nil
         }

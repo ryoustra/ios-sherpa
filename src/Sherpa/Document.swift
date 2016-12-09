@@ -127,11 +127,28 @@ internal class Document {
     }
     
     private func _load(from dictionary: [String:AnyObject]) {
-        self.feedbackEmail = dictionary["feedback_email"] as? String
-        self.feedbackTwitter = dictionary["feedback_twitter"] as? String
-        
-        let entries = dictionary["entries"] as? [[String:AnyObject]] ?? []
-        self._load(from: entries)
+		// Feedback email
+		let emailRegex = "^\\s*(\"?[^\"]\"?\\s)?<?.+@.+>?\\s*$"
+		if let string = dictionary["feedback_email"] as? String where string.rangeOfString(emailRegex, options: .RegularExpressionSearch) != nil {
+			feedbackEmail = string
+		}
+		else {
+			feedbackEmail = nil
+		}
+
+		// Feedback twitter
+		let twitterRegex = "^\\s*[@＠]?[a-zA-Z0-9_]{1,20}\\s*$"
+		if let string = dictionary["feedback_twitter"] as? String where string.rangeOfString(twitterRegex, options: .RegularExpressionSearch) != nil {
+			let characterSet = NSMutableCharacterSet.whitespaceAndNewlineCharacterSet()
+			characterSet.addCharactersInString("@＠")
+			feedbackTwitter = string.stringByTrimmingCharactersInSet(characterSet)
+		}
+		else {
+			feedbackTwitter = nil
+		}
+		
+		// Sections
+        self._load(from: dictionary["entries"] as? [[String:AnyObject]] ?? [])
     }
     
     private func _load(from array: [[String:AnyObject]]) {
