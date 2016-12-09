@@ -122,11 +122,12 @@ class ArticleTests: XCTestCase {
         XCTAssertGreaterThan(buildAsDefault.buildMax, Int.max - 1, "A missing 'build_max' value should result in a build number matching any integer less than Int.max.")
     }
     
-    func testMatches() {
+    func testMatchesQuery() {
         guard let article = Sherpa.Article(dictionary: ArticleTests.dictionary) else {
             return
         }
         
+        XCTAssertTrue(article.matches(""), "Article should always match an empty query.")
         XCTAssertTrue(article.matches("Est"), "Article should match query when (case-insensitively) found in both title and body.")
         XCTAssertTrue(article.matches("artic"), "Article should match query when (case-insensitively) found only in title.")
         XCTAssertTrue(article.matches("PENDI"), "Article should match query when (case-insensitively) found only in body.")

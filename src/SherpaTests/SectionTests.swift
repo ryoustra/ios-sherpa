@@ -102,9 +102,20 @@ class SectionTests: XCTestCase {
             return
         }
         
-        let nonMatching = section.section("example")
-        XCTAssertNil(nonMatching, "Filter that do not (case-insensitively) match at least one article should return nil.")
-        
+		let empty = section.section("")
+		XCTAssertNotNil(empty, "An empty query should always return a section.")
+
+		if let empty = empty {
+			XCTAssertEqual(empty.title, section.title, "An empty query should always return section with same title.")
+			XCTAssertEqual(empty.detail, section.detail, "An empty query should always return section with same detail text.")
+			XCTAssertEqual(empty.articles.count, section.articles.count, "An empty query should always return all articles.")
+			XCTAssertEqual(empty.articles[0].title, section.articles[0].title, "An empty query should always return section containing the same articles.")
+			XCTAssertEqual(empty.articles[1].title, section.articles[1].title, "An empty query should always return section containing the same articles.")
+		}
+		
+		let nonMatching = section.section("example")
+		XCTAssertNil(nonMatching, "Filter that do not (case-insensitively) match at least one article should return nil.")
+		
         let matching = section.section("Element")
         XCTAssertNotNil(matching, "Filter that (case-insensitively) matches at least one article should not return nil.")
         
