@@ -30,7 +30,7 @@ internal struct Section {
     
     let detail: String?
     
-    let articles: [Article]!
+    let articles: [Article]
     
     internal init?(dictionary: [String: AnyObject]) {
         self.title = dictionary["title"] as? String

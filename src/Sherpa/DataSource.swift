@@ -63,15 +63,15 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 		var sections = self.sections
 
 		if let query = self.query {
-			sections = sections.map({ $0.section(query) }).flatMap({ $0 })
+			sections = sections.flatMap({ $0.section(query) })
 		}
 
 		if let filter = self.filter {
-			sections = sections.map({ $0.section(filter) }).flatMap({ $0 })
+			sections = sections.flatMap({ $0.section(filter) })
 		}
 
 		if let sectionTitle = self.sectionTitle {
-			let articles = sections.flatMap({ $0.articles }).flatMap({ $0 })
+			let articles = sections.flatMap({ $0.articles })
             
             if articles.count > 0 {
                 let title: String? = articles.count > 0 ? sectionTitle : nil

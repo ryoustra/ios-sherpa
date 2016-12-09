@@ -28,15 +28,15 @@ internal struct Article {
     
     let key: String?
     
-    let title: String!
+    let title: String
     
-    let body: String!
+    let body: String
     
-    let buildMin: Int!
+    let buildMin: Int
     
-    let buildMax: Int!
+    let buildMax: Int
     
-    let relatedKeys: [String]!
+    let relatedKeys: [String]
     
     internal init?(dictionary: [String: AnyObject]) {
         self.key = dictionary["key"] as? String

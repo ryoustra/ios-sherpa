@@ -69,9 +69,7 @@ internal class ArticleViewController: ListViewController {
 		self.titleLabel.numberOfLines = 0
 		self.contentView.addSubview(self.titleLabel)
 
-		if let title = self.article.title {
-			self.titleLabel.text = title
-		}
+		self.titleLabel.text = self.article.title
 
 		self.bodyView.backgroundColor = UIColor.clearColor()
 		self.bodyView.editable = false

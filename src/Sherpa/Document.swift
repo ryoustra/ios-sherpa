@@ -38,11 +38,11 @@ internal class Document {
 
 	// MARK: Customising appearance
 
-	internal var tintColor: UIColor! = UINavigationBar.appearance().tintColor
+	internal var tintColor: UIColor? = UINavigationBar.appearance().tintColor
 
-	internal var articleBackgroundColor: UIColor! = UIColor.whiteColor()
+	internal var articleBackgroundColor: UIColor = UIColor.whiteColor()
 
-	internal var articleTextColor: UIColor! = UIColor.darkTextColor()
+	internal var articleTextColor: UIColor = UIColor.darkTextColor()
 
 	internal var articleCellClass = UITableViewCell.self
 
