@@ -62,4 +62,8 @@ internal struct Section {
         return self.section { $0.matches(query) }
     }
     
+    internal func section(buildNumber: Int) -> Section? {
+        return self.section { $0.matches(buildNumber) }
+    }
+    
 }

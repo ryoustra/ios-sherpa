@@ -35,6 +35,11 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 
 	internal init(document: Document!) {
 		self.document = document
+		
+		if let mainBundleBuildNumber = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleVersion") as? String {
+			self.buildNumber = Int(mainBundleBuildNumber)
+		}
+		
 		super.init()
 		self.applyFilter()
 	}
@@ -56,6 +61,10 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 	internal var filter: ((Article) -> Bool)? {
 		didSet{ self.applyFilter() }
 	}
+	
+	internal var buildNumber: Int? {
+		didSet{ self.applyFilter() }
+	}
 
 	internal var filteredSections: [Section] = []
 
@@ -68,6 +77,10 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 
 		if let filter = self.filter {
 			sections = sections.flatMap({ $0.section(filter) })
+		}
+		
+		if let buildNumber = self.buildNumber {
+			sections = sections.flatMap({ $0.section(buildNumber) })
 		}
 
 		if let sectionTitle = self.sectionTitle {

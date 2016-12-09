@@ -70,11 +70,6 @@ internal struct Article {
         if title.isEmpty || body.isEmpty {
             return nil
         }
-        
-        // Compare to the build number
-        if let build = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleVersion") as? String where Int(build) < buildMin && Int(build) > buildMax {
-            return nil
-        }
     }
     
     internal func matches(query: String) -> Bool {
@@ -93,6 +88,10 @@ internal struct Article {
         }
         
         return false
+    }
+    
+    internal func matches(buildNumber: Int) -> Bool {
+        return buildNumber >= self.buildMin && buildNumber <= self.buildMax
     }
     
 }

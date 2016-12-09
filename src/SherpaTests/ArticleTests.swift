@@ -133,4 +133,14 @@ class ArticleTests: XCTestCase {
         XCTAssertFalse(article.matches("Example"), "Article should NOT match query when not (case-insensitively) found in the title or body.")
     }
     
+    func testMatchesBuildNumber() {
+        guard let article = Sherpa.Article(dictionary: ArticleTests.dictionary) else {
+            return
+        }
+
+        XCTAssertTrue(article.matches(500), "Article should match build number (500) that is greater than its buildMin (\(article.buildMin)) and less than its buildMax (\(article.buildMax)).")
+        XCTAssertFalse(article.matches(200), "Article should not match build number (200) that is less than its buildMin (\(article.buildMin)).")
+        XCTAssertFalse(article.matches(900), "Article should not match build number (900) that is greater than its buildMax (\(article.buildMax)).")
+    }
+    
 }

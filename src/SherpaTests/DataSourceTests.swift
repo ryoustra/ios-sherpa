@@ -79,6 +79,17 @@ class DataSourceTests: XCTestCase {
         XCTAssertEqual(datasource.filteredSections[1].articles.count, 1, "Articles that don't match the specified filter should be removed.")
     }
     
+    func testBuildNumber() {
+        let document = Sherpa.Document(dictionary: DocumentTests.dictionary)
+        let datasource = Sherpa.DataSource(document: document)
+        
+        datasource.buildNumber = 370
+        
+        XCTAssertEqual(datasource.filteredSections.count, 2, "Sections that do not contain articles matching the specified query should be removed.")
+        XCTAssertEqual(datasource.filteredSections[0].articles.count, 1, "Articles that don't match the specified filter should be removed.")
+        XCTAssertEqual(datasource.filteredSections[1].articles.count, 1, "Articles that don't match the specified filter should be removed.")
+    }
+    
     func testSectionTitle() {
         let document = Sherpa.Document(dictionary: DocumentTests.dictionary)
         let datasource = Sherpa.DataSource(document: document)
