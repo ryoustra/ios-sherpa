@@ -47,8 +47,27 @@ class SectionTests: XCTestCase {
         ]
     ]
     
+    func testInitWithDictionary() {
+        XCTAssertNotNil(Sherpa.Section(dictionary: SectionTests.dictionary), "Section should successfully initialize with valid dictionary.")
+        
+        var minimal = SectionTests.dictionary
+        minimal.removeValueForKey("title")
+        minimal.removeValueForKey("details")
+        XCTAssertNotNil(Sherpa.Section(dictionary: minimal), "Section should successfully initialize with only articles.")
+        
+        var emptyArticles = SectionTests.dictionary
+        emptyArticles["articles"] = []
+        XCTAssertNil(Sherpa.Section(dictionary: emptyArticles), "Section should not initialize with empty articles value.")
+        
+        var missingArticles = SectionTests.dictionary
+        missingArticles.removeValueForKey("articles")
+        XCTAssertNil(Sherpa.Section(dictionary: missingArticles), "Section should not initialize with missing articles value.")
+    }
+    
     func testKeys() {
-        let section = Sherpa.Section(dictionary: SectionTests.dictionary)
+        guard let section = Sherpa.Section(dictionary: SectionTests.dictionary) else {
+            return
+        }
         
         XCTAssertEqual(section.title, SectionTests.dictionary["title"], "Section title should match the 'title' value in the provided dictionary.")
         XCTAssertEqual(section.detail, SectionTests.dictionary["detail"], "Section detail text should match the 'detail' value in the provided dictionary.")
@@ -60,7 +79,9 @@ class SectionTests: XCTestCase {
     }
     
     func testSectionByFilteringArticles() {
-        let section = Sherpa.Section(dictionary: SectionTests.dictionary)
+        guard let section = Sherpa.Section(dictionary: SectionTests.dictionary) else {
+            return
+        }
         
         let nonMatching = section.section { return $0.key == "example-key" }
         XCTAssertNil(nonMatching, "Filter that do not match at least one article should return nil.")
@@ -77,7 +98,9 @@ class SectionTests: XCTestCase {
     }
     
     func testSectionMatchingQuery() {
-        let section = Sherpa.Section(dictionary: SectionTests.dictionary)
+        guard let section = Sherpa.Section(dictionary: SectionTests.dictionary) else {
+            return
+        }
         
         let nonMatching = section.section("example")
         XCTAssertNil(nonMatching, "Filter that do not (case-insensitively) match at least one article should return nil.")

@@ -32,10 +32,14 @@ internal struct Section {
     
     let articles: [Article]!
     
-    internal init(dictionary: [String: AnyObject]) {
+    internal init?(dictionary: [String: AnyObject]) {
         self.title = dictionary["title"] as? String
         self.detail = dictionary["detail"] as? String
         self.articles = (dictionary["articles"] as? [[String: AnyObject]])?.map({ Article(dictionary: $0) }).flatMap({ $0 }) ?? []
+        
+        if self.articles.count == 0 {
+            return nil
+        }
     }
     
     internal init(title: String?, detail: String?, articles: [Article]!) {
@@ -47,13 +51,15 @@ internal struct Section {
     internal func section(@noescape filter: (Article) -> Bool) -> Section? {
         let articles = self.articles.filter(filter)
         
-        if articles.count == 0 { return nil }
+        if articles.count == 0 {
+            return nil
+        }
         
         return Section(title: self.title, detail: self.detail, articles: articles)
     }
     
     internal func section(query: String) -> Section? {
-        return self.section({ return $0.matches(query) })
+        return self.section { $0.matches(query) }
     }
     
 }

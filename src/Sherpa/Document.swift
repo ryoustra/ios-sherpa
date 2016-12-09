@@ -127,15 +127,15 @@ internal class Document {
     }
     
     private func _load(from dictionary: [String:AnyObject]) {
-        feedbackEmail = dictionary["feedback_email"] as? String
-        feedbackTwitter = dictionary["feedback_twitter"] as? String
+        self.feedbackEmail = dictionary["feedback_email"] as? String
+        self.feedbackTwitter = dictionary["feedback_twitter"] as? String
         
         let entries = dictionary["entries"] as? [[String:AnyObject]] ?? []
         self._load(from: entries)
     }
     
     private func _load(from array: [[String:AnyObject]]) {
-        sections = array.map({ Section(dictionary: $0) }).flatMap({ $0 }) ?? []
+        self.sections = array.flatMap({ Section(dictionary: $0) })
     }
     
 }

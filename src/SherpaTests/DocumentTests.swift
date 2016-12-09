@@ -88,21 +88,21 @@ class DocumentTests: XCTestCase {
     }
     
     func testSectionsFromDictionary() {
+        let entries = DocumentTests.dictionary["entries"] as! [[String: AnyObject]]
         let document = Sherpa.Document(dictionary: DocumentTests.dictionary)
 
-        XCTAssertEqual(document.sections.count, 3, "")
-        XCTAssertEqual(document.sections[0].title, nil, "")
-        XCTAssertEqual(document.sections[1].title, "Empty Section", "")
-        XCTAssertEqual(document.sections[2].title, "Section Three", "")
+        XCTAssertEqual(document.sections.count, entries.count - 1, "Number of sections in the document should reflect the number found in the dictionary, minus any empty sections.")
+        XCTAssertEqual(document.sections[0].title, entries[0]["title"] as? String, "Sections in the document should match those found in the dictionary, minus any empty sections.")
+        XCTAssertEqual(document.sections[1].title, entries[2]["title"] as? String, "Sections in the document should match those found in the dictionary, minus any empty sections.")
     }
     
     func testSectionsFromArray() {
-        let document = Sherpa.Document(array: DocumentTests.dictionary["entries"] as! [[String: AnyObject]])
+        let entries = DocumentTests.dictionary["entries"] as! [[String: AnyObject]]
+        let document = Sherpa.Document(array: entries)
         
-        XCTAssertEqual(document.sections.count, 3, "")
-        XCTAssertEqual(document.sections[0].title, nil, "")
-        XCTAssertEqual(document.sections[1].title, "Empty Section", "")
-        XCTAssertEqual(document.sections[2].title, "Section Three", "")
+        XCTAssertEqual(document.sections.count, entries.count - 1, "Number of sections in the document should reflect the number found in the array, minus any empty sections.")
+        XCTAssertEqual(document.sections[0].title, entries[0]["title"] as? String, "Sections in the document should match those found in the array, minus any empty sections.")
+        XCTAssertEqual(document.sections[1].title, entries[2]["title"] as? String, "Sections in the document should match those found in the array, minus any empty sections.")
     }
     
     func testSectionAtIndex() {

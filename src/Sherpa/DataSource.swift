@@ -72,8 +72,14 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 
 		if let sectionTitle = self.sectionTitle {
 			let articles = sections.flatMap({ $0.articles }).flatMap({ $0 })
-			let title: String? = articles.count > 0 ? sectionTitle : nil
-			sections = [ Section(title: title, detail: nil, articles: articles) ]
+            
+            if articles.count > 0 {
+                let title: String? = articles.count > 0 ? sectionTitle : nil
+                sections = [ Section(title: title, detail: nil, articles: articles) ]
+            }
+            else {
+                sections = []
+            }
 		}
 
 		self.filteredSections = sections

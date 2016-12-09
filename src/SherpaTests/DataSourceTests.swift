@@ -43,7 +43,7 @@ class DataSourceTests: XCTestCase {
         let outOfBoundsIndexPath = NSIndexPath(forRow: 0, inSection: 100)
         XCTAssertNil(datasource.article(outOfBoundsIndexPath), "Nil should be returned when attempting to retrieve article with out-of-bounds index path.")
         
-        let validIndexPath = NSIndexPath(forRow: 0, inSection: 2)
+        let validIndexPath = NSIndexPath(forRow: 0, inSection: 1)
         XCTAssertEqual(datasource.article(validIndexPath)?.title, datasource.filteredSections[validIndexPath.section].articles[validIndexPath.row].title, "Article retrieved by index path should be the same as when accessing via filteredSections array.")
     }
     
