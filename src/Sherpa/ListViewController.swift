@@ -34,7 +34,12 @@ internal class ListViewController: UIViewController, UISearchControllerDelegate,
 
 	internal init(dataSource: DataSource!) {
 		self.dataSource = dataSource
+
 		super.init(nibName: nil, bundle: nil)
+
+		self.tableView.dataSource = self.dataSource
+		self.tableView.delegate = self.dataSource
+		self.tableView.reloadData()
 	}
 
 	internal required init?(coder aDecoder: NSCoder) {
@@ -82,9 +87,6 @@ internal class ListViewController: UIViewController, UISearchControllerDelegate,
 
 			self.definesPresentationContext = true;
 		}
-
-		self.tableView.dataSource = self.dataSource
-		self.tableView.delegate = self.dataSource
 	}
 
 	override func viewWillAppear(animated: Bool) {
@@ -137,9 +139,6 @@ internal class ListViewController: UIViewController, UISearchControllerDelegate,
 
 		self.tableView.reloadData()
 	}
-
-	// MARK: Customising the table view
-	
 
 	// MARK: Utilities
 	
