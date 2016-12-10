@@ -2,8 +2,57 @@
 
 A drop-in solution for displaying a user guide in an iOS app, based on a JSON template.
 
-[![Build Status](https://travis-ci.org/jellybeansoup/ios-sherpa.svg?branch=master)](https://travis-ci.org/jellybeansoup/ios-sherpa) [![codecov](https://codecov.io/gh/jellybeansoup/ios-sherpa/branch/master/graph/badge.svg)](https://codecov.io/gh/jellybeansoup/ios-sherpa)
+[![Build Status](https://travis-ci.org/jellybeansoup/ios-sherpa.svg?branch=master)](https://travis-ci.org/jellybeansoup/ios-sherpa)
+[![Code Coverage](https://codecov.io/gh/jellybeansoup/ios-sherpa/branch/master/graph/badge.svg)](https://codecov.io/gh/jellybeansoup/ios-sherpa)
+[![CocoaPods Compatible](https://img.shields.io/cocoapods/v/Sherpa.svg)](https://cocoapods.org/pods/Sherpa)
 
+## Features
+
+- Compatible with iOS 8.4 and above.
+- Provide a plain JSON file for content.
+- Deep-link to articles for contextual help.
+- User search with query highlighting.
+- Built in feedback mechanisms for email and Twitter.
+- Customize colors, and optionally provide a `UITableViewCell` subclass to use.
+
+## How to Use
+
+Sherpa uses a JSON file as the source of its content, which allows you to provide a file in your app bundle, download a file from a server, or both! It handles parsing of the JSON for you, all you need to do is give it the local URL to the document, and it will handle the rest. You don't even need to wrap the view controller in a `UINavigationController`, as this is done automatically; just present the `SherpaViewController` directly and you're good to go.
+
+```swift
+let viewController = SherpaViewController(fileAtURL: fileURL)
+self.presentViewController(viewController, animated: true, completion: nil)
+```
+
+To deep link to a specific article for contextual help, you can optionally provide an `articleKey` that matches the key on the article you would like to link to. Sherpa will present with the selected article open, and allow users to navigate back to the full list of articles to find additional help if they want to.
+
+```swift
+let viewController = SherpaViewController(fileAtURL: fileURL)
+viewController.articleKey = "related-articles"
+self.presentViewController(viewController, animated: true, completion: nil)
+```
+
+If you'd like to push Sherpa into an existing `UINavigationController` stack, this is handled gracefully without any additional configuration required. Simply push the `SherpaViewController` directly.
+
+```swift
+let viewController = SherpaViewController(fileAtURL: fileURL)
+viewController.articleKey = "related-articles"
+self.navigationController?.pushViewController(viewController, animated: true)
+```
+
+More information about setting up the JSON document can be found within [the example application's UserGuide.json file](https://raw.githubusercontent.com/jellybeansoup/ios-sherpa/master/example/SherpaExample/UserGuide.json). You can read this user guide and see the examples in action by taking the example application itself for a spin. CocoaPods makes this easy with the `pod try Sherpa` command, which can be run from Terminal if you have CocoaPods installed.
+
+## Installation
+
+CocoaPods
+
+```
+pod Sherpa
+```
+
+## Get in Touch
+
+If you have questions, I can be found on [Twitter](https://twitter.com/jellybeansoup), or you can get in touch via [email](https://jellystyle.com/contact).
 
 ## Released under the BSD License
 
