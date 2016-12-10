@@ -6,20 +6,6 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		A1713532185009D900E56C4D /* Documentation */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = A1713533185009D900E56C4D /* Build configuration list for PBXAggregateTarget "Documentation" */;
-			buildPhases = (
-				A171353918500A8200E56C4D /* Generate Documentation */,
-			);
-			dependencies = (
-			);
-			name = Documentation;
-			productName = Documentation;
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
 		A10591731DFB7B45003CE03A /* array.json in Resources */ = {isa = PBXBuildFile; fileRef = A10591701DFB7B45003CE03A /* array.json */; };
 		A10591741DFB7B45003CE03A /* dictionary.json in Resources */ = {isa = PBXBuildFile; fileRef = A10591711DFB7B45003CE03A /* dictionary.json */; };
@@ -274,7 +260,6 @@
 			targets = (
 				A1A787371C7BED9C0095A0EF /* Sherpa */,
 				A1CF09F91DF8D65400D13E21 /* SherpaTests */,
-				A1713532185009D900E56C4D /* Documentation */,
 			);
 		};
 /* End PBXProject section */
@@ -298,23 +283,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		A171353918500A8200E56C4D /* Generate Documentation */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Generate Documentation";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/appledoc \\\n--ignore example \\\n--ignore .m \\\n--create-html \\\n--create-docset \\\n--install-docset \\\n--keep-intermediate-files \\\n--project-name \"Dropbox Auth\" \\\n--project-company \"JellyStyle Media\" \\\n--company-id \"com.jellystyle\" \\\n--docset-platform-family \"iphoneos\" \\\n--merge-categories \\\n--no-repeat-first-par \\\n--warn-undocumented-object \\\n--warn-undocumented-member \\\n--warn-empty-description \\\n--warn-unknown-directive \\\n--warn-invalid-crossref \\\n--warn-missing-arg \\\n--logformat xcode \\\n--exit-threshold 2 \\\n--output \"docs\" \\\n\"${SRCROOT}\"";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A1A787331C7BED9C0095A0EF /* Sources */ = {
@@ -432,20 +400,6 @@
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		A1713534185009D900E56C4D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		A1713535185009D900E56C4D /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -569,15 +523,6 @@
 			buildConfigurations = (
 				A1713526185007F800E56C4D /* Debug */,
 				A1713527185007F800E56C4D /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		A1713533185009D900E56C4D /* Build configuration list for PBXAggregateTarget "Documentation" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A1713534185009D900E56C4D /* Debug */,
-				A1713535185009D900E56C4D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
