@@ -1,0 +1,35 @@
+[
+    {
+        "detail": "Text that appears in the footer for the section.",
+        "articles": [
+            {
+                "title": "Article 1",
+                "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc lacinia, nibh in rutrum placerat, augue risus convallis enim, eget elementum metus odio ut arcu. Phasellus ultricies sollicitudin arcu, at lacinia sem convallis sit amet. Suspendisse ac mauris elementum, eleifend est in, placerat urna. Donec elementum dignissim elit sed tempor.",
+                "build_min": 360,
+            },
+            {
+                "key": "invalid-article",
+            },
+            {
+                "key": "article-key",
+                "title": "Article 2",
+                "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at rhoncus erat, in bibendum lectus. Aliquam vel turpis nec justo volutpat rhoncus. Integer venenatis, lectus sed ultrices dictum, dolor nunc scelerisque arcu, et tincidunt justo elit eu nulla. Aenean erat ante, blandit vitae elit non, posuere eleifend mi.",
+                "build_min": 401,
+            },
+        ],
+    },
+    {
+        "title": "Empty Section",
+        "articles": [],
+    },
+    {
+        "title": "Section Three",
+        "articles": [
+            {
+                "key": "article-key",
+                "title": "Article 3",
+                "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla hendrerit tortor ac velit porta, at bibendum neque imperdiet. In bibendum urna nec nisl consequat, ac eleifend lacus vehicula. Nam laoreet risus a mollis ultrices. Proin at magna eget sem interdum porta id eget eros. Nam vitae molestie orci, at ornare mauris. In hac habitasse platea dictumst.",
+            }
+        ]
+    }
+]
