@@ -18,6 +18,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		A10591791DFBA1ED003CE03A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1A787291C7BEC1E0095A0EF /* Sherpa.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A1CF09FA1DF8D65400D13E21;
+			remoteInfo = SherpaTests;
+		};
 		A1E6661E1C97961D0005CE51 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A1A787291C7BEC1E0095A0EF /* Sherpa.xcodeproj */;
@@ -115,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				A1E6661F1C97961D0005CE51 /* Sherpa.framework */,
+				A105917A1DFBA1ED003CE03A /* SherpaTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -180,6 +188,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		A105917A1DFBA1ED003CE03A /* SherpaTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = SherpaTests.xctest;
+			remoteRef = A10591791DFBA1ED003CE03A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		A1E6661F1C97961D0005CE51 /* Sherpa.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;

@@ -29,10 +29,28 @@ class ViewController: UIViewController {
 
 	@IBAction func openUserGuide() {
 		let guideURL = NSBundle.mainBundle().URLForResource("UserGuide", withExtension: "json")!
-
 		let viewController = SherpaViewController(fileAtURL: guideURL)
-		let navigationController = UINavigationController(rootViewController: viewController)
-		self.presentViewController(navigationController, animated: true, completion: nil)
+		self.presentViewController(viewController, animated: true, completion: nil)
 	}
-
+	
+	@IBAction func openArticle() {
+		let guideURL = NSBundle.mainBundle().URLForResource("UserGuide", withExtension: "json")!
+		let viewController = SherpaViewController(fileAtURL: guideURL)
+		viewController.articleKey = "related-articles"
+		self.presentViewController(viewController, animated: true, completion: nil)
+	}
+	
+	@IBAction func pushUserGuide() {
+		let guideURL = NSBundle.mainBundle().URLForResource("UserGuide", withExtension: "json")!
+		let viewController = SherpaViewController(fileAtURL: guideURL)
+		self.navigationController?.pushViewController(viewController, animated: true)
+	}
+	
+	@IBAction func pushArticle() {
+		let guideURL = NSBundle.mainBundle().URLForResource("UserGuide", withExtension: "json")!
+		let viewController = SherpaViewController(fileAtURL: guideURL)
+		viewController.articleKey = "related-articles"
+		self.navigationController?.pushViewController(viewController, animated: true)
+	}
+	
 }

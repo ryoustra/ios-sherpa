@@ -1,7 +1,13 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="B5x-4J-4Xz">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11760" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="B5x-4J-4Xz">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11755"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Sherpa-->
@@ -13,21 +19,72 @@
                         <viewControllerLayoutGuide type="bottom" id="cWg-12-ASd"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="YOX-Js-wd5">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VIo-s8-p3e">
-                                <rect key="frame" x="101" y="269" width="118" height="30"/>
-                                <state key="normal" title="Open User Guide"/>
-                                <connections>
-                                    <action selector="openUserGuide" destination="7v0-CX-GkX" eventType="touchUpInside" id="wZb-or-qLS"/>
-                                </connections>
-                            </button>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="J4t-Ns-eAW">
+                                <rect key="frame" x="16" y="200.5" width="343" height="266"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VIo-s8-p3e">
+                                        <rect key="frame" x="112.5" y="0.0" width="118" height="44"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="44" id="tCa-pB-bGK"/>
+                                        </constraints>
+                                        <state key="normal" title="Open User Guide"/>
+                                        <connections>
+                                            <action selector="openUserGuide" destination="7v0-CX-GkX" eventType="touchUpInside" id="MUk-21-yFE"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OQf-dg-1PF">
+                                        <rect key="frame" x="128.5" y="74" width="86" height="44"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="44" id="uyQ-OI-Au2"/>
+                                        </constraints>
+                                        <state key="normal" title="Open Article"/>
+                                        <connections>
+                                            <action selector="openArticle" destination="7v0-CX-GkX" eventType="touchUpInside" id="d2R-en-VFN"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sz0-lr-j47">
+                                        <rect key="frame" x="114" y="148" width="115" height="44"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="44" id="KMb-eY-bxv"/>
+                                        </constraints>
+                                        <state key="normal" title="Push User Guide"/>
+                                        <connections>
+                                            <action selector="pushUserGuide" destination="7v0-CX-GkX" eventType="touchUpInside" id="FBo-Me-kTA"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QSS-Cn-uLX">
+                                        <rect key="frame" x="130" y="222" width="83" height="44"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="44" id="Jm4-7I-hwU"/>
+                                        </constraints>
+                                        <state key="normal" title="Push Article"/>
+                                        <connections>
+                                            <action selector="pushArticle" destination="7v0-CX-GkX" eventType="touchUpInside" id="VOW-AA-hwW"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="OQf-dg-1PF" firstAttribute="centerX" secondItem="J4t-Ns-eAW" secondAttribute="centerX" id="2lY-i0-qh1"/>
+                                    <constraint firstItem="VIo-s8-p3e" firstAttribute="top" secondItem="J4t-Ns-eAW" secondAttribute="top" id="AhP-TT-owQ"/>
+                                    <constraint firstItem="OQf-dg-1PF" firstAttribute="top" secondItem="VIo-s8-p3e" secondAttribute="bottom" constant="30" id="Cfp-Vh-dFQ"/>
+                                    <constraint firstItem="QSS-Cn-uLX" firstAttribute="centerX" secondItem="J4t-Ns-eAW" secondAttribute="centerX" id="JIh-Hv-HaM"/>
+                                    <constraint firstItem="sz0-lr-j47" firstAttribute="centerX" secondItem="J4t-Ns-eAW" secondAttribute="centerX" id="P4i-QJ-fqW"/>
+                                    <constraint firstAttribute="bottom" secondItem="QSS-Cn-uLX" secondAttribute="bottom" id="R28-Oz-aJh"/>
+                                    <constraint firstItem="QSS-Cn-uLX" firstAttribute="top" secondItem="sz0-lr-j47" secondAttribute="bottom" constant="30" id="Wcp-6x-S7I"/>
+                                    <constraint firstItem="sz0-lr-j47" firstAttribute="top" secondItem="OQf-dg-1PF" secondAttribute="bottom" constant="30" id="aVQ-H2-2Dw"/>
+                                    <constraint firstItem="VIo-s8-p3e" firstAttribute="centerX" secondItem="J4t-Ns-eAW" secondAttribute="centerX" id="j2H-kZ-7dB"/>
+                                </constraints>
+                            </view>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="VIo-s8-p3e" firstAttribute="centerX" secondItem="YOX-Js-wd5" secondAttribute="centerX" id="iUY-Bl-zIs"/>
-                            <constraint firstItem="VIo-s8-p3e" firstAttribute="centerY" secondItem="YOX-Js-wd5" secondAttribute="centerY" id="tX1-Jy-gM9"/>
+                            <constraint firstItem="J4t-Ns-eAW" firstAttribute="leading" secondItem="YOX-Js-wd5" secondAttribute="leadingMargin" id="BaX-TI-6hI"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="J4t-Ns-eAW" secondAttribute="trailing" id="SqE-FS-1YB"/>
+                            <constraint firstItem="J4t-Ns-eAW" firstAttribute="centerY" secondItem="YOX-Js-wd5" secondAttribute="centerY" id="Zyd-xK-xoi"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Sherpa" id="Toc-La-NZv"/>
@@ -55,4 +112,9 @@
             <point key="canvasLocation" x="487" y="15"/>
         </scene>
     </scenes>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination" type="retina4_7.fullscreen"/>
+    </simulatedMetricsContainer>
 </document>
