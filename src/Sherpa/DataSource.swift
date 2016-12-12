@@ -31,13 +31,16 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 
 	// MARK: Instance life cycle
 
-	internal var document: Document!
-
-	internal init(document: Document!) {
+	internal let document: Document
+	
+	internal let bundle: NSBundle
+	
+	internal init(document: Document, bundle: NSBundle = .mainBundle() ) {
 		self.document = document
+		self.bundle = bundle
 		
-		if let mainBundleBuildNumber = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleVersion") as? String {
-			self.buildNumber = Int(mainBundleBuildNumber)
+		if let buildNumber = bundle.objectForInfoDictionaryKey("CFBundleVersion") as? String {
+			self.buildNumber = Int(buildNumber)
 		}
 		
 		super.init()
@@ -294,10 +297,9 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 			let key = self.feedbackKeys[indexPath.row]
 
 			if key == "__email" && MFMailComposeViewController.canSendMail() {
-				let bundle = NSBundle.mainBundle()
-				let name = bundle.objectForInfoDictionaryKey("CFBundleDisplayName") ?? bundle.objectForInfoDictionaryKey("CFBundleName") ?? ""
-				let version = bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") ?? ""
-				let build = bundle.objectForInfoDictionaryKey("CFBundleVersion") ?? ""
+				let name = self.bundle.objectForInfoDictionaryKey("CFBundleDisplayName") ?? self.bundle.objectForInfoDictionaryKey("CFBundleName") ?? ""
+				let version = self.bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") ?? ""
+				let build = self.bundle.objectForInfoDictionaryKey("CFBundleVersion") ?? ""
 				let subject = "Feedback for \(name!) v\(version!) (\(build!))"
 
 				let viewController = MFMailComposeViewController()

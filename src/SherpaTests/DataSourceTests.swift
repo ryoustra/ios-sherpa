@@ -36,9 +36,11 @@ class DataSourceTests: XCTestCase {
 	override func setUp() {
 		super.setUp()
 		
+		let bundle = NSBundle(forClass: DataSourceTests.self)
+
 		let url = NSBundle(forClass: DataSourceTests.self).URLForResource("dictionary", withExtension: "json")!
 		self.document = Sherpa.Document(fileAtURL: url)
-		self.dataSource = Sherpa.DataSource(document: self.document)
+		self.dataSource = Sherpa.DataSource(document: self.document, bundle: bundle)
 
 		self.tableView = UITableView(frame: CGRect.zero, style: .Plain)
 		self.tableView.dataSource = self.dataSource
