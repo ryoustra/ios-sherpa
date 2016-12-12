@@ -26,93 +26,133 @@ import XCTest
 @testable import Sherpa
 
 class DataSourceTests: XCTestCase {
-    
-    func testSectionAtIndex() {
-        let document = Sherpa.Document(dictionary: DocumentTests.dictionary)
-        let datasource = Sherpa.DataSource(document: document)
-        
-        XCTAssertNil(datasource.section(-1), "Nil should be returned when attempting to retrieve section with out-of-bounds index.")
-        XCTAssertNil(datasource.section(100), "Nil should be returned when attempting to retrieve section with out-of-bounds index.")
-        XCTAssertEqual(datasource.section(1)?.title, datasource.filteredSections[1].title, "Section retrieved by index should be the same as when accessing via filteredSections array.")
+
+	var document: Sherpa.Document!
+		
+	var dataSource: Sherpa.DataSource!
+
+	var tableView: UITableView!
+
+	override func setUp() {
+		super.setUp()
+		
+		let url = NSBundle(forClass: DataSourceTests.self).URLForResource("dictionary", withExtension: "json")!
+		self.document = Sherpa.Document(fileAtURL: url)
+		self.dataSource = Sherpa.DataSource(document: self.document)
+
+		self.tableView = UITableView(frame: CGRect.zero, style: .Plain)
+		self.tableView.dataSource = self.dataSource
+	}
+
+	func testSectionAtIndex() {
+        XCTAssertNil(dataSource.section(-1), "Nil should be returned when attempting to retrieve section with out-of-bounds index.")
+        XCTAssertNil(dataSource.section(100), "Nil should be returned when attempting to retrieve section with out-of-bounds index.")
+        XCTAssertEqual(dataSource.section(1)?.title, dataSource.filteredSections[1].title, "Section retrieved by index should be the same as when accessing via filteredSections array.")
     }
     
     func testArticleAtIndexPath() {
-        let document = Sherpa.Document(dictionary: DocumentTests.dictionary)
-        let datasource = Sherpa.DataSource(document: document)
-        
         let outOfBoundsIndexPath = NSIndexPath(forRow: 0, inSection: 100)
-        XCTAssertNil(datasource.article(outOfBoundsIndexPath), "Nil should be returned when attempting to retrieve article with out-of-bounds index path.")
+        XCTAssertNil(dataSource.article(outOfBoundsIndexPath), "Nil should be returned when attempting to retrieve article with out-of-bounds index path.")
         
         let validIndexPath = NSIndexPath(forRow: 0, inSection: 1)
-        XCTAssertEqual(datasource.article(validIndexPath)?.title, datasource.filteredSections[validIndexPath.section].articles[validIndexPath.row].title, "Article retrieved by index path should be the same as when accessing via filteredSections array.")
+        XCTAssertEqual(dataSource.article(validIndexPath)?.title, dataSource.filteredSections[validIndexPath.section].articles[validIndexPath.row].title, "Article retrieved by index path should be the same as when accessing via filteredSections array.")
     }
     
     func testIndexPathForArticle() {
-        let document = Sherpa.Document(dictionary: DocumentTests.dictionary)
-        let datasource = Sherpa.DataSource(document: document)
-
-        let articleFromDataSource = datasource.filteredSections[0].articles[1]
-        XCTAssertEqual(datasource.indexPath(articleFromDataSource), NSIndexPath(forRow: 1, inSection: 0), "Index path for article retrieved from datasource should match indices used to access via filteredSections array.")
+        let articleFromDataSource = dataSource.filteredSections[0].articles[1]
+        XCTAssertEqual(dataSource.indexPath(articleFromDataSource), NSIndexPath(forRow: 1, inSection: 0), "Index path for article retrieved from dataSource should match indices used to access via filteredSections array.")
 
         let articleFromExternalSource = Sherpa.Article(dictionary: ArticleTests.dictionary)!
-        XCTAssertNil(datasource.indexPath(articleFromExternalSource), "Nil should be returned when attempting to retrieve index path for article that doesn't exist in the data source.")
+        XCTAssertNil(dataSource.indexPath(articleFromExternalSource), "Nil should be returned when attempting to retrieve index path for article that doesn't exist in the data source.")
     }
     
     func testFilter() {
-        let document = Sherpa.Document(dictionary: DocumentTests.dictionary)
-        let datasource = Sherpa.DataSource(document: document)
-        
-        datasource.filter = { $0.buildMin >= 400 }
-        
-        XCTAssertEqual(datasource.filteredSections.count, 1, "Sections that do not contain articles matching the specified filter should be removed.")
-        XCTAssertEqual(datasource.filteredSections[0].articles.count, 1, "Articles that don't match the specified filter should be removed.")
+		let testCases: [(filter: ((Article) -> Bool)?, expectedNumberOfRows: [Int])] = [
+			(nil, self.document.sections.map { $0.articles.count }),
+			({ $0.buildMin >= 400 }, [1])
+		]
+
+		for (filter, expectedNumberOfRows) in testCases {
+			dataSource.sectionTitle = nil
+			dataSource.filter = filter
+			
+			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), expectedNumberOfRows.count + 1, "Sections without articles matching the filter should not be visible (the Feedback section should always match).")
+			for (i, count) in (expectedNumberOfRows + [2]).enumerate() {
+				XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: i), count, "Articles that don't match the specified filter should not be visible.")
+			}
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count), 2, "The feedback section should always contain rows for each of the available feedback options.")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count * 10), 0, "Out-of-bounds sections should always have zero rows.")
+			
+			dataSource.sectionTitle = "Example Section Title"
+			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), 1, "If a section title is specified, there should only be one section (with the feedback section removed).")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 0), expectedNumberOfRows.reduce(0, combine: +), "All articles matching the specified query should be visible in the combined section.")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count * 10), 0, "Out-of-bounds sections should always have zero rows.")
+		}
     }
     
     func testQuery() {
-        let document = Sherpa.Document(dictionary: DocumentTests.dictionary)
-        let datasource = Sherpa.DataSource(document: document)
-        
-        datasource.query = "biBE"
-        
-        XCTAssertEqual(datasource.filteredSections.count, 2, "Sections that do not contain articles matching the specified query should be removed.")
-        XCTAssertEqual(datasource.filteredSections[0].articles.count, 1, "Articles that don't match the specified filter should be removed.")
-        XCTAssertEqual(datasource.filteredSections[1].articles.count, 1, "Articles that don't match the specified filter should be removed.")
+		let testCases: [(query: String?, expectedNumberOfRows: [Int])] = [
+			(nil, self.document.sections.map { $0.articles.count }),
+			("biBE", [1, 1])
+		]
+		
+		for (query, expectedNumberOfRows) in testCases {
+			dataSource.sectionTitle = nil
+			dataSource.query = query
+			
+			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), expectedNumberOfRows.count + 1, "Sections without articles matching the query should not be visible (the Feedback section should always match).")
+			for (i, count) in (expectedNumberOfRows + [2]).enumerate() {
+				XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: i), count, "Articles that don't match the specified query should not be visible.")
+			}
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count), 2, "The feedback section should always contain rows for each of the available feedback options.")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count * 10), 0, "Out-of-bounds sections should always have zero rows.")
+			
+			dataSource.sectionTitle = "Example Section Title"
+			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), 1, "If a section title is specified, there should only be one section (with the feedback section removed).")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 0), expectedNumberOfRows.reduce(0, combine: +), "All articles matching the specified query should be visible in the combined section.")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count * 10), 0, "Out-of-bounds sections should always have zero rows.")
+		}
     }
     
     func testBuildNumber() {
-        let document = Sherpa.Document(dictionary: DocumentTests.dictionary)
-        let datasource = Sherpa.DataSource(document: document)
-        
-        datasource.buildNumber = 370
-        
-        XCTAssertEqual(datasource.filteredSections.count, 2, "Sections that do not contain articles matching the specified query should be removed.")
-        XCTAssertEqual(datasource.filteredSections[0].articles.count, 1, "Articles that don't match the specified filter should be removed.")
-        XCTAssertEqual(datasource.filteredSections[1].articles.count, 1, "Articles that don't match the specified filter should be removed.")
+		let testCases: [(buildNumber: Int?, expectedNumberOfRows: [Int])] = [
+			(nil, self.document.sections.map { $0.articles.count }),
+			(370, [1, 1])
+		]
+		
+		for (buildNumber, expectedNumberOfRows) in testCases {
+			dataSource.sectionTitle = nil
+			dataSource.buildNumber = buildNumber
+			
+			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), expectedNumberOfRows.count + 1, "Sections without articles matching the build number should not be visible (the Feedback section should always match).")
+			for (i, count) in (expectedNumberOfRows + [2]).enumerate() {
+				XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: i), count, "Articles that don't match the specified build number should not be visible.")
+			}
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count), 2, "The feedback section should always contain rows for each of the available feedback options.")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count * 10), 0, "Out-of-bounds sections should always have zero rows.")
+			
+			dataSource.sectionTitle = "Example Section Title"
+			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), 1, "If a section title is specified, there should only be one section (with the feedback section removed).")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 0), expectedNumberOfRows.reduce(0, combine: +), "All articles matching the specified build number should be visible in the combined section.")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count * 10), 0, "Out-of-bounds sections should always have zero rows.")
+		}
     }
-    
-    func testSectionTitle() {
-        let document = Sherpa.Document(dictionary: DocumentTests.dictionary)
-        let datasource = Sherpa.DataSource(document: document)
-        
-        datasource.sectionTitle = "Section Title"
-        
-        XCTAssertEqual(datasource.filteredSections.count, 1, "When a data source has a section title specified, it should only have a single section.")
-        XCTAssertEqual(datasource.filteredSections[0].articles.count, 3, "When a data source has a section title specified, all articles should exist in a single section.")
-    }
-    
-    func testTableViewDataSource() {
-        let document = Sherpa.Document(dictionary: DocumentTests.dictionary)
-        let datasource = Sherpa.DataSource(document: document)
-        
+
+	func testTableViewDataSource() {
         let tableView = UITableView()
         
-        XCTAssertEqual(datasource.numberOfSectionsInTableView(tableView), document.sections.count + 1, "The number of table view sections should reflect the number of article sections, plus the feedback section.")
-        XCTAssertEqual(datasource.tableView(tableView, numberOfRowsInSection: 0), document.sections[0].articles.count, "The number of table view rows for a section should reflect the number of articles in that section.")
-        XCTAssertEqual(datasource.tableView(tableView, numberOfRowsInSection: document.sections.count), 2, "The number of table view rows for the feedback section should reflect the number of feedback options available.")
-        XCTAssertEqual(datasource.tableView(tableView, titleForHeaderInSection: 0), document.sections[0].title, "The title for a section's header should match that section's `title` property.")
-        XCTAssertEqual(datasource.tableView(tableView, titleForFooterInSection: 0), document.sections[0].detail, "The title for a section's footer should match that section's `detail` property.")
-        XCTAssertEqual(datasource.tableView(tableView, titleForHeaderInSection: 1), document.sections[1].title, "The title for a section's header should match that section's `title` property.")
-        XCTAssertEqual(datasource.tableView(tableView, titleForFooterInSection: 1), document.sections[1].detail, "The title for a section's footer should match that section's `detail` property.")
+        XCTAssertEqual(dataSource.numberOfSectionsInTableView(tableView), document.sections.count + 1, "The number of table view sections should reflect the number of article sections, plus the feedback section.")
+
+		for (i, section) in document.sections.enumerate() {
+			XCTAssertEqual(dataSource.tableView(tableView, numberOfRowsInSection: i), section.articles.count, "The number of table view rows for a section should reflect the number of articles in that section.")
+			XCTAssertEqual(dataSource.tableView(tableView, titleForHeaderInSection: i), section.title, "The title for a section's header should match that section's `title` property.")
+			XCTAssertEqual(dataSource.tableView(tableView, titleForFooterInSection: i), section.detail, "The title for a section's footer should match that section's `detail` property.")
+		}
+
+		let feedbackIndex = document.sections.count
+		XCTAssertEqual(dataSource.tableView(tableView, numberOfRowsInSection: feedbackIndex), 2, "The feedback section should always contain rows for each of the available feedback options.")
+        XCTAssertEqual(dataSource.tableView(tableView, titleForHeaderInSection: feedbackIndex), "Feedback", "The title for a the feedback section should always bee \"Feedback\".")
+        XCTAssertNil(dataSource.tableView(tableView, titleForFooterInSection: feedbackIndex), "The detail text for the feeback section should always be nil.")
     }
 
 }
