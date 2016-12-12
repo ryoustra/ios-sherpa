@@ -87,10 +87,6 @@ internal class Document {
 		return self.sections.flatMap({ $0.articles }).filter({ key == $0.key }).first
 	}
 
-	internal func dataSource() -> DataSource! {
-		return DataSource(document: self)
-	}
-
 	// MARK: Utilities
 
 	internal func didSelect(article: Article) {

@@ -40,10 +40,11 @@ class DataSourceTests: XCTestCase {
 
 		let url = NSBundle(forClass: DataSourceTests.self).URLForResource("dictionary", withExtension: "json")!
 		self.document = Sherpa.Document(fileAtURL: url)
-		self.dataSource = Sherpa.DataSource(document: self.document, bundle: bundle)
 
 		self.tableView = UITableView(frame: CGRect.zero, style: .Plain)
 		self.tableView.dataSource = self.dataSource
+
+		self.dataSource = Sherpa.DataSource(tableView: self.tableView, document: self.document, bundle: bundle)
 	}
 
 	func testSectionAtIndex() {

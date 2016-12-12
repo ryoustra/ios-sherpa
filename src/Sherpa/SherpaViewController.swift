@@ -88,7 +88,7 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 		let document = Document(fileAtURL: fileURL)
 
 		self.document = document
-		self.listViewController = ListViewController(dataSource: document.dataSource())
+		self.listViewController = ListViewController(document: document)
 
 		super.init(nibName: nil, bundle: nil)
 
@@ -130,16 +130,14 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 			if let key = articleKey, let article = self.document.article(key) {
 				self.listViewController.selectRowForArticle(article)
 
-				let dataSource = self.document.dataSource()
-				let articleViewController = ArticleViewController(dataSource:dataSource, article: article)
+				let articleViewController = ArticleViewController(document: self.document, article: article)
 				navigationController.pushViewController(articleViewController, animated: false)
 			}
 		}
 
 		// Pushing a deep-linked article into a navigation stack
 		else if let key = articleKey, let article = self.document.article(key) {
-			let dataSource = self.document.dataSource()
-			let articleViewController = ArticleViewController(dataSource:dataSource, article: article)
+			let articleViewController = ArticleViewController(document: self.document, article: article)
 			self.articleViewController = articleViewController
 
 			self.addChildViewController(articleViewController)
@@ -186,8 +184,7 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 	// MARK: Document controller delegate
 
 	internal func document(document: Document, didSelectArticle article: Article) {
-		let dataSource = self.document.dataSource()
-		let articleViewController = ArticleViewController(dataSource:dataSource, article: article)
+		let articleViewController = ArticleViewController(document: self.document, article: article)
 		let navigationController = self.embeddedNavigationController ?? self.navigationController
 		navigationController!.pushViewController(articleViewController, animated: true)
 	}

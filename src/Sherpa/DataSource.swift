@@ -31,11 +31,14 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 
 	// MARK: Instance life cycle
 
+	internal let tableView: UITableView
+	
 	internal let document: Document
 	
 	internal let bundle: NSBundle
 	
-	internal init(document: Document, bundle: NSBundle = .mainBundle() ) {
+	internal init(tableView: UITableView, document: Document, bundle: NSBundle = .mainBundle()) {
+		self.tableView = tableView
 		self.document = document
 		self.bundle = bundle
 		

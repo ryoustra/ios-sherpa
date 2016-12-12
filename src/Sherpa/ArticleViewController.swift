@@ -30,9 +30,14 @@ internal class ArticleViewController: ListViewController {
 
 	internal let article: Article!
 
-	init(dataSource: DataSource!, article: Article!) {
+	init(document: Document, article: Article) {
 		self.article = article
-		super.init(dataSource: dataSource)
+
+		super.init(document: document)
+
+		self.dataSource.sectionTitle = NSLocalizedString("Related", comment: "Title for table view section containing one or more related articles.")
+		self.dataSource.filter = { (article: Article) -> Bool in return article.key != nil && self.article.relatedKeys.contains(article.key!)  }
+
 		self.allowSearch = false
 	}
 
@@ -52,9 +57,6 @@ internal class ArticleViewController: ListViewController {
 		super.viewDidLoad()
 
 		self.navigationItem.title = nil
-
-		self.dataSource.sectionTitle = NSLocalizedString("Related", comment: "Title for table view section containing one or more related articles.")
-		self.dataSource.filter = { (article: Article) -> Bool in return article.key != nil && self.article.relatedKeys.contains(article.key!)  }
 
 		self.contentView.preservesSuperviewLayoutMargins = true
 		self.contentView.translatesAutoresizingMaskIntoConstraints = false

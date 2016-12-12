@@ -30,13 +30,13 @@ internal class ListViewController: UIViewController, UISearchControllerDelegate,
 
 	// MARK: Instance life cycle
 
-	internal let dataSource: DataSource!
+	internal private(set) var dataSource: DataSource! = nil
 
-	internal init(dataSource: DataSource!) {
-		self.dataSource = dataSource
-
+	internal init(document: Document) {
 		super.init(nibName: nil, bundle: nil)
 
+		self.dataSource = DataSource(tableView: self.tableView, document: document)
+		
 		self.tableView.dataSource = self.dataSource
 		self.tableView.delegate = self.dataSource
 		self.tableView.reloadData()
