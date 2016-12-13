@@ -26,25 +26,25 @@ import XCTest
 @testable import Sherpa
 
 class ArticleTests: XCTestCase {
-    
-    static let dictionary = [
-        "key": "example-key",
-        "title": "Test Article",
-        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc lacinia, nibh in rutrum placerat, augue risus convallis enim, eget elementum metus odio ut arcu. Phasellus ultricies sollicitudin arcu, at lacinia sem convallis sit amet. Suspendisse ac mauris elementum, eleifend est in, placerat urna. Donec elementum dignissim elit sed tempor.",
-        "build_min": 365,
-        "build_max": 867,
-        "related_articles": ["missing-article"]
-    ]
-
-    func testInit() {
-        XCTAssertNotNil(Sherpa.Article(dictionary: ArticleTests.dictionary), "Article should successfully initialize with valid dictionary.")
-        
-        var minimal = ArticleTests.dictionary
-        minimal.removeValueForKey("key")
-        minimal.removeValueForKey("build_min")
-        minimal.removeValueForKey("build_max")
-        minimal.removeValueForKey("related_articles")
-        XCTAssertNotNil(Sherpa.Article(dictionary: minimal), "Article should successfully initialize with title and body.")
+	
+	static let dictionary = [
+		"key": "example-key",
+		"title": "Test Article",
+		"body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc lacinia, nibh in rutrum placerat, augue risus convallis enim, eget elementum metus odio ut arcu. Phasellus ultricies sollicitudin arcu, at lacinia sem convallis sit amet. Suspendisse ac mauris elementum, eleifend est in, placerat urna. Donec elementum dignissim elit sed tempor.",
+		"build_min": 365,
+		"build_max": 867,
+		"related_articles": ["missing-article"]
+	]
+	
+	func testInit() {
+		XCTAssertNotNil(Sherpa.Article(dictionary: ArticleTests.dictionary), "Article should successfully initialize with valid dictionary.")
+		
+		var minimal = ArticleTests.dictionary
+		minimal.removeValueForKey("key")
+		minimal.removeValueForKey("build_min")
+		minimal.removeValueForKey("build_max")
+		minimal.removeValueForKey("related_articles")
+		XCTAssertNotNil(Sherpa.Article(dictionary: minimal), "Article should successfully initialize with title and body.")
 	}
 	
 	func testKey() {
@@ -81,7 +81,7 @@ class ArticleTests: XCTestCase {
 	
 	func testTitle() {
 		var dictionary = ArticleTests.dictionary
-
+		
 		let article = Sherpa.Article(dictionary: dictionary)
 		XCTAssertNotNil(article, "Article should successfully init from dictionary with valid 'title' and 'body' values.")
 		if let article = article {
@@ -94,28 +94,28 @@ class ArticleTests: XCTestCase {
 		dictionary["title"] = [23]
 		XCTAssertNil(Sherpa.Article(dictionary: dictionary), "Article should not initialize with an invalid 'title' value.")
 		
-        dictionary.removeValueForKey("title")
-        XCTAssertNil(Sherpa.Article(dictionary: dictionary), "Article should not initialize without a 'title' value.")
+		dictionary.removeValueForKey("title")
+		XCTAssertNil(Sherpa.Article(dictionary: dictionary), "Article should not initialize without a 'title' value.")
 	}
 	
 	func testBody() {
-        var dictionary = ArticleTests.dictionary
-
+		var dictionary = ArticleTests.dictionary
+		
 		let article = Sherpa.Article(dictionary: dictionary)
 		XCTAssertNotNil(article, "Article should successfully init from dictionary with valid 'title' and 'body' values.")
 		if let article = article {
 			XCTAssertEqual(article.body, dictionary["body"], "Article body should match the 'body' value in the provided dictionary.")
 		}
-
+		
 		dictionary["body"] = ""
-        XCTAssertNil(Sherpa.Article(dictionary: dictionary), "Article should not initialize with an empty 'body' value.")
-
+		XCTAssertNil(Sherpa.Article(dictionary: dictionary), "Article should not initialize with an empty 'body' value.")
+		
 		dictionary["body"] = [23]
 		XCTAssertNil(Sherpa.Article(dictionary: dictionary), "Article should not initialize with an invalid 'body' value.")
 		
-        dictionary.removeValueForKey("body")
-        XCTAssertNil(Sherpa.Article(dictionary: dictionary), "Article should not initialize without a 'body' value.")
-    }
+		dictionary.removeValueForKey("body")
+		XCTAssertNil(Sherpa.Article(dictionary: dictionary), "Article should not initialize without a 'body' value.")
+	}
 	
 	func testBuildMin() {
 		var dictionary = ArticleTests.dictionary
@@ -133,7 +133,7 @@ class ArticleTests: XCTestCase {
 		if let article = buildAsString {
 			XCTAssertEqual(article.buildMin, 88, "Minimum build should match the 'build_min' value in the provided dictionary.")
 		}
-
+		
 		dictionary["build_min"] = ""
 		let buildAsEmptyString = Sherpa.Article(dictionary: dictionary)
 		XCTAssertNotNil(buildAsEmptyString, "Article should successfully init from dictionary with a string 'build_min' value.")
@@ -172,14 +172,14 @@ class ArticleTests: XCTestCase {
 		if let article = buildAsInt {
 			XCTAssertEqual(article.buildMax, 42, "Minimum build should match the 'build_max' value in the provided dictionary.")
 		}
-
+		
 		dictionary["build_max"] = "88"
 		let buildAsString = Sherpa.Article(dictionary: dictionary)
 		XCTAssertNotNil(buildAsString, "Article should successfully init from dictionary with a string 'build_max' value.")
 		if let article = buildAsString {
 			XCTAssertEqual(article.buildMax, 88, "Minimum build should match the 'build_max' value in the provided dictionary.")
 		}
-
+		
 		dictionary["build_max"] = ""
 		let buildAsEmptyString = Sherpa.Article(dictionary: dictionary)
 		XCTAssertNotNil(buildAsEmptyString, "Article should successfully init from dictionary with a string 'build_max' value.")
@@ -246,7 +246,7 @@ class ArticleTests: XCTestCase {
 		if let article = relatedAsInvalidType {
 			XCTAssertEqual(article.relatedKeys, [], "Related keys should be an empty array if the 'related_articles' value in the provided dictionary is invalid.")
 		}
-
+		
 		dictionary.removeValueForKey("related_articles")
 		let missingRelated = Sherpa.Article(dictionary: dictionary)
 		XCTAssertNotNil(missingRelated, "Article should successfully init from dictionary when 'related_articles' is missing.")
@@ -255,24 +255,24 @@ class ArticleTests: XCTestCase {
 		}
 	}
 	
-    func testMatchesQuery() {
-        if let article = Sherpa.Article(dictionary: ArticleTests.dictionary) {
+	func testMatchesQuery() {
+		if let article = Sherpa.Article(dictionary: ArticleTests.dictionary) {
 			XCTAssertTrue(article.matches(""), "Article should always match an empty query.")
 			XCTAssertTrue(article.matches("Est"), "Article should match query when (case-insensitively) found in both title and body.")
 			XCTAssertTrue(article.matches("artic"), "Article should match query when (case-insensitively) found only in title.")
 			XCTAssertTrue(article.matches("PENDI"), "Article should match query when (case-insensitively) found only in body.")
 			XCTAssertFalse(article.matches("Example"), "Article should NOT match query when not (case-insensitively) found in the title or body.")
-        }
-    }
-    
-    func testMatchesBuildNumber() {
-        if let article = Sherpa.Article(dictionary: ArticleTests.dictionary) {
+		}
+	}
+	
+	func testMatchesBuildNumber() {
+		if let article = Sherpa.Article(dictionary: ArticleTests.dictionary) {
 			XCTAssertTrue(article.matches(article.buildMin), "Article should match build number that is equal to its buildMin (\(article.buildMin)).")
 			XCTAssertTrue(article.matches(article.buildMin), "Article should match build number that is equal to its buildMax (\(article.buildMax)).")
 			XCTAssertTrue(article.matches(500), "Article should match build number (500) that is greater than its buildMin (\(article.buildMin)) and less than its buildMax (\(article.buildMax)).")
 			XCTAssertFalse(article.matches(200), "Article should not match build number (200) that is less than its buildMin (\(article.buildMin)).")
 			XCTAssertFalse(article.matches(900), "Article should not match build number (900) that is greater than its buildMax (\(article.buildMax)).")
-        }
-    }
-    
+		}
+	}
+	
 }

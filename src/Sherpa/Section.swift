@@ -25,14 +25,14 @@
 import Foundation
 
 internal struct Section {
-    
-    let title: String?
-    
-    let detail: String?
-    
-    let articles: [Article]
-    
-    internal init?(dictionary: [String: AnyObject]) {
+	
+	let title: String?
+	
+	let detail: String?
+	
+	let articles: [Article]
+	
+	internal init?(dictionary: [String: AnyObject]) {
 		// Title
 		if let string = dictionary["title"] as? String where !string.isEmpty {
 			title = string
@@ -50,34 +50,34 @@ internal struct Section {
 		}
 		
 		// Articles
-        articles = (dictionary["articles"] as? [[String: AnyObject]])?.map({ Article(dictionary: $0) }).flatMap({ $0 }) ?? []
-        if articles.count == 0 {
-            return nil
-        }
-    }
-    
-    internal init(title: String?, detail: String?, articles: [Article]!) {
-        self.title = title
-        self.detail = detail
-        self.articles = articles
-    }
-    
-    internal func section(@noescape filter: (Article) -> Bool) -> Section? {
-        let articles = self.articles.filter(filter)
-        
-        if articles.count == 0 {
-            return nil
-        }
-        
-        return Section(title: self.title, detail: self.detail, articles: articles)
-    }
-    
-    internal func section(query: String) -> Section? {
-        return self.section { $0.matches(query) }
-    }
-    
-    internal func section(buildNumber: Int) -> Section? {
-        return self.section { $0.matches(buildNumber) }
-    }
-    
+		articles = (dictionary["articles"] as? [[String: AnyObject]])?.map({ Article(dictionary: $0) }).flatMap({ $0 }) ?? []
+		if articles.count == 0 {
+			return nil
+		}
+	}
+	
+	internal init(title: String?, detail: String?, articles: [Article]!) {
+		self.title = title
+		self.detail = detail
+		self.articles = articles
+	}
+	
+	internal func section(@noescape filter: (Article) -> Bool) -> Section? {
+		let articles = self.articles.filter(filter)
+		
+		if articles.count == 0 {
+			return nil
+		}
+		
+		return Section(title: self.title, detail: self.detail, articles: articles)
+	}
+	
+	internal func section(query: String) -> Section? {
+		return self.section { $0.matches(query) }
+	}
+	
+	internal func section(buildNumber: Int) -> Section? {
+		return self.section { $0.matches(buildNumber) }
+	}
+	
 }

@@ -25,104 +25,104 @@
 import UIKit
 
 internal protocol DocumentDelegate {
-
+	
 	func document(document: Document, didSelectArticle article: Article)
-
+	
 	func document(document: Document, didSelectViewController viewController: UIViewController)
-
+	
 }
 
 internal class Document {
-
+	
 	internal var delegate: DocumentDelegate?
-
+	
 	// MARK: Customising appearance
-
+	
 	internal var tintColor: UIColor? = UINavigationBar.appearance().tintColor
-
+	
 	internal var articleBackgroundColor: UIColor = UIColor.whiteColor()
-
+	
 	internal var articleTextColor: UIColor = UIColor.darkTextColor()
-
+	
 	internal var articleCellClass = UITableViewCell.self
-
+	
 	internal var feedbackCellClass = UITableViewCell.self
-
+	
 	// MARK: Feedback points.
-
+	
 	internal var feedbackEmail: String? = nil
-
+	
 	internal var feedbackTwitter: String? = nil
 	
 	// MARK: Instance life cycle
-
+	
 	internal let fileURL: NSURL?
-
+	
 	internal var sections: [Section] = []
-
-    internal init(fileAtURL fileURL: NSURL) {
-        self.fileURL = fileURL
-        self._loadFromFile()
-    }
-    
-    internal init(dictionary: [String: AnyObject]) {
-        self.fileURL = nil
-        self._load(from: dictionary)
-    }
-    
-    internal init(array: [[String: AnyObject]]) {
-        self.fileURL = nil
-        self._load(from: array)
-    }
-    
+	
+	internal init(fileAtURL fileURL: NSURL) {
+		self.fileURL = fileURL
+		self._loadFromFile()
+	}
+	
+	internal init(dictionary: [String: AnyObject]) {
+		self.fileURL = nil
+		self._load(from: dictionary)
+	}
+	
+	internal init(array: [[String: AnyObject]]) {
+		self.fileURL = nil
+		self._load(from: array)
+	}
+	
 	// MARK: Retrieving content
-
+	
 	internal func section(index: Int) -> Section? {
 		if index < 0 || index >= self.sections.count { return nil }
-
+		
 		return self.sections[index]
 	}
-
+	
 	internal func article(key: String) -> Article? {
 		return self.sections.flatMap({ $0.articles }).filter({ key == $0.key }).first
 	}
-
+	
 	// MARK: Utilities
-
+	
 	internal func didSelect(article: Article) {
 		if let delegate = self.delegate {
 			delegate.document(self, didSelectArticle: article)
 		}
 	}
-
+	
 	internal func shouldPresent(viewController: UIViewController) {
 		if let delegate = self.delegate {
 			delegate.document(self, didSelectViewController: viewController)
 		}
 	}
-
+	
 	private func _loadFromFile() {
 		do {
 			guard let fileURL = self.fileURL, let data = NSData(contentsOfURL: fileURL) else {
 				return
 			}
-
+			
 			let json = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(rawValue: 0))
-
+			
 			if let dictionary = json as? [String:AnyObject] {
-                self._load(from: dictionary)
+				self._load(from: dictionary)
 			}
-
+				
 			else if let array = json as? [[String:AnyObject]] {
-                self._load(from: array)
+				self._load(from: array)
 			}
 		}
 		catch {
 			return
 		}
-    }
-    
-    private func _load(from dictionary: [String:AnyObject]) {
+	}
+	
+	private func _load(from dictionary: [String:AnyObject]) {
 		// Feedback email
 		let emailRegex = "^\\s*(\"?[^\"]\"?\\s)?<?.+@.+>?\\s*$"
 		if let string = dictionary["feedback_email"] as? String where string.rangeOfString(emailRegex, options: .RegularExpressionSearch) != nil {
@@ -131,7 +131,7 @@ internal class Document {
 		else {
 			feedbackEmail = nil
 		}
-
+		
 		// Feedback twitter
 		let twitterRegex = "^\\s*[@＠]?[a-zA-Z0-9_]{1,20}\\s*$"
 		if let string = dictionary["feedback_twitter"] as? String where string.rangeOfString(twitterRegex, options: .RegularExpressionSearch) != nil {
@@ -144,11 +144,11 @@ internal class Document {
 		}
 		
 		// Sections
-        self._load(from: dictionary["entries"] as? [[String:AnyObject]] ?? [])
-    }
-    
-    private func _load(from array: [[String:AnyObject]]) {
-        self.sections = array.flatMap({ Section(dictionary: $0) })
-    }
-    
+		self._load(from: dictionary["entries"] as? [[String:AnyObject]] ?? [])
+	}
+	
+	private func _load(from array: [[String:AnyObject]]) {
+		self.sections = array.flatMap({ Section(dictionary: $0) })
+	}
+	
 }

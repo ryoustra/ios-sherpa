@@ -26,7 +26,7 @@ import XCTest
 @testable import Sherpa
 
 class DocumentTests: XCTestCase {
-    
+	
 	static let dictionary: [String:AnyObject] = {
 		let url = NSBundle(forClass: DocumentTests.self).URLForResource("dictionary", withExtension: "json")!
 		let data = NSData(contentsOfURL: url)!
@@ -38,7 +38,7 @@ class DocumentTests: XCTestCase {
 		let data = NSData(contentsOfURL: url)!
 		return try! NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(rawValue: 0)) as! [[String:AnyObject]]
 	}()
-
+	
 	func testFeedbackEmail() {
 		var dictionary = DocumentTests.dictionary
 		
@@ -98,7 +98,7 @@ class DocumentTests: XCTestCase {
 		let missingTwitter = Sherpa.Document(dictionary: dictionary)
 		XCTAssertNil(missingTwitter.feedbackTwitter, "Feedback Twitter account should match the 'feedback_twitter' value in the provided dictionary.")
 	}
-
+	
 	func testSectionsFromFiles() {
 		let bundle = NSBundle(forClass: DocumentTests.self)
 		
@@ -107,7 +107,7 @@ class DocumentTests: XCTestCase {
 			(bundle.URLForResource("array", withExtension: "json")!, true),
 			(bundle.URLForResource("invalid", withExtension: "json")!, false),
 			(bundle.resourceURL!.URLByAppendingPathComponent("missing.json")!, false),
-		]
+			]
 		
 		for (url, shouldBeValid) in fileURLs {
 			let entries = DocumentTests.dictionary["entries"] as! [[String: AnyObject]]
@@ -133,7 +133,7 @@ class DocumentTests: XCTestCase {
 		XCTAssertEqual(validEntries.sections.count, entries.count - 1, "Number of sections in the document should reflect the number found in the dictionary, minus any empty sections.")
 		XCTAssertEqual(validEntries.sections[0].title, entries[0]["title"] as? String, "Sections in the document should match those found in the dictionary, minus any empty sections.")
 		XCTAssertEqual(validEntries.sections[1].title, entries[2]["title"] as? String, "Sections in the document should match those found in the dictionary, minus any empty sections.")
-
+		
 		dictionary["entries"] = []
 		let entriesAsEmptyArray = Sherpa.Document(dictionary: dictionary)
 		XCTAssertEqual(entriesAsEmptyArray.sections.count, 0, "Number of sections in the document should reflect the number found in the dictionary, minus any empty sections.")
@@ -151,75 +151,75 @@ class DocumentTests: XCTestCase {
 		XCTAssertEqual(missingEntries.sections.count, 0, "Number of sections in the document should be zero if the JSON file does not match the required structure.")
 	}
 	
-    func testSectionsFromArray() {
-        let document = Sherpa.Document(array: DocumentTests.array)
+	func testSectionsFromArray() {
+		let document = Sherpa.Document(array: DocumentTests.array)
 		let entries = DocumentTests.array
 		
-        XCTAssertEqual(document.sections.count, entries.count - 1, "Number of sections in the document should reflect the number found in the array, minus any empty sections.")
-        XCTAssertEqual(document.sections[0].title, entries[0]["title"] as? String, "Sections in the document should match those found in the array, minus any empty sections.")
-        XCTAssertEqual(document.sections[1].title, entries[2]["title"] as? String, "Sections in the document should match those found in the array, minus any empty sections.")
-    }
-    
-    func testSectionAtIndex() {
-        let document = Sherpa.Document(array: DocumentTests.array)
-        
-        XCTAssertNil(document.section(-1), "Nil should be returned when attempting to retrieve section with out-of-bounds index.")
-        XCTAssertNil(document.section(100), "Nil should be returned when attempting to retrieve section with out-of-bounds index.")
-        XCTAssertEqual(document.section(1)?.title, document.sections[1].title, "Section retrieved by index should be the same as when accessing via sections array.")
-    }
-
-    func testArticleWithKey() {
-        let document = Sherpa.Document(array: DocumentTests.array)
-        
-        XCTAssertNil(document.article("invalid-key"), "Nil should be returned when attempting to retrieve article with a key that doesn't exist.")
-        XCTAssertEqual(document.article("article-key")?.title, document.sections[0].articles[1].title, "Section retrieved by key should be the first matching when accessing via indices.")
-    }
-
-    func testDelegate() {
-        let document = Sherpa.Document(array: DocumentTests.array)
-        let delegate = DocumentTestDelegate()
-        
-        document.delegate = delegate
-        
-        let article = document.sections[0].articles[0]
-        document.didSelect(article)
-        XCTAssertNotNil(delegate.document, "Document provided to delegate should match the calling document.")
-        XCTAssertNotNil(delegate.article, "Article provided to the delegate should match the one provided to `didSelect`.")
-        XCTAssertNil(delegate.viewController, "View controller should not be present after call to `didSelect`.")
-
-        let viewController = UIViewController()
-        document.shouldPresent(viewController)
-        XCTAssertNotNil(delegate.document, "Document provided to delegate should match the calling document.")
-        XCTAssertNotNil(delegate.viewController, "View controller provided to the delegate should match the one provided to `shouldPresent`.")
-        XCTAssertNil(delegate.article, "Article should not be present after call to `shouldPresent`.")
-    }
-    
-    private class DocumentTestDelegate: DocumentDelegate {
-        
-        var document: Document? = nil
-        
-        var article: Article? = nil
-        
-        var viewController: UIViewController? = nil
-        
-        func document(document: Document, didSelectArticle article: Article) {
-            self.reset()
-            self.document = document
-            self.article = article
-        }
-        
-        func document(document: Document, didSelectViewController viewController: UIViewController) {
-            self.reset()
-            self.document = document
-            self.viewController = viewController
-        }
-        
-        func reset() {
-            self.document = nil
-            self.article = nil
-            self.viewController = nil
-        }
-
-    }
-
+		XCTAssertEqual(document.sections.count, entries.count - 1, "Number of sections in the document should reflect the number found in the array, minus any empty sections.")
+		XCTAssertEqual(document.sections[0].title, entries[0]["title"] as? String, "Sections in the document should match those found in the array, minus any empty sections.")
+		XCTAssertEqual(document.sections[1].title, entries[2]["title"] as? String, "Sections in the document should match those found in the array, minus any empty sections.")
+	}
+	
+	func testSectionAtIndex() {
+		let document = Sherpa.Document(array: DocumentTests.array)
+		
+		XCTAssertNil(document.section(-1), "Nil should be returned when attempting to retrieve section with out-of-bounds index.")
+		XCTAssertNil(document.section(100), "Nil should be returned when attempting to retrieve section with out-of-bounds index.")
+		XCTAssertEqual(document.section(1)?.title, document.sections[1].title, "Section retrieved by index should be the same as when accessing via sections array.")
+	}
+	
+	func testArticleWithKey() {
+		let document = Sherpa.Document(array: DocumentTests.array)
+		
+		XCTAssertNil(document.article("invalid-key"), "Nil should be returned when attempting to retrieve article with a key that doesn't exist.")
+		XCTAssertEqual(document.article("article-key")?.title, document.sections[0].articles[1].title, "Section retrieved by key should be the first matching when accessing via indices.")
+	}
+	
+	func testDelegate() {
+		let document = Sherpa.Document(array: DocumentTests.array)
+		let delegate = DocumentTestDelegate()
+		
+		document.delegate = delegate
+		
+		let article = document.sections[0].articles[0]
+		document.didSelect(article)
+		XCTAssertNotNil(delegate.document, "Document provided to delegate should match the calling document.")
+		XCTAssertNotNil(delegate.article, "Article provided to the delegate should match the one provided to `didSelect`.")
+		XCTAssertNil(delegate.viewController, "View controller should not be present after call to `didSelect`.")
+		
+		let viewController = UIViewController()
+		document.shouldPresent(viewController)
+		XCTAssertNotNil(delegate.document, "Document provided to delegate should match the calling document.")
+		XCTAssertNotNil(delegate.viewController, "View controller provided to the delegate should match the one provided to `shouldPresent`.")
+		XCTAssertNil(delegate.article, "Article should not be present after call to `shouldPresent`.")
+	}
+	
+	private class DocumentTestDelegate: DocumentDelegate {
+		
+		var document: Document? = nil
+		
+		var article: Article? = nil
+		
+		var viewController: UIViewController? = nil
+		
+		func document(document: Document, didSelectArticle article: Article) {
+			self.reset()
+			self.document = document
+			self.article = article
+		}
+		
+		func document(document: Document, didSelectViewController viewController: UIViewController) {
+			self.reset()
+			self.document = document
+			self.viewController = viewController
+		}
+		
+		func reset() {
+			self.document = nil
+			self.article = nil
+			self.viewController = nil
+		}
+		
+	}
+	
 }

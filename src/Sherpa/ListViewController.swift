@@ -25,46 +25,46 @@
 import UIKit
 
 internal class ListViewController: UIViewController, UISearchControllerDelegate, UISearchResultsUpdating {
-
+	
 	internal var allowSearch: Bool = true
-
+	
 	// MARK: Instance life cycle
-
+	
 	internal private(set) var dataSource: DataSource! = nil
-
+	
 	internal init(document: Document) {
 		super.init(nibName: nil, bundle: nil)
-
+		
 		self.dataSource = DataSource(tableView: self.tableView, document: document)
 		
 		self.tableView.dataSource = self.dataSource
 		self.tableView.delegate = self.dataSource
 		self.tableView.reloadData()
 	}
-
+	
 	internal required init?(coder aDecoder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
-
+	
 	deinit{
 		self.searchController?.view.removeFromSuperview()
 	}
-
+	
 	// MARK: View life cycle
-
+	
 	private var searchController: UISearchController?
-
+	
 	internal let tableView = UITableView(frame: CGRectZero, style: .Grouped)
-
+	
 	override func loadView() {
 		self.view = self.tableView
 	}
-
+	
 	override internal func viewDidLoad() {
 		super.viewDidLoad()
-
+		
 		self.navigationItem.title = NSLocalizedString("User Guide", comment: "Title for view controller listing user guide articles.")
-
+		
 		if self.allowSearch {
 			let searchController = UISearchController(searchResultsController: nil)
 			if #available(iOS 9.1, *) {
@@ -78,68 +78,68 @@ internal class ListViewController: UIViewController, UISearchControllerDelegate,
 			searchController.searchBar.tintColor = self.dataSource.document.tintColor
 			searchController.searchBar.autoresizingMask = [.FlexibleWidth]
 			self.searchController = searchController
-
+			
 			// Sticking the searchBar inside a wrapper stops the tableview trying to be clever with the content size.
 			let headerView = UIView(frame: searchController.searchBar.frame)
 			headerView.autoresizingMask = [.FlexibleWidth]
 			headerView.addSubview(searchController.searchBar)
 			self.tableView.tableHeaderView = headerView
-
+			
 			self.definesPresentationContext = true;
 		}
 	}
-
+	
 	override func viewWillAppear(animated: Bool) {
 		super.viewWillAppear(animated)
-
+		
 		if let indexPath = self.tableView.indexPathForSelectedRow {
 			self.tableView.deselectRowAtIndexPath(indexPath, animated: animated)
 		}
-
+		
 		if let searchController = self.searchController where searchController.active {
 			self.navigationController?.setNavigationBarHidden(true, animated: false)
 		}
-
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(onKeyboard(_:)), name: UIKeyboardWillShowNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(onKeyboard(_:)), name: UIKeyboardWillHideNotification, object: nil)
-    }
-
-    @objc private func onKeyboard(notification: NSNotification) {
-        UIView.beginAnimations(nil, context: nil)
-
-        if let rawValue = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey]?.integerValue, let curve = UIViewAnimationCurve(rawValue: rawValue) {
-            UIView.setAnimationCurve(curve)
-        }
-
-        if let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey]?.doubleValue {
-            UIView.setAnimationDuration(duration)
-        }
-
-        let keyboardOrigin = notification.userInfo?[UIKeyboardFrameEndUserInfoKey]?.CGRectValue.origin.y ?? 0
-        
-        let contentInset = self.tableView.contentInset
-        let bottomInset = max(self.bottomLayoutGuide.length, self.tableView.frame.size.height - keyboardOrigin)
-        
-        self.tableView.contentInset = UIEdgeInsets(top: contentInset.top, left: contentInset.left, bottom: bottomInset, right: contentInset.right)
-
-        UIView.commitAnimations()
-    }
-
-    // MARK: Search results updating
-
+		
+		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(onKeyboard(_:)), name: UIKeyboardWillShowNotification, object: nil)
+		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(onKeyboard(_:)), name: UIKeyboardWillHideNotification, object: nil)
+	}
+	
+	@objc private func onKeyboard(notification: NSNotification) {
+		UIView.beginAnimations(nil, context: nil)
+		
+		if let rawValue = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey]?.integerValue, let curve = UIViewAnimationCurve(rawValue: rawValue) {
+			UIView.setAnimationCurve(curve)
+		}
+		
+		if let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey]?.doubleValue {
+			UIView.setAnimationDuration(duration)
+		}
+		
+		let keyboardOrigin = notification.userInfo?[UIKeyboardFrameEndUserInfoKey]?.CGRectValue.origin.y ?? 0
+		
+		let contentInset = self.tableView.contentInset
+		let bottomInset = max(self.bottomLayoutGuide.length, self.tableView.frame.size.height - keyboardOrigin)
+		
+		self.tableView.contentInset = UIEdgeInsets(top: contentInset.top, left: contentInset.left, bottom: bottomInset, right: contentInset.right)
+		
+		UIView.commitAnimations()
+	}
+	
+	// MARK: Search results updating
+	
 	internal func updateSearchResultsForSearchController(searchController: UISearchController) {
 		if !self.allowSearch { return }
-
+		
 		if searchController.active, let query = searchController.searchBar.text where query.characters.count > 0 {
 			self.dataSource.query = query
 		}
 		else {
 			self.dataSource.query = nil
 		}
-
+		
 		self.tableView.reloadData()
 	}
-
+	
 	// MARK: Utilities
 	
 	internal func selectRowForArticle(article: Article) {
@@ -147,5 +147,5 @@ internal class ListViewController: UIViewController, UISearchControllerDelegate,
 			self.tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .Middle)
 		}
 	}
-
+	
 }

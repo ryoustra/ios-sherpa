@@ -25,20 +25,20 @@
 import Foundation
 
 internal struct Article {
-    
-    let key: String?
-    
-    let title: String
-    
-    let body: String
-    
-    let buildMin: Int
-    
-    let buildMax: Int
 	
-    let relatedKeys: [String]
-    
-    internal init?(dictionary: [String: AnyObject]) {
+	let key: String?
+	
+	let title: String
+	
+	let body: String
+	
+	let buildMin: Int
+	
+	let buildMax: Int
+	
+	let relatedKeys: [String]
+	
+	internal init?(dictionary: [String: AnyObject]) {
 		// Key
 		if let string = dictionary["key"] as? String where !string.isEmpty {
 			key = string
@@ -46,7 +46,7 @@ internal struct Article {
 		else {
 			key = nil
 		}
-
+		
 		// Minimum build
 		if let int = dictionary["build_min"] as? Int {
 			buildMin = int
@@ -57,17 +57,17 @@ internal struct Article {
 		else {
 			buildMin = 1
 		}
-
-        // Maximum build
-        if let int = dictionary["build_max"] as? Int {
-            buildMax = int
-        }
-        else if let string = dictionary["build_max"] as? String, let int = Int(string) {
-            buildMax = int
-        }
-        else {
-            buildMax = Int.max
-        }
+		
+		// Maximum build
+		if let int = dictionary["build_max"] as? Int {
+			buildMax = int
+		}
+		else if let string = dictionary["build_max"] as? String, let int = Int(string) {
+			buildMax = int
+		}
+		else {
+			buildMax = Int.max
+		}
 		
 		// Related articles
 		if let array = dictionary["related_articles"] as? [String] {
@@ -79,35 +79,35 @@ internal struct Article {
 		else {
 			relatedKeys = []
 		}
-
-        // Title and body
+		
+		// Title and body
 		title = dictionary["title"] as? String ?? ""
 		body = dictionary["body"] as? String ?? ""
-        if title.isEmpty || body.isEmpty {
-            return nil
-        }
-    }
-    
-    internal func matches(query: String) -> Bool {
-        if query.isEmpty {
-            return true
-        }
-        
-        let lowercaseQuery = query.lowercaseString
-        
-        if self.title.lowercaseString.rangeOfString(lowercaseQuery) != nil {
-            return true
-        }
-            
-        else if self.body.lowercaseString.rangeOfString(lowercaseQuery) != nil {
-            return true
-        }
-        
-        return false
-    }
-    
-    internal func matches(buildNumber: Int) -> Bool {
-        return buildNumber >= self.buildMin && buildNumber <= self.buildMax
-    }
-    
+		if title.isEmpty || body.isEmpty {
+			return nil
+		}
+	}
+	
+	internal func matches(query: String) -> Bool {
+		if query.isEmpty {
+			return true
+		}
+		
+		let lowercaseQuery = query.lowercaseString
+		
+		if self.title.lowercaseString.rangeOfString(lowercaseQuery) != nil {
+			return true
+		}
+			
+		else if self.body.lowercaseString.rangeOfString(lowercaseQuery) != nil {
+			return true
+		}
+		
+		return false
+	}
+	
+	internal func matches(buildNumber: Int) -> Bool {
+		return buildNumber >= self.buildMin && buildNumber <= self.buildMax
+	}
+	
 }

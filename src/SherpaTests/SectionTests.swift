@@ -26,35 +26,35 @@ import XCTest
 @testable import Sherpa
 
 class SectionTests: XCTestCase {
-    
-    static let dictionary = [
-        "title": "Section Title",
-        "detail": "Text that appears in the footer for the section.",
-        "articles": [
-            [
-                "title": "Article 1",
-                "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc lacinia, nibh in rutrum placerat, augue risus convallis enim, eget elementum metus odio ut arcu. Phasellus ultricies sollicitudin arcu, at lacinia sem convallis sit amet. Suspendisse ac mauris elementum, eleifend est in, placerat urna. Donec elementum dignissim elit sed tempor.",
-                "build_min": 360,
-            ],
-            [
-                "key": "invalid-article",
-            ],
-            [
-                "title": "Article 2",
-                "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at rhoncus erat, in bibendum lectus. Aliquam vel turpis nec justo volutpat rhoncus. Integer venenatis, lectus sed ultrices dictum, dolor nunc scelerisque arcu, et tincidunt justo elit eu nulla. Aenean erat ante, blandit vitae elit non, posuere eleifend mi.",
-                "build_min": 401,
-            ]
-        ]
-    ]
-    
-    func testInit() {
-        XCTAssertNotNil(Sherpa.Section(dictionary: SectionTests.dictionary), "Section should successfully initialize with valid dictionary.")
-        
-        var minimal = SectionTests.dictionary
-        minimal.removeValueForKey("title")
-        minimal.removeValueForKey("details")
-        XCTAssertNotNil(Sherpa.Section(dictionary: minimal), "Section should successfully initialize with only articles.")
-    }
+	
+	static let dictionary = [
+		"title": "Section Title",
+		"detail": "Text that appears in the footer for the section.",
+		"articles": [
+			[
+				"title": "Article 1",
+				"body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc lacinia, nibh in rutrum placerat, augue risus convallis enim, eget elementum metus odio ut arcu. Phasellus ultricies sollicitudin arcu, at lacinia sem convallis sit amet. Suspendisse ac mauris elementum, eleifend est in, placerat urna. Donec elementum dignissim elit sed tempor.",
+				"build_min": 360,
+			],
+			[
+				"key": "invalid-article",
+			],
+			[
+				"title": "Article 2",
+				"body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at rhoncus erat, in bibendum lectus. Aliquam vel turpis nec justo volutpat rhoncus. Integer venenatis, lectus sed ultrices dictum, dolor nunc scelerisque arcu, et tincidunt justo elit eu nulla. Aenean erat ante, blandit vitae elit non, posuere eleifend mi.",
+				"build_min": 401,
+			]
+		]
+	]
+	
+	func testInit() {
+		XCTAssertNotNil(Sherpa.Section(dictionary: SectionTests.dictionary), "Section should successfully initialize with valid dictionary.")
+		
+		var minimal = SectionTests.dictionary
+		minimal.removeValueForKey("title")
+		minimal.removeValueForKey("details")
+		XCTAssertNotNil(Sherpa.Section(dictionary: minimal), "Section should successfully initialize with only articles.")
+	}
 	
 	func testTitle() {
 		var dictionary = SectionTests.dictionary
@@ -119,9 +119,9 @@ class SectionTests: XCTestCase {
 			XCTAssertNil(section.detail, "Section detail should match the 'detail' value in the provided dictionary.")
 		}
 	}
-
+	
 	func testSectionByFilteringArticles() {
-        if let section = Sherpa.Section(dictionary: SectionTests.dictionary) {
+		if let section = Sherpa.Section(dictionary: SectionTests.dictionary) {
 			let nonMatching = section.section { return $0.key == "example-key" }
 			XCTAssertNil(nonMatching, "Filter that do not match at least one article should return nil.")
 			
@@ -134,11 +134,11 @@ class SectionTests: XCTestCase {
 				XCTAssertEqual(matching.articles.count, 1, "Filter that matches at least one article should only contain filtered articles.")
 				XCTAssertEqual(matching.articles[0].title, section.articles[1].title, "Filter that matches at least one article should only contain filtered articles.")
 			}
-        }
-    }
+		}
+	}
 	
-    func testSectionMatchingQuery() {
-        if let section = Sherpa.Section(dictionary: SectionTests.dictionary) {
+	func testSectionMatchingQuery() {
+		if let section = Sherpa.Section(dictionary: SectionTests.dictionary) {
 			let empty = section.section("")
 			XCTAssertNotNil(empty, "An empty query should always return a section.")
 			
@@ -162,7 +162,7 @@ class SectionTests: XCTestCase {
 				XCTAssertEqual(matching.articles.count, 1, "Filter that matches at least one article should only contain filtered articles.")
 				XCTAssertEqual(matching.articles[0].title, section.articles[0].title, "Filter that matches at least one article should only contain filtered articles.")
 			}
-        }
-    }
+		}
+	}
 	
 }
