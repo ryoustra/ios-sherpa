@@ -72,7 +72,8 @@ class DataSourceTests: XCTestCase {
     func testFilter() {
 		let testCases: [(filter: ((Article) -> Bool)?, expectedNumberOfRows: [Int])] = [
 			(nil, self.document.sections.map { $0.articles.count }),
-			({ $0.buildMin >= 400 }, [1])
+			({ $0.buildMin >= 400 }, [1]),
+			({ _ in return false }, []) // Non-matching
 		]
 
 		for (filter, expectedNumberOfRows) in testCases {
@@ -84,19 +85,20 @@ class DataSourceTests: XCTestCase {
 				XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: i), count, "Articles that don't match the specified filter should not be visible.")
 			}
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count), 2, "The feedback section should always contain rows for each of the available feedback options.")
-			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count * 10), 0, "Out-of-bounds sections should always have zero rows.")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 100), 0, "Out-of-bounds sections should always have zero rows.")
 			
 			dataSource.sectionTitle = "Example Section Title"
-			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), 1, "If a section title is specified, there should only be one section (with the feedback section removed).")
+			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), min(1, expectedNumberOfRows.count), "If a section title is specified, there should only be one section (with the feedback section removed).")
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 0), expectedNumberOfRows.reduce(0, combine: +), "All articles matching the specified query should be visible in the combined section.")
-			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count * 10), 0, "Out-of-bounds sections should always have zero rows.")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 100), 0, "Out-of-bounds sections should always have zero rows.")
 		}
     }
     
     func testQuery() {
 		let testCases: [(query: String?, expectedNumberOfRows: [Int])] = [
 			(nil, self.document.sections.map { $0.articles.count }),
-			("biBE", [1, 1])
+			("biBE", [1, 1]),
+			("a very specific, non-matching query", []) // Non-matching
 		]
 		
 		for (query, expectedNumberOfRows) in testCases {
@@ -108,19 +110,20 @@ class DataSourceTests: XCTestCase {
 				XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: i), count, "Articles that don't match the specified query should not be visible.")
 			}
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count), 2, "The feedback section should always contain rows for each of the available feedback options.")
-			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count * 10), 0, "Out-of-bounds sections should always have zero rows.")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 100), 0, "Out-of-bounds sections should always have zero rows.")
 			
 			dataSource.sectionTitle = "Example Section Title"
-			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), 1, "If a section title is specified, there should only be one section (with the feedback section removed).")
+			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), min(1, expectedNumberOfRows.count), "If a section title is specified, there should only be one section (with the feedback section removed).")
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 0), expectedNumberOfRows.reduce(0, combine: +), "All articles matching the specified query should be visible in the combined section.")
-			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count * 10), 0, "Out-of-bounds sections should always have zero rows.")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 100), 0, "Out-of-bounds sections should always have zero rows.")
 		}
     }
     
     func testBuildNumber() {
 		let testCases: [(buildNumber: Int?, expectedNumberOfRows: [Int])] = [
 			(nil, self.document.sections.map { $0.articles.count }),
-			(370, [1, 1])
+			(370, [1, 1]),
+			(0, []) // Non-matching
 		]
 		
 		for (buildNumber, expectedNumberOfRows) in testCases {
@@ -132,12 +135,12 @@ class DataSourceTests: XCTestCase {
 				XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: i), count, "Articles that don't match the specified build number should not be visible.")
 			}
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count), 2, "The feedback section should always contain rows for each of the available feedback options.")
-			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count * 10), 0, "Out-of-bounds sections should always have zero rows.")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 100), 0, "Out-of-bounds sections should always have zero rows.")
 			
 			dataSource.sectionTitle = "Example Section Title"
-			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), 1, "If a section title is specified, there should only be one section (with the feedback section removed).")
+			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), min(1, expectedNumberOfRows.count), "If a section title is specified, there should only be one section (with the feedback section removed).")
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 0), expectedNumberOfRows.reduce(0, combine: +), "All articles matching the specified build number should be visible in the combined section.")
-			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count * 10), 0, "Out-of-bounds sections should always have zero rows.")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 100), 0, "Out-of-bounds sections should always have zero rows.")
 		}
     }
 
