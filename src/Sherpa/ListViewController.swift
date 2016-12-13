@@ -24,13 +24,23 @@
 
 import UIKit
 
-internal class ListViewController: UIViewController, UISearchControllerDelegate, UISearchResultsUpdating {
+internal protocol ListViewControllerDelegate: class {
+	
+	func listViewController(listViewController: ListViewController, didSelectArticle article: Article)
+	
+	func listViewController(listViewController: ListViewController, didSelectFeedback feedbackType: DataSource.FeedbackType)
+	
+}
+
+internal class ListViewController: UIViewController, UITableViewDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
+	
+	internal weak var delegate: ListViewControllerDelegate?
 	
 	internal var allowSearch: Bool = true
 	
 	// MARK: Instance life cycle
 	
-	internal private(set) var dataSource: DataSource! = nil
+	internal private(set) var dataSource: DataSource!
 	
 	internal init(document: Document) {
 		super.init(nibName: nil, bundle: nil)
@@ -38,7 +48,7 @@ internal class ListViewController: UIViewController, UISearchControllerDelegate,
 		self.dataSource = DataSource(tableView: self.tableView, document: document)
 		
 		self.tableView.dataSource = self.dataSource
-		self.tableView.delegate = self.dataSource
+		self.tableView.delegate = self
 		self.tableView.reloadData()
 	}
 	
@@ -139,7 +149,23 @@ internal class ListViewController: UIViewController, UISearchControllerDelegate,
 		
 		self.tableView.reloadData()
 	}
+
+	// MARK: Table view delegate
 	
+	func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+		return 44
+	}
+	
+	func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+		if let key = self.dataSource.feedback(indexPath) {
+			self.delegate?.listViewController(self, didSelectFeedback: key)
+		}
+			
+		else if let article = self.dataSource.article(indexPath) {
+			self.delegate?.listViewController(self, didSelectArticle: article)
+		}
+	}
+
 	// MARK: Utilities
 	
 	internal func selectRowForArticle(article: Article) {

@@ -27,8 +27,13 @@ import MessageUI
 import Social
 import SafariServices
 
-internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate, MFMailComposeViewControllerDelegate {
+internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate {
 	
+	enum FeedbackType: Int {
+		case Twitter
+		case Email
+	}
+
 	// MARK: Instance life cycle
 	
 	internal let tableView: UITableView
@@ -93,8 +98,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 			let articles = sections.flatMap({ $0.articles })
 			
 			if articles.count > 0 {
-				let title: String? = articles.count > 0 ? sectionTitle : nil
-				sections = [ Section(title: title, detail: nil, articles: articles) ]
+				sections = [Section(title: sectionTitle, detail: nil, articles: articles)]
 			}
 			else {
 				sections = []
@@ -102,6 +106,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 		}
 		
 		self.filteredSections = sections
+		self.generateFeedbackSection()
 	}
 	
 	// MARK: Accessing data
@@ -142,27 +147,33 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 		get{ return self.allowFeedback ? self.filteredSections.count : nil }
 	}
 	
-	private var feedbackKeys: [String] = []
+	private var feedbackKeys: [FeedbackType] = []
 	
 	private func generateFeedbackSection() {
-		var feedbackKeys: [String] = []
+		var feedbackKeys: [FeedbackType] = []
 		
 		if self.document.feedbackEmail != nil {
-			feedbackKeys.append("__email")
+			feedbackKeys.append(.Email)
 		}
 		
 		if self.document.feedbackTwitter != nil {
-			feedbackKeys.append("__twitter")
+			feedbackKeys.append(.Twitter)
 		}
 		
 		self.feedbackKeys = feedbackKeys
 	}
 	
+	internal func feedback(indexPath: NSIndexPath) -> FeedbackType? {
+		guard indexPath.section == self.indexOfFeedbackSection else { return nil }
+		
+		if indexPath.row < 0 || indexPath.row >= self.feedbackKeys.count { return nil }
+		
+		return self.feedbackKeys[indexPath.row]
+	}
+	
 	// MARK: Table view data source
 	
 	@objc func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-		self.generateFeedbackSection()
-		
 		if self.allowFeedback {
 			return self.filteredSections.count + 1
 		}
@@ -202,7 +213,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 			cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) ?? self.document.feedbackCellClass.init(style: .Value1, reuseIdentifier: reuseIdentifier)
 			
 			let key = self.feedbackKeys[indexPath.row]
-			if key == "__email" {
+			if key == .Email {
 				var email = self.document.feedbackEmail!
 				
 				do {
@@ -226,7 +237,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 				}
 			}
 				
-			else if key == "__twitter" {
+			else if key == .Twitter {
 				cell.textLabel!.text = NSLocalizedString("Twitter", comment: "Label for Twitter feedback button.")
 				cell.detailTextLabel!.text = "@\(self.document.feedbackTwitter!)".stringByReplacingOccurrencesOfString("@@", withString: "@")
 				
@@ -287,58 +298,6 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate,
 		}
 		
 		return cell
-	}
-	
-	// MARK: Table view delegate
-	
-	func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-		return 44
-	}
-	
-	func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-		if indexPath.section == self.indexOfFeedbackSection {
-			let key = self.feedbackKeys[indexPath.row]
-			
-			if key == "__email" && MFMailComposeViewController.canSendMail() {
-				let name = self.bundle.objectForInfoDictionaryKey("CFBundleDisplayName") ?? self.bundle.objectForInfoDictionaryKey("CFBundleName") ?? ""
-				let version = self.bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") ?? ""
-				let build = self.bundle.objectForInfoDictionaryKey("CFBundleVersion") ?? ""
-				let subject = "Feedback for \(name!) v\(version!) (\(build!))"
-				
-				let viewController = MFMailComposeViewController()
-				viewController.mailComposeDelegate = self
-				viewController.setToRecipients([self.document.feedbackEmail!])
-				viewController.setSubject(subject)
-				self.document.shouldPresent(viewController)
-			}
-				
-			else if key == "__twitter" {
-				let handle = self.document.feedbackTwitter!.stringByReplacingOccurrencesOfString("@", withString: "")
-				
-				if SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter) {
-					let viewController = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
-					viewController.setInitialText("@\(handle) ")
-					self.document.shouldPresent(viewController)
-				}
-					
-				else if let url = NSURL(string: "https://twitter.com/\(handle)") {
-					if #available(iOSApplicationExtension 9.0, *) {
-						let viewController = SFSafariViewController(URL: url)
-						self.document.shouldPresent(viewController)
-					}
-				}
-			}
-		}
-			
-		else if let article = self.article(indexPath) {
-			self.document.didSelect(article)
-		}
-	}
-	
-	// MARK: Mail compose controller delegate
-	
-	func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
-		controller.dismissViewControllerAnimated(true, completion: nil)
 	}
 	
 }

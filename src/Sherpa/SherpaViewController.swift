@@ -23,8 +23,11 @@
 //
 
 import UIKit
+import MessageUI
+import Social
+import SafariServices
 
-public class SherpaViewController: UIViewController, UINavigationControllerDelegate, DocumentDelegate {
+public class SherpaViewController: UIViewController, UINavigationControllerDelegate, MFMailComposeViewControllerDelegate, ListViewControllerDelegate {
 	
 	// MARK: Deep-linking
 	
@@ -91,8 +94,8 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 		self.listViewController = ListViewController(document: document)
 		
 		super.init(nibName: nil, bundle: nil)
-		
-		document.delegate = self
+
+		self.listViewController.delegate = self
 	}
 	
 	public required init?(coder aDecoder: NSCoder) {
@@ -131,13 +134,15 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 				self.listViewController.selectRowForArticle(article)
 				
 				let articleViewController = ArticleViewController(document: self.document, article: article)
+				articleViewController.delegate = self
 				navigationController.pushViewController(articleViewController, animated: false)
 			}
 		}
 			
-			// Pushing a deep-linked article into a navigation stack
+		// Pushing a deep-linked article into a navigation stack
 		else if let key = articleKey, let article = self.document.article(key) {
 			let articleViewController = ArticleViewController(document: self.document, article: article)
+			articleViewController.delegate = self
 			self.articleViewController = articleViewController
 			
 			self.addChildViewController(articleViewController)
@@ -148,7 +153,7 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 			articleViewController.view.preservesSuperviewLayoutMargins = true
 		}
 			
-			// Pushing into a navigation stack
+		// Pushing into a navigation stack
 		else {
 			self.addChildViewController(self.listViewController)
 			self.view.addSubview(self.listViewController.view)
@@ -181,17 +186,58 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 		}
 	}
 	
-	// MARK: Document controller delegate
+	// MARK: Data source delegate
 	
-	internal func document(document: Document, didSelectArticle article: Article) {
+	func listViewController(listViewController: ListViewController, didSelectArticle article: Article) {
 		let articleViewController = ArticleViewController(document: self.document, article: article)
+		articleViewController.delegate = self
+		
 		let navigationController = self.embeddedNavigationController ?? self.navigationController
 		navigationController!.pushViewController(articleViewController, animated: true)
 	}
 	
-	internal func document(document: Document, didSelectViewController viewController: UIViewController) {
-		let navigationController = self.embeddedNavigationController ?? self.navigationController
-		navigationController!.presentViewController(viewController, animated: true, completion: nil)
+	func listViewController(listViewController: ListViewController, didSelectFeedback feedbackType: DataSource.FeedbackType) {
+		let navigationController = self.embeddedNavigationController ?? self.navigationController!
+		
+		if feedbackType == .Email && MFMailComposeViewController.canSendMail() {
+			let bundle = NSBundle.mainBundle()
+			let name = bundle.objectForInfoDictionaryKey("CFBundleDisplayName") ?? bundle.objectForInfoDictionaryKey("CFBundleName") ?? ""
+			let version = bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") ?? ""
+			let build = bundle.objectForInfoDictionaryKey("CFBundleVersion") ?? ""
+			let subject = "Feedback for \(name!) v\(version!) (\(build!))"
+			
+			let viewController = MFMailComposeViewController()
+			viewController.mailComposeDelegate = self
+			viewController.setToRecipients([self.document.feedbackEmail!])
+			viewController.setSubject(subject)
+			
+			navigationController.presentViewController(viewController, animated: true, completion: nil)
+		}
+			
+		else if feedbackType == .Twitter {
+			let handle = self.document.feedbackTwitter!.stringByReplacingOccurrencesOfString("@", withString: "")
+			
+			if SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter) {
+				let viewController = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
+				viewController.setInitialText("@\(handle) ")
+				
+				navigationController.presentViewController(viewController, animated: true, completion: nil)
+			}
+				
+			else if let url = NSURL(string: "https://twitter.com/\(handle)") {
+				if #available(iOSApplicationExtension 9.0, *) {
+					let viewController = SFSafariViewController(URL: url)
+					
+					navigationController.presentViewController(viewController, animated: true, completion: nil)
+				}
+			}
+		}
+	}
+	
+	// MARK: Mail compose controller delegate
+	
+	public func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
+		controller.dismissViewControllerAnimated(true, completion: nil)
 	}
 	
 	// MARK: Utilities

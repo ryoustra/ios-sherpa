@@ -24,17 +24,7 @@
 
 import UIKit
 
-internal protocol DocumentDelegate {
-	
-	func document(document: Document, didSelectArticle article: Article)
-	
-	func document(document: Document, didSelectViewController viewController: UIViewController)
-	
-}
-
 internal class Document {
-	
-	internal var delegate: DocumentDelegate?
 	
 	// MARK: Customising appearance
 	
@@ -88,19 +78,7 @@ internal class Document {
 	}
 	
 	// MARK: Utilities
-	
-	internal func didSelect(article: Article) {
-		if let delegate = self.delegate {
-			delegate.document(self, didSelectArticle: article)
-		}
-	}
-	
-	internal func shouldPresent(viewController: UIViewController) {
-		if let delegate = self.delegate {
-			delegate.document(self, didSelectViewController: viewController)
-		}
-	}
-	
+
 	private func _loadFromFile() {
 		do {
 			guard let fileURL = self.fileURL, let data = NSData(contentsOfURL: fileURL) else {

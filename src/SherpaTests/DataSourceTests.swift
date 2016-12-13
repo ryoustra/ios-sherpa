@@ -160,5 +160,5 @@ class DataSourceTests: XCTestCase {
 		XCTAssertEqual(dataSource.tableView(tableView, titleForHeaderInSection: feedbackIndex), "Feedback", "The title for a the feedback section should always bee \"Feedback\".")
 		XCTAssertNil(dataSource.tableView(tableView, titleForFooterInSection: feedbackIndex), "The detail text for the feeback section should always be nil.")
 	}
-	
+
 }

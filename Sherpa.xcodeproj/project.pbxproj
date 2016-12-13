@@ -15,6 +15,7 @@
 		A184CE2E1DF8E9400046D048 /* DocumentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A184CE2D1DF8E9400046D048 /* DocumentTests.swift */; };
 		A184CE321DF90D1A0046D048 /* Section.swift in Sources */ = {isa = PBXBuildFile; fileRef = A184CE311DF90D1A0046D048 /* Section.swift */; };
 		A184CE341DF90D2E0046D048 /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = A184CE331DF90D2E0046D048 /* Article.swift */; };
+		A18F82B21E000A8600E3D348 /* ListViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18F82B11E000A8600E3D348 /* ListViewControllerTests.swift */; };
 		A1CF09FD1DF8D65400D13E21 /* ArticleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1CF09FC1DF8D65400D13E21 /* ArticleTests.swift */; };
 		A1CF09FF1DF8D65400D13E21 /* Sherpa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1A787381C7BED9C0095A0EF /* Sherpa.framework */; };
 		A1E665F81C978ABB0005CE51 /* SherpaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E665F71C978ABB0005CE51 /* SherpaViewController.swift */; };
@@ -48,6 +49,7 @@
 		A184CE2D1DF8E9400046D048 /* DocumentTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentTests.swift; sourceTree = "<group>"; };
 		A184CE311DF90D1A0046D048 /* Section.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Section.swift; sourceTree = "<group>"; };
 		A184CE331DF90D2E0046D048 /* Article.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Article.swift; sourceTree = "<group>"; };
+		A18F82B11E000A8600E3D348 /* ListViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListViewControllerTests.swift; sourceTree = "<group>"; };
 		A1A787381C7BED9C0095A0EF /* Sherpa.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sherpa.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1A7873C1C7BED9C0095A0EF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1CF09FA1DF8D65400D13E21 /* SherpaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SherpaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,6 +106,7 @@
 		A137E74A1DF9397B00AF7BEB /* User Interface */ = {
 			isa = PBXGroup;
 			children = (
+				A18F82B11E000A8600E3D348 /* ListViewControllerTests.swift */,
 				A137E74B1DF939BB00AF7BEB /* DataSourceTests.swift */,
 			);
 			name = "User Interface";
@@ -306,6 +309,7 @@
 				A1CF09FD1DF8D65400D13E21 /* ArticleTests.swift in Sources */,
 				A184CE2E1DF8E9400046D048 /* DocumentTests.swift in Sources */,
 				A137E74D1DF939BB00AF7BEB /* DataSourceTests.swift in Sources */,
+				A18F82B21E000A8600E3D348 /* ListViewControllerTests.swift in Sources */,
 				A184CE2C1DF8E8FD0046D048 /* SectionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
