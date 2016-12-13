@@ -138,28 +138,28 @@ class ArticleTests: XCTestCase {
 		let buildAsEmptyString = Sherpa.Article(dictionary: dictionary)
 		XCTAssertNotNil(buildAsEmptyString, "Article should successfully init from dictionary with a string 'build_min' value.")
 		if let article = buildAsEmptyString {
-			XCTAssertLessThan(article.buildMin, 1, "An empty 'build_min' string should result in a build number matching any integer greater than zero.")
+			XCTAssertLessThanOrEqual(article.buildMin, 1, "An empty 'build_min' string should result in a build number matching any integer greater than zero.")
 		}
 		
 		dictionary["build_min"] = "invalid build number"
 		let buildAsInvalidString = Sherpa.Article(dictionary: dictionary)
 		XCTAssertNotNil(buildAsInvalidString, "Article should successfully init from dictionary with a string 'build_min' value.")
 		if let article = buildAsInvalidString {
-			XCTAssertLessThan(article.buildMin, 1, "An invalid 'build_min' string should result in a build number matching any integer greater than zero.")
+			XCTAssertLessThanOrEqual(article.buildMin, 1, "An invalid 'build_min' string should result in a build number matching any integer greater than zero.")
 		}
 		
 		dictionary["build_min"] = [23]
 		let buildAsInvalidType = Sherpa.Article(dictionary: dictionary)
 		XCTAssertNotNil(buildAsInvalidType, "Article should successfully init from dictionary with an invalid 'build_min' value.")
 		if let article = buildAsInvalidType {
-			XCTAssertLessThan(article.buildMin, 1, "An invalid 'build_min' value should result in a build number matching any integer greater than zero.")
+			XCTAssertLessThanOrEqual(article.buildMin, 1, "An invalid 'build_min' value should result in a build number matching any integer greater than zero.")
 		}
 		
 		dictionary.removeValueForKey("build_min")
 		let missingBuild = Sherpa.Article(dictionary: dictionary)
 		XCTAssertNotNil(missingBuild, "Article should successfully init from dictionary without a 'build_min' value.")
 		if let article = missingBuild {
-			XCTAssertLessThan(article.buildMin, 1, "A missing 'build_min' value should result in a build number matching any integer greater than zero.")
+			XCTAssertLessThanOrEqual(article.buildMin, 1, "A missing 'build_min' value should result in a build number matching any integer greater than zero.")
 		}
 	}
 	
@@ -184,28 +184,28 @@ class ArticleTests: XCTestCase {
 		let buildAsEmptyString = Sherpa.Article(dictionary: dictionary)
 		XCTAssertNotNil(buildAsEmptyString, "Article should successfully init from dictionary with a string 'build_max' value.")
 		if let article = buildAsEmptyString {
-			XCTAssertGreaterThan(article.buildMax, Int.max - 1, "An empty 'build_max' string should result in a build number matching any integer less than Int.max.")
+			XCTAssertGreaterThanOrEqual(article.buildMax, Int.max, "An empty 'build_max' string should result in a build number matching any integer less than Int.max.")
 		}
 		
 		dictionary["build_max"] = "invalid build number"
 		let buildAsInvalidString = Sherpa.Article(dictionary: dictionary)
 		XCTAssertNotNil(buildAsInvalidString, "Article should successfully init from dictionary with a string 'build_max' value.")
 		if let article = buildAsInvalidString {
-			XCTAssertGreaterThan(article.buildMax, Int.max - 1, "An invalid 'build_max' string should result in a build number matching any integer less than Int.max.")
+			XCTAssertGreaterThanOrEqual(article.buildMax, Int.max, "An invalid 'build_max' string should result in a build number matching any integer less than Int.max.")
 		}
 		
 		dictionary["build_max"] = [23]
 		let buildAsInvalidType = Sherpa.Article(dictionary: dictionary)
 		XCTAssertNotNil(buildAsInvalidType, "Article should successfully init from dictionary with an invalid 'build_max' value.")
 		if let article = buildAsInvalidType {
-			XCTAssertGreaterThan(article.buildMax, Int.max - 1, "An invalid 'build_max' value should result in a build number matching any integer less than Int.max.")
+			XCTAssertGreaterThanOrEqual(article.buildMax, Int.max, "An invalid 'build_max' value should result in a build number matching any integer less than Int.max.")
 		}
 		
 		dictionary.removeValueForKey("build_max")
 		let missingBuild = Sherpa.Article(dictionary: dictionary)
 		XCTAssertNotNil(missingBuild, "Article should successfully init from dictionary without a 'build_max' value.")
 		if let article = missingBuild {
-			XCTAssertGreaterThan(article.buildMax, Int.max - 1, "A missing 'build_max' value should result in a build number matching any integer less than Int.max.")
+			XCTAssertGreaterThanOrEqual(article.buildMax, Int.max, "A missing 'build_max' value should result in a build number matching any integer less than Int.max.")
 		}
 	}
 	
@@ -267,6 +267,8 @@ class ArticleTests: XCTestCase {
     
     func testMatchesBuildNumber() {
         if let article = Sherpa.Article(dictionary: ArticleTests.dictionary) {
+			XCTAssertTrue(article.matches(article.buildMin), "Article should match build number that is equal to its buildMin (\(article.buildMin)).")
+			XCTAssertTrue(article.matches(article.buildMin), "Article should match build number that is equal to its buildMax (\(article.buildMax)).")
 			XCTAssertTrue(article.matches(500), "Article should match build number (500) that is greater than its buildMin (\(article.buildMin)) and less than its buildMax (\(article.buildMax)).")
 			XCTAssertFalse(article.matches(200), "Article should not match build number (200) that is less than its buildMin (\(article.buildMin)).")
 			XCTAssertFalse(article.matches(900), "Article should not match build number (900) that is greater than its buildMax (\(article.buildMax)).")

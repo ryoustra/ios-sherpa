@@ -55,7 +55,7 @@ internal struct Article {
 			buildMin = int
 		}
 		else {
-			buildMin = 0
+			buildMin = 1
 		}
 
         // Maximum build
