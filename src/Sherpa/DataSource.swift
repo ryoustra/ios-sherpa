@@ -29,11 +29,6 @@ import SafariServices
 
 internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate {
 	
-	enum FeedbackType: Int {
-		case Twitter
-		case Email
-	}
-
 	// MARK: Instance life cycle
 	
 	internal let tableView: UITableView
@@ -106,7 +101,6 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 		}
 		
 		self.filteredSections = sections
-		self.generateFeedbackSection()
 	}
 	
 	// MARK: Accessing data
@@ -140,35 +134,19 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 	// MARK: Feedback
 	
 	private var allowFeedback: Bool {
-		get{ return self.sectionTitle == nil && self.feedbackKeys.count > 0 }
+		get{ return self.sectionTitle == nil && self.document.feedback.count > 0 }
 	}
 	
 	private var indexOfFeedbackSection: Int? {
 		get{ return self.allowFeedback ? self.filteredSections.count : nil }
 	}
 	
-	private var feedbackKeys: [FeedbackType] = []
-	
-	private func generateFeedbackSection() {
-		var feedbackKeys: [FeedbackType] = []
-		
-		if self.document.feedbackEmail != nil {
-			feedbackKeys.append(.Email)
-		}
-		
-		if self.document.feedbackTwitter != nil {
-			feedbackKeys.append(.Twitter)
-		}
-		
-		self.feedbackKeys = feedbackKeys
-	}
-	
-	internal func feedback(indexPath: NSIndexPath) -> FeedbackType? {
+	internal func feedback(indexPath: NSIndexPath) -> Feedback? {
 		guard indexPath.section == self.indexOfFeedbackSection else { return nil }
 		
-		if indexPath.row < 0 || indexPath.row >= self.feedbackKeys.count { return nil }
+		if indexPath.row < 0 || indexPath.row >= self.document.feedback.count { return nil }
 		
-		return self.feedbackKeys[indexPath.row]
+		return self.document.feedback[indexPath.row]
 	}
 	
 	// MARK: Table view data source
@@ -183,7 +161,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 	
 	@objc func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		if section == self.indexOfFeedbackSection {
-			return self.feedbackKeys.count
+			return self.document.feedback.count
 		}
 		
 		return self.section(section)?.articles.count ?? 0
@@ -208,47 +186,19 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 	@objc func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
 		let cell: UITableViewCell
 		
-		if indexPath.section == self.indexOfFeedbackSection {
+		if let feedback = self.feedback(indexPath) {
 			let reuseIdentifier = "_SherpaFeedbackCell";
 			cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) ?? self.document.feedbackCellClass.init(style: .Value1, reuseIdentifier: reuseIdentifier)
 			
-			let key = self.feedbackKeys[indexPath.row]
-			if key == .Email {
-				var email = self.document.feedbackEmail!
-				
-				do {
-					let regex = try NSRegularExpression(pattern: "<([^>]+)>", options: [])
-					if let match = regex.firstMatchInString(email, options: [], range: NSMakeRange(0,email.characters.count)) {
-						email = (email as NSString).substringWithRange(match.rangeAtIndex(1))
-					}
-				}
-				catch {}
-				
-				cell.textLabel!.text = NSLocalizedString("Email", comment: "Label for email feedback button.")
-				cell.detailTextLabel!.text = email
-				
-				if MFMailComposeViewController.canSendMail() {
-					if self.document.feedbackCellClass === UITableViewCell.self {
-						cell.textLabel!.textColor = self.document.tintColor
-					}
-				}
-				else {
-					cell.selectionStyle = .None
-				}
+			cell.textLabel!.text = feedback.label
+			cell.detailTextLabel!.text = feedback.detail
+			
+			if feedback.viewController == nil {
+				cell.selectionStyle = .None
 			}
-				
-			else if key == .Twitter {
-				cell.textLabel!.text = NSLocalizedString("Twitter", comment: "Label for Twitter feedback button.")
-				cell.detailTextLabel!.text = "@\(self.document.feedbackTwitter!)".stringByReplacingOccurrencesOfString("@@", withString: "@")
-				
-				if #available(iOSApplicationExtension 9.0, *) {
-					if self.document.feedbackCellClass === UITableViewCell.self {
-						cell.textLabel!.textColor = self.document.tintColor
-					}
-				}
-				else {
-					cell.selectionStyle = .None
-				}
+			else if self.document.feedbackCellClass === UITableViewCell.self {
+				cell.selectionStyle = .Default
+				cell.textLabel!.textColor = self.document.tintColor
 			}
 		}
 			
@@ -264,6 +214,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 				} else {
 					cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
 				}
+				cell.selectionStyle = .Default
 				cell.textLabel!.textColor = self.document.tintColor
 			}
 			
@@ -299,5 +250,5 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 		
 		return cell
 	}
-	
+
 }

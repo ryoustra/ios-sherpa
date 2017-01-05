@@ -41,62 +41,71 @@ class DocumentTests: XCTestCase {
 	
 	func testFeedbackEmail() {
 		var dictionary = DocumentTests.dictionary
+
+		let testValues: [(input: AnyObject?, email: String?, name: String?)] = [
+			("support@jellystyle.com", "support@jellystyle.com", nil),
+			("JellyStyle Support <support@jellystyle.com>", "support@jellystyle.com", "JellyStyle Support"),
+			("<support@jellystyle.com>", "support@jellystyle.com", nil),
+			("JellyStyle Support", nil, nil),
+			([23], nil, nil),
+			(nil, nil, nil)
+		]
 		
-		dictionary["feedback_email"] = "support@jellystyle.com"
-		let validEmail = Sherpa.Document(dictionary: dictionary)
-		XCTAssertEqual(validEmail.feedbackEmail, dictionary["feedback_email"] as? String, "Feedback email should match the 'feedback_email' value in the provided dictionary.")
-		
-		dictionary["feedback_email"] = "JellyStyle Support <support@jellystyle.com>"
-		let validEmailWithName = Sherpa.Document(dictionary: dictionary)
-		XCTAssertEqual(validEmailWithName.feedbackEmail, dictionary["feedback_email"] as? String, "Feedback email should match the 'feedback_email' value in the provided dictionary.")
-		
-		dictionary["feedback_email"] = "JellyStyle Support"
-		let emailAsInvalidString = Sherpa.Document(dictionary: dictionary)
-		XCTAssertNil(emailAsInvalidString.feedbackEmail, "Document should translate an invalid 'feedback_email' string to nil.")
-		
-		dictionary["feedback_email"] = ""
-		let emptyEmail = Sherpa.Document(dictionary: dictionary)
-		XCTAssertNil(emptyEmail.feedbackEmail, "Document should translate an empty 'feedback_email' value to nil.")
-		
-		dictionary["feedback_email"] = [23]
-		let emailAsInvalidType = Sherpa.Document(dictionary: dictionary)
-		XCTAssertNil(emailAsInvalidType.feedbackEmail, "Document should translate an invalid 'title' value to nil.")
-		
-		dictionary.removeValueForKey("feedback_email")
-		let missingEmail = Sherpa.Document(dictionary: dictionary)
-		XCTAssertNil(missingEmail.feedbackEmail, "Feedback email should match the 'feedback_email' value in the provided dictionary.")
+		for (input, email, name) in testValues {
+			if let input = input {
+				dictionary["feedback_email"] = input
+			}
+			else {
+				dictionary.removeValueForKey("feedback_email")
+			}
+
+			let document = Sherpa.Document(dictionary: dictionary)
+			let feedback = document.feedback.flatMap { $0 as? FeedbackEmail }
+
+			if let email = email {
+				XCTAssert(feedback.count == 1, "Document should contain a object for the feedback email if a valid value is provided.")
+				XCTAssertEqual(feedback[0].email, email, "Document should correctly parse the given feedback email if a valid value is provided.")
+				XCTAssertEqual(feedback[0].name, name, "Document should correctly parse the given feedback name if a valid value is provided.")
+			}
+				
+			else {
+				XCTAssert(feedback.count == 0, "Document should not contain a object for the feedback email if an invalid value is provided.")
+			}
+		}
 	}
 	
 	func testFeedbackTwitter() {
 		var dictionary = DocumentTests.dictionary
 		
-		dictionary["feedback_twitter"] = "jellybeansoup"
-		let validTwitter = Sherpa.Document(dictionary: dictionary)
-		XCTAssertEqual(validTwitter.feedbackTwitter, dictionary["feedback_twitter"] as? String, "Feedback Twitter account should match the 'feedback_twitter' value in the provided dictionary.")
+		let testValues: [(input: AnyObject?, handle: String?)] = [
+			("jellybeansoup", "jellybeansoup"),
+			("@jellybeansoup", "jellybeansoup"),
+			("＠jellybeansoup", "jellybeansoup"),
+			("JellyStyle Support", nil),
+			([23], nil),
+			(nil, nil)
+		]
 		
-		dictionary["feedback_twitter"] = "@jellybeansoup"
-		let validTwitterWithAt = Sherpa.Document(dictionary: dictionary)
-		XCTAssertEqual(validTwitterWithAt.feedbackTwitter, "jellybeansoup", "Feedback Twitter account should match the 'feedback_twitter' value in the provided dictionary.")
-		
-		dictionary["feedback_twitter"] = "＠jellybeansoup"
-		let validTwitterWithAlternateAt = Sherpa.Document(dictionary: dictionary)
-		XCTAssertEqual(validTwitterWithAlternateAt.feedbackTwitter, "jellybeansoup", "Feedback Twitter account should match the 'feedback_twitter' value in the provided dictionary.")
-		
-		dictionary["feedback_twitter"] = "Daniel Farrelly"
-		let twitterAsInvalidString = Sherpa.Document(dictionary: dictionary)
-		XCTAssertNil(twitterAsInvalidString.feedbackTwitter, "Document should translate an invalid 'feedback_twitter' string to nil.")
-		
-		dictionary["feedback_twitter"] = ""
-		let emptyTwitter = Sherpa.Document(dictionary: dictionary)
-		XCTAssertNil(emptyTwitter.feedbackTwitter, "Document should translate an empty 'feedback_twitter' value to nil.")
-		
-		dictionary["feedback_twitter"] = [23]
-		let twitterAsInvalidType = Sherpa.Document(dictionary: dictionary)
-		XCTAssertNil(twitterAsInvalidType.feedbackTwitter, "Document should translate an invalid 'feedback_twitter' value to nil.")
-		
-		dictionary.removeValueForKey("feedback_twitter")
-		let missingTwitter = Sherpa.Document(dictionary: dictionary)
-		XCTAssertNil(missingTwitter.feedbackTwitter, "Feedback Twitter account should match the 'feedback_twitter' value in the provided dictionary.")
+		for (input, handle) in testValues {
+			if let input = input {
+				dictionary["feedback_twitter"] = input
+			}
+			else {
+				dictionary.removeValueForKey("feedback_twitter")
+			}
+			
+			let document = Sherpa.Document(dictionary: dictionary)
+			let feedback = document.feedback.flatMap { $0 as? FeedbackTwitter }
+			
+			if let handle = handle {
+				XCTAssert(feedback.count == 1, "Document should contain a object for the feedback Twitter handle if a valid value is provided.")
+				XCTAssertEqual(feedback[0].handle, handle, "Document should correctly parse the given feedback Twitter handle if a valid value is provided.")
+			}
+				
+			else {
+				XCTAssert(feedback.count == 0, "Document should not contain a object for the feedback Twitter handle if an invalid value is provided.")
+			}
+		}
 	}
 	
 	func testSectionsFromFiles() {

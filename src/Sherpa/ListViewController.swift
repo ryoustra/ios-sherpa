@@ -28,7 +28,7 @@ internal protocol ListViewControllerDelegate: class {
 	
 	func listViewController(listViewController: ListViewController, didSelectArticle article: Article)
 	
-	func listViewController(listViewController: ListViewController, didSelectFeedback feedbackType: DataSource.FeedbackType)
+	func listViewController(listViewController: ListViewController, didSelectFeedback feedback: Feedback)
 	
 }
 

@@ -48,26 +48,26 @@ class ListViewControllerTests: XCTestCase {
 		
 		var article: Sherpa.Article?
 		
-		var feedbackType: Sherpa.DataSource.FeedbackType?
+		var feedback: Sherpa.Feedback?
 		
 		var count: Int = 0
 		
-		private func listViewController(listViewController: ListViewController, didSelectArticle article: Article) {
+		private func listViewController(listViewController: Sherpa.ListViewController, didSelectArticle article: Sherpa.Article) {
 			self.listViewController = listViewController
 			self.article = article
 			self.count += 1
 		}
 		
-		private func listViewController(listViewController: ListViewController, didSelectFeedback feedbackType: DataSource.FeedbackType) {
+		private func listViewController(listViewController: Sherpa.ListViewController, didSelectFeedback feedback: Sherpa.Feedback) {
 			self.listViewController = listViewController
-			self.feedbackType = feedbackType
+			self.feedback = feedback
 			self.count += 1
 		}
 		
 		private func reset() {
 			self.listViewController = nil
 			self.article = nil
-			self.feedbackType = nil
+			self.feedback = nil
 			self.count = 0
 		}
 		
@@ -88,7 +88,7 @@ class ListViewControllerTests: XCTestCase {
 				
 				XCTAssertEqual(delegate.listViewController, listViewController, "Data source provided to delegate should match the calling data source.")
 				XCTAssertNotNil(delegate.article, "Article provided to delegate should match the article for the selected row.")
-				XCTAssertNil(delegate.feedbackType, "Feedback type should not be present after selecting an article row.")
+				XCTAssertNil(delegate.feedback, "Feedback type should not be present after selecting an article row.")
 				XCTAssertEqual(delegate.count, 1, "Delegate methods should only be called one time when row is selected.")
 				
 				delegate.reset()
@@ -102,7 +102,7 @@ class ListViewControllerTests: XCTestCase {
 			listViewController.tableView(self.listViewController.tableView, didSelectRowAtIndexPath: indexPath)
 			
 			XCTAssertEqual(delegate.listViewController, listViewController, "Data source provided to delegate should match the calling data source.")
-			XCTAssertNotNil(delegate.feedbackType, "Feedback type provided to delegate should match the option for the selected row.")
+			XCTAssertNotNil(delegate.feedback, "Feedback type provided to delegate should match the option for the selected row.")
 			XCTAssertNil(delegate.article, "Article should not be present after selecting a feedback row.")
 			XCTAssertEqual(delegate.count, 1, "Delegate methods should only be called one time when row is selected.")
 			
@@ -122,7 +122,7 @@ class ListViewControllerTests: XCTestCase {
 			
 			XCTAssertNil(delegate.listViewController, "Delegate should never be called for an out-of-bounds index path.")
 			XCTAssertNil(delegate.article, "Delegate should never be called for an out-of-bounds index path.")
-			XCTAssertNil(delegate.feedbackType, "Delegate should never be called for an out-of-bounds index path.")
+			XCTAssertNil(delegate.feedback, "Delegate should never be called for an out-of-bounds index path.")
 			XCTAssertEqual(delegate.count, 0, "Delegate should never be called for an out-of-bounds index path.")
 			
 			delegate.reset()

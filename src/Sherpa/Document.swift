@@ -40,9 +40,7 @@ internal class Document {
 	
 	// MARK: Feedback points.
 	
-	internal var feedbackEmail: String? = nil
-	
-	internal var feedbackTwitter: String? = nil
+	internal var feedback: [Feedback] = []
 	
 	// MARK: Instance life cycle
 	
@@ -101,24 +99,13 @@ internal class Document {
 	}
 	
 	private func _load(from dictionary: [String:AnyObject]) {
-		// Feedback email
-		let emailRegex = "^\\s*(\"?[^\"]\"?\\s)?<?.+@.+>?\\s*$"
-		if let string = dictionary["feedback_email"] as? String where string.rangeOfString(emailRegex, options: .RegularExpressionSearch) != nil {
-			feedbackEmail = string
+		// Feedback
+		if let string = dictionary["feedback_email"] as? String, let email = FeedbackEmail(string: string) {
+			self.feedback.append(email)
 		}
-		else {
-			feedbackEmail = nil
-		}
-		
-		// Feedback twitter
-		let twitterRegex = "^\\s*[@＠]?[a-zA-Z0-9_]{1,20}\\s*$"
-		if let string = dictionary["feedback_twitter"] as? String where string.rangeOfString(twitterRegex, options: .RegularExpressionSearch) != nil {
-			let characterSet = NSMutableCharacterSet.whitespaceAndNewlineCharacterSet()
-			characterSet.addCharactersInString("@＠")
-			feedbackTwitter = string.stringByTrimmingCharactersInSet(characterSet)
-		}
-		else {
-			feedbackTwitter = nil
+
+		if let string = dictionary["feedback_twitter"] as? String, let twitter = FeedbackTwitter(string: string) {
+			self.feedback.append(twitter)
 		}
 		
 		// Sections

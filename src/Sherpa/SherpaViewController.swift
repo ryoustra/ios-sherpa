@@ -23,11 +23,8 @@
 //
 
 import UIKit
-import MessageUI
-import Social
-import SafariServices
 
-public class SherpaViewController: UIViewController, UINavigationControllerDelegate, MFMailComposeViewControllerDelegate, ListViewControllerDelegate {
+public class SherpaViewController: UIViewController, UINavigationControllerDelegate, ListViewControllerDelegate {
 	
 	// MARK: Deep-linking
 	
@@ -37,15 +34,33 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 	// MARK: Allowing feedback
 	
 	//! Email address for receiving feedback.
+	@available(*, deprecated)
 	public var feedbackEmail: String? {
-		get { return self.document.feedbackEmail }
-		set(feedbackEmail) { self.document.feedbackEmail = feedbackEmail }
+		get { return self.document.feedback.flatMap{ $0 as? FeedbackEmail }.first?.fullString }
+		set(feedbackEmail) {
+			var feedback = self.document.feedback.filter{ !($0 is FeedbackEmail) }
+			
+			if let emailString = feedbackEmail, let twitter = FeedbackEmail(string: emailString) {
+				feedback.append(twitter)
+			}
+
+			self.document.feedback = feedback
+		}
 	}
 	
 	//! Twitter account handle for receiving feedback.
+	@available(*, deprecated)
 	public var feedbackTwitter: String? {
-		get { return self.document.feedbackTwitter }
-		set(feedbackTwitter) { self.document.feedbackTwitter = feedbackTwitter }
+		get { return self.document.feedback.flatMap{ $0 as? FeedbackTwitter }.first?.handle }
+		set(feedbackTwitter) {
+			var feedback = self.document.feedback.filter{ !($0 is FeedbackTwitter) }
+			
+			if let twitterString = feedbackTwitter, let twitter = FeedbackTwitter(string: twitterString) {
+				feedback.append(twitter)
+			}
+			
+			self.document.feedback = feedback
+		}
 	}
 	
 	// MARK: Customising appearance
@@ -196,50 +211,16 @@ public class SherpaViewController: UIViewController, UINavigationControllerDeleg
 		navigationController!.pushViewController(articleViewController, animated: true)
 	}
 	
-	func listViewController(listViewController: ListViewController, didSelectFeedback feedbackType: DataSource.FeedbackType) {
+	func listViewController(listViewController: ListViewController, didSelectFeedback feedback: Feedback) {
 		let navigationController = self.embeddedNavigationController ?? self.navigationController!
 		
-		if feedbackType == .Email && MFMailComposeViewController.canSendMail() {
-			let bundle = NSBundle.mainBundle()
-			let name = bundle.objectForInfoDictionaryKey("CFBundleDisplayName") ?? bundle.objectForInfoDictionaryKey("CFBundleName") ?? ""
-			let version = bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") ?? ""
-			let build = bundle.objectForInfoDictionaryKey("CFBundleVersion") ?? ""
-			let subject = "Feedback for \(name!) v\(version!) (\(build!))"
-			
-			let viewController = MFMailComposeViewController()
-			viewController.mailComposeDelegate = self
-			viewController.setToRecipients([self.document.feedbackEmail!])
-			viewController.setSubject(subject)
-			
-			navigationController.presentViewController(viewController, animated: true, completion: nil)
+		guard let viewController = feedback.viewController else {
+			return
 		}
-			
-		else if feedbackType == .Twitter {
-			let handle = self.document.feedbackTwitter!.stringByReplacingOccurrencesOfString("@", withString: "")
-			
-			if SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter) {
-				let viewController = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
-				viewController.setInitialText("@\(handle) ")
-				
-				navigationController.presentViewController(viewController, animated: true, completion: nil)
-			}
-				
-			else if let url = NSURL(string: "https://twitter.com/\(handle)") {
-				if #available(iOSApplicationExtension 9.0, *) {
-					let viewController = SFSafariViewController(URL: url)
-					
-					navigationController.presentViewController(viewController, animated: true, completion: nil)
-				}
-			}
-		}
+
+		navigationController.presentViewController(viewController, animated: true, completion: nil)
 	}
-	
-	// MARK: Mail compose controller delegate
-	
-	public func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
-		controller.dismissViewControllerAnimated(true, completion: nil)
-	}
-	
+
 	// MARK: Utilities
 	
 	private func sherpa_activeViewController() -> UIViewController {
