@@ -1,11 +1,4 @@
 //
-//  FeedbackTests.swift
-//  Sherpa
-//
-//  Created by Daniel Farrelly on 5/1/17.
-//  Copyright © 2017 Daniel Farrelly. All rights reserved.
-//
-//
 // Copyright © 2016 Daniel Farrelly
 //
 // Redistribution and use in source and binary forms, with or without modification,
