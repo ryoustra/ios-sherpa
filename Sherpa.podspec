@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "Sherpa"
-  s.version      = "0.2.1"
+  s.version      = "0.3"
   s.summary      = "A drop-in view controller for displaying a User Guide or FAQ."
   s.homepage     = "https://github.com/jellybeansoup/ios-sherpa"
   s.license      = { :type => 'BSD', :file => 'LICENSE' }
