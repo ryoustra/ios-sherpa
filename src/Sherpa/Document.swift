@@ -30,9 +30,9 @@ internal class Document {
 	
 	internal var tintColor: UIColor? = UINavigationBar.appearance().tintColor
 	
-	internal var articleBackgroundColor: UIColor = UIColor.whiteColor()
+	internal var articleBackgroundColor: UIColor = UIColor.white
 	
-	internal var articleTextColor: UIColor = UIColor.darkTextColor()
+	internal var articleTextColor: UIColor = UIColor.darkText
 	
 	internal var articleCellClass = UITableViewCell.self
 	
@@ -44,52 +44,52 @@ internal class Document {
 	
 	// MARK: Instance life cycle
 	
-	internal let fileURL: NSURL?
+	internal let fileURL: URL?
 	
 	internal var sections: [Section] = []
 	
-	internal init(fileAtURL fileURL: NSURL) {
+	internal init(fileAtURL fileURL: URL) {
 		self.fileURL = fileURL
 		self._loadFromFile()
 	}
 	
-	internal init(dictionary: [String: AnyObject]) {
+	internal init(dictionary: [String: Any]) {
 		self.fileURL = nil
 		self._load(from: dictionary)
 	}
 	
-	internal init(array: [[String: AnyObject]]) {
+	internal init(array: [[String: Any]]) {
 		self.fileURL = nil
 		self._load(from: array)
 	}
 	
 	// MARK: Retrieving content
 	
-	internal func section(index: Int) -> Section? {
+	internal func section(_ index: Int) -> Section? {
 		if index < 0 || index >= self.sections.count { return nil }
 		
 		return self.sections[index]
 	}
 	
-	internal func article(key: String) -> Article? {
+	internal func article(_ key: String) -> Article? {
 		return self.sections.flatMap({ $0.articles }).filter({ key == $0.key }).first
 	}
 	
 	// MARK: Utilities
 
-	private func _loadFromFile() {
+	fileprivate func _loadFromFile() {
 		do {
-			guard let fileURL = self.fileURL, let data = NSData(contentsOfURL: fileURL) else {
+			guard let fileURL = self.fileURL, let data = try? Data(contentsOf: fileURL) else {
 				return
 			}
 			
-			let json = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(rawValue: 0))
+			let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions(rawValue: 0))
 			
-			if let dictionary = json as? [String:AnyObject] {
+			if let dictionary = json as? [String:Any] {
 				self._load(from: dictionary)
 			}
 				
-			else if let array = json as? [[String:AnyObject]] {
+			else if let array = json as? [[String:Any]] {
 				self._load(from: array)
 			}
 		}
@@ -98,7 +98,7 @@ internal class Document {
 		}
 	}
 	
-	private func _load(from dictionary: [String:AnyObject]) {
+	fileprivate func _load(from dictionary: [String:Any]) {
 		// Feedback
 		if let string = dictionary["feedback_email"] as? String, let email = FeedbackEmail(string: string) {
 			self.feedback.append(email)
@@ -109,10 +109,10 @@ internal class Document {
 		}
 		
 		// Sections
-		self._load(from: dictionary["entries"] as? [[String:AnyObject]] ?? [])
+		self._load(from: dictionary["entries"] as? [[String:Any]] ?? [])
 	}
 	
-	private func _load(from array: [[String:AnyObject]]) {
+	fileprivate func _load(from array: [[String:Any]]) {
 		self.sections = array.flatMap({ Section(dictionary: $0) })
 	}
 	

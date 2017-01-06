@@ -32,9 +32,9 @@ internal struct Section {
 	
 	let articles: [Article]
 	
-	internal init?(dictionary: [String: AnyObject]) {
+	internal init?(dictionary: [String: Any]) {
 		// Title
-		if let string = dictionary["title"] as? String where !string.isEmpty {
+		if let string = dictionary["title"] as? String, !string.isEmpty {
 			title = string
 		}
 		else {
@@ -42,7 +42,7 @@ internal struct Section {
 		}
 		
 		// Detail
-		if let string = dictionary["detail"] as? String where !string.isEmpty {
+		if let string = dictionary["detail"] as? String, !string.isEmpty {
 			detail = string
 		}
 		else {
@@ -50,7 +50,7 @@ internal struct Section {
 		}
 		
 		// Articles
-		articles = (dictionary["articles"] as? [[String: AnyObject]])?.map({ Article(dictionary: $0) }).flatMap({ $0 }) ?? []
+		articles = (dictionary["articles"] as? [[String: Any]])?.map({ Article(dictionary: $0) }).flatMap({ $0 }) ?? []
 		if articles.count == 0 {
 			return nil
 		}
@@ -62,7 +62,7 @@ internal struct Section {
 		self.articles = articles
 	}
 	
-	internal func section(@noescape filter: (Article) -> Bool) -> Section? {
+	internal func section(_ filter: (Article) -> Bool) -> Section? {
 		let articles = self.articles.filter(filter)
 		
 		if articles.count == 0 {
@@ -72,11 +72,11 @@ internal struct Section {
 		return Section(title: self.title, detail: self.detail, articles: articles)
 	}
 	
-	internal func section(query: String) -> Section? {
+	internal func section(_ query: String) -> Section? {
 		return self.section { $0.matches(query) }
 	}
 	
-	internal func section(buildNumber: Int) -> Section? {
+	internal func section(_ buildNumber: Int) -> Section? {
 		return self.section { $0.matches(buildNumber) }
 	}
 	

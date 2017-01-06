@@ -34,7 +34,7 @@ class ListViewControllerTests: XCTestCase {
 	override func setUp() {
 		super.setUp()
 		
-		let url = NSBundle(forClass: DataSourceTests.self).URLForResource("dictionary", withExtension: "json")!
+		let url = Bundle(for: DataSourceTests.self).url(forResource: "dictionary", withExtension: "json")!
 		self.document = Sherpa.Document(fileAtURL: url)
 
 		self.listViewController = Sherpa.ListViewController(document: self.document)
@@ -42,7 +42,7 @@ class ListViewControllerTests: XCTestCase {
 	
 	// MARK: Delegate tests
 	
-	private class ListViewControllerTestDelegate: ListViewControllerDelegate {
+	fileprivate class ListViewControllerTestDelegate: ListViewControllerDelegate {
 		
 		var listViewController: Sherpa.ListViewController?
 		
@@ -52,19 +52,19 @@ class ListViewControllerTests: XCTestCase {
 		
 		var count: Int = 0
 		
-		private func listViewController(listViewController: Sherpa.ListViewController, didSelectArticle article: Sherpa.Article) {
+		fileprivate func listViewController(_ listViewController: Sherpa.ListViewController, didSelectArticle article: Sherpa.Article) {
 			self.listViewController = listViewController
 			self.article = article
 			self.count += 1
 		}
 		
-		private func listViewController(listViewController: Sherpa.ListViewController, didSelectFeedback feedback: Sherpa.Feedback) {
+		fileprivate func listViewController(_ listViewController: Sherpa.ListViewController, didSelectFeedback feedback: Sherpa.Feedback) {
 			self.listViewController = listViewController
 			self.feedback = feedback
 			self.count += 1
 		}
 		
-		private func reset() {
+		fileprivate func reset() {
 			self.listViewController = nil
 			self.article = nil
 			self.feedback = nil
@@ -81,10 +81,10 @@ class ListViewControllerTests: XCTestCase {
 
 		// Articles
 		
-		for (x, section) in self.document.sections.enumerate() {
-			for (y, _) in section.articles.enumerate() {
-				let indexPath = NSIndexPath(forRow: y, inSection: x)
-				listViewController.tableView(self.listViewController.tableView, didSelectRowAtIndexPath: indexPath)
+		for (x, section) in self.document.sections.enumerated() {
+			for (y, _) in section.articles.enumerated() {
+				let indexPath = IndexPath(row: y, section: x)
+				listViewController.tableView(self.listViewController.tableView, didSelectRowAt: indexPath)
 				
 				XCTAssertEqual(delegate.listViewController, listViewController, "Data source provided to delegate should match the calling data source.")
 				XCTAssertNotNil(delegate.article, "Article provided to delegate should match the article for the selected row.")
@@ -98,8 +98,8 @@ class ListViewControllerTests: XCTestCase {
 		// Feedback
 		
 		for i in 0..<2 {
-			let indexPath = NSIndexPath(forRow: i, inSection: self.document.sections.count)
-			listViewController.tableView(self.listViewController.tableView, didSelectRowAtIndexPath: indexPath)
+			let indexPath = IndexPath(row: i, section: self.document.sections.count)
+			listViewController.tableView(self.listViewController.tableView, didSelectRowAt: indexPath)
 			
 			XCTAssertEqual(delegate.listViewController, listViewController, "Data source provided to delegate should match the calling data source.")
 			XCTAssertNotNil(delegate.feedback, "Feedback type provided to delegate should match the option for the selected row.")
@@ -112,13 +112,13 @@ class ListViewControllerTests: XCTestCase {
 		// Out-of-bounds
 		
 		let outOfBoundsIndexPaths = [
-			NSIndexPath(forRow: 100, inSection: self.document.sections.startIndex), // Article section
-			NSIndexPath(forRow: 100, inSection: self.document.sections.endIndex), // Feedback section
-			NSIndexPath(forRow: 100, inSection: 100) // Out-of-bounds section
+			IndexPath(row: 100, section: self.document.sections.startIndex), // Article section
+			IndexPath(row: 100, section: self.document.sections.endIndex), // Feedback section
+			IndexPath(row: 100, section: 100) // Out-of-bounds section
 		]
 		
 		for indexPath in outOfBoundsIndexPaths {
-			listViewController.tableView(self.listViewController.tableView, didSelectRowAtIndexPath: indexPath)
+			listViewController.tableView(self.listViewController.tableView, didSelectRowAt: indexPath)
 			
 			XCTAssertNil(delegate.listViewController, "Delegate should never be called for an out-of-bounds index path.")
 			XCTAssertNil(delegate.article, "Delegate should never be called for an out-of-bounds index path.")

@@ -62,9 +62,9 @@ internal class ArticleViewController: ListViewController {
 		self.contentView.translatesAutoresizingMaskIntoConstraints = false
 		
 		if #available(iOSApplicationExtension 9.0, *) {
-			self.titleLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleTitle2)
+			self.titleLabel.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.title2)
 		} else {
-			self.titleLabel.font = UIFont.preferredFontForTextStyle(UIFontTextStyleHeadline)
+			self.titleLabel.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline)
 		}
 		self.titleLabel.textColor = self.dataSource.document.articleTextColor
 		self.titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -73,20 +73,20 @@ internal class ArticleViewController: ListViewController {
 		
 		self.titleLabel.text = self.article.title
 		
-		self.bodyView.backgroundColor = UIColor.clearColor()
-		self.bodyView.editable = false
-		self.bodyView.font = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
+		self.bodyView.backgroundColor = UIColor.clear
+		self.bodyView.isEditable = false
+		self.bodyView.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.body)
 		self.bodyView.textColor = self.dataSource.document.articleTextColor
 		self.bodyView.tintColor = self.dataSource.document.tintColor
 		self.bodyView.translatesAutoresizingMaskIntoConstraints = false
 		self.bodyView.textContainer.lineFragmentPadding = 0
-		self.bodyView.textContainerInset = UIEdgeInsetsZero
+		self.bodyView.textContainerInset = UIEdgeInsets.zero
 		self.contentView.addSubview(self.bodyView)
 		
 		self.bodyView.attributedText = self._applyAttributes(toString: self.article.body)
 	}
 	
-	override func viewWillAppear(animated: Bool) {
+	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		
 		self.navigationController?.setNavigationBarHidden(false, animated: false)
@@ -94,35 +94,35 @@ internal class ArticleViewController: ListViewController {
 	
 	override func viewDidLayoutSubviews() {
 		let header = self.contentView
-		if header.superview == nil || CGRectGetWidth(header.frame) != CGRectGetWidth(header.superview!.frame) {
+		if header?.superview == nil || header?.frame.width != header?.superview!.frame.width {
 			let margins = self.tableView.layoutMargins
-			let width = CGRectGetWidth(self.tableView.frame)
+			let width = self.tableView.frame.width
 			
-			let maxSize = CGSize(width: width - margins.left - margins.right, height: CGFloat.max)
+			let maxSize = CGSize(width: width - margins.left - margins.right, height: CGFloat.greatestFiniteMagnitude)
 			let titleSize = self.titleLabel.sizeThatFits(maxSize)
 			let bodySize = self.bodyView.sizeThatFits(maxSize)
 			
 			self.titleLabel.frame = CGRect(x: margins.left, y: 30, width: maxSize.width, height: titleSize.height)
-			self.bodyView.frame = CGRect(x: margins.left, y: CGRectGetMaxY(self.titleLabel.frame) + 15, width: maxSize.width, height: bodySize.height)
-			header.frame = CGRect(x: 0, y: 0, width: width, height: CGRectGetMaxY(self.bodyView.frame))
+			self.bodyView.frame = CGRect(x: margins.left, y: self.titleLabel.frame.maxY + 15, width: maxSize.width, height: bodySize.height)
+			header?.frame = CGRect(x: 0, y: 0, width: width, height: self.bodyView.frame.maxY)
 			
 			self.tableView.tableHeaderView = header
 		}
 	}
 	
 	@_semantics("optimize.sil.never")
-	private func _applyAttributes(toString string: String?) -> NSAttributedString? {
+	fileprivate func _applyAttributes(toString string: String?) -> NSAttributedString? {
 		guard let string = string else {
 			return nil
 		}
 		
 		var mutable = string
 		
-		while let range = mutable.rangeOfString("\n") {
-			mutable.replaceRange(range, with: "<br />")
+		while let range = mutable.range(of: "\n") {
+			mutable.replaceSubrange(range, with: "<br />")
 		}
 		
-		guard let data = mutable.dataUsingEncoding(NSUnicodeStringEncoding, allowLossyConversion: false) else {
+		guard let data = mutable.data(using: String.Encoding.unicode, allowLossyConversion: false) else {
 			return nil
 		}
 		
@@ -130,19 +130,19 @@ internal class ArticleViewController: ListViewController {
 			let attributedText = try NSMutableAttributedString(data: data, options: [NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType], documentAttributes: nil)
 			
 			attributedText.beginEditing()
-			attributedText.enumerateAttributesInRange(NSMakeRange(0,attributedText.length), options: [], usingBlock: { attributes, range, stop in
+			attributedText.enumerateAttributes(in: NSMakeRange(0,attributedText.length), options: [], using: { attributes, range, stop in
 				var mutable = attributes
 				
 				if let font = mutable[NSFontAttributeName] as? UIFont {
-					let symbolicTraits = font.fontDescriptor().symbolicTraits
-					let descriptor = self.bodyView.font!.fontDescriptor().fontDescriptorWithSymbolicTraits(symbolicTraits)
+					let symbolicTraits = font.fontDescriptor.symbolicTraits
+					let descriptor = self.bodyView.font!.fontDescriptor.withSymbolicTraits(symbolicTraits)
 					
 					if font.familyName == "Times New Roman" {
 						mutable[NSFontAttributeName] = UIFont(descriptor: descriptor!, size: self.bodyView.font!.pointSize)
 					}
 						
 					else {
-						mutable[NSFontAttributeName] = font.fontWithSize(self.bodyView.font!.pointSize)
+						mutable[NSFontAttributeName] = font.withSize(self.bodyView.font!.pointSize)
 					}
 				}
 				

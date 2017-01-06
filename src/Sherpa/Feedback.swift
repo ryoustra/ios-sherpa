@@ -48,12 +48,12 @@ internal class FeedbackEmail: NSObject, Feedback, MFMailComposeViewControllerDel
 	required init?(string: String) {
 		let regex = try! NSRegularExpression(pattern: "^\\s*((\"?([^\"]*)\"?|.*)\\s)?<?(.+?@.+?)>?\\s*$", options: [])
 		
-		if let match = regex.matchesInString(string, options: [], range: NSRange(location: 0, length: string.characters.count)).first {
-			let nameRange = match.rangeAtIndex(3)
-			self.name = nameRange.location != NSNotFound ? (string as NSString).substringWithRange(nameRange) : nil
+		if let match = regex.matches(in: string, options: [], range: NSRange(location: 0, length: string.characters.count)).first {
+			let nameRange = match.rangeAt(3)
+			self.name = nameRange.location != NSNotFound ? (string as NSString).substring(with: nameRange) : nil
 			
-			let emailRange = match.rangeAtIndex(4)
-			self.email = emailRange.location != NSNotFound ? (string as NSString).substringWithRange(emailRange) : ""
+			let emailRange = match.rangeAt(4)
+			self.email = emailRange.location != NSNotFound ? (string as NSString).substring(with: emailRange) : ""
 		}
 		else {
 			self.name = nil
@@ -78,11 +78,11 @@ internal class FeedbackEmail: NSObject, Feedback, MFMailComposeViewControllerDel
 			return nil
 		}
 		
-		let bundle = NSBundle.mainBundle()
-		let name = bundle.objectForInfoDictionaryKey("CFBundleDisplayName") ?? bundle.objectForInfoDictionaryKey("CFBundleName") ?? ""
-		let version = bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") ?? ""
-		let build = bundle.objectForInfoDictionaryKey("CFBundleVersion") ?? ""
-		let subject = "Feedback for \(name!) v\(version!) (\(build!))"
+		let bundle = Bundle.main
+		let name = bundle.object(forInfoDictionaryKey: "CFBundleDisplayName") ?? bundle.object(forInfoDictionaryKey: "CFBundleName") ?? ""
+		let version = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") ?? ""
+		let build = bundle.object(forInfoDictionaryKey: "CFBundleVersion") ?? ""
+		let subject = "Feedback for \(name) v\(version) (\(build))"
 		
 		let viewController = MFMailComposeViewController()
 		viewController.mailComposeDelegate = self
@@ -100,8 +100,8 @@ internal class FeedbackEmail: NSObject, Feedback, MFMailComposeViewControllerDel
 		return self.email
 	}
 
-	internal func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
-		controller.dismissViewControllerAnimated(true, completion: nil)
+	internal func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+		controller.dismiss(animated: true, completion: nil)
 	}
 	
 }
@@ -111,12 +111,12 @@ internal struct FeedbackTwitter: Feedback {
 	let handle: String
 	
 	init?(string: String) {
-		let characterSet = NSMutableCharacterSet.whitespaceAndNewlineCharacterSet()
-		characterSet.addCharactersInString("@＠")
-		self.handle = string.stringByTrimmingCharactersInSet(characterSet)
+		let characterSet = NSMutableCharacterSet.whitespaceAndNewline()
+		characterSet.addCharacters(in: "@＠")
+		self.handle = string.trimmingCharacters(in: characterSet as CharacterSet)
 		
 		let regex = "^[a-zA-Z0-9_]{1,20}$"
-		if self.handle.isEmpty || self.handle.rangeOfString(regex, options: .RegularExpressionSearch) == nil {
+		if self.handle.isEmpty || self.handle.range(of: regex, options: .regularExpression) == nil {
 			return nil
 		}
 	}
@@ -130,15 +130,15 @@ internal struct FeedbackTwitter: Feedback {
 	}
 
 	var viewController: UIViewController? {
-		if SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter) {
+		if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeTwitter) {
 			let viewController = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
-			viewController.setInitialText("@\(self.handle) ")
+			viewController?.setInitialText("@\(self.handle) ")
 			return viewController
 		}
 			
 		else if #available(iOSApplicationExtension 9.0, *) {
-			let url = NSURL(string: "https://twitter.com/\(self.handle)")!
-			return SFSafariViewController(URL: url)
+			let url = URL(string: "https://twitter.com/\(self.handle)")!
+			return SFSafariViewController(url: url)
 		}
 		
 		return nil

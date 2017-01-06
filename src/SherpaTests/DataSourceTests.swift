@@ -36,12 +36,12 @@ class DataSourceTests: XCTestCase {
 	override func setUp() {
 		super.setUp()
 		
-		let bundle = NSBundle(forClass: DataSourceTests.self)
+		let bundle = Bundle(for: DataSourceTests.self)
 		
-		let url = NSBundle(forClass: DataSourceTests.self).URLForResource("dictionary", withExtension: "json")!
+		let url = Bundle(for: DataSourceTests.self).url(forResource: "dictionary", withExtension: "json")!
 		self.document = Sherpa.Document(fileAtURL: url)
 		
-		self.tableView = UITableView(frame: CGRect.zero, style: .Plain)
+		self.tableView = UITableView(frame: CGRect.zero, style: .plain)
 		self.tableView.dataSource = self.dataSource
 		
 		self.dataSource = Sherpa.DataSource(tableView: self.tableView, document: self.document, bundle: bundle)
@@ -54,16 +54,16 @@ class DataSourceTests: XCTestCase {
 	}
 	
 	func testArticleAtIndexPath() {
-		let outOfBoundsIndexPath = NSIndexPath(forRow: 0, inSection: 100)
+		let outOfBoundsIndexPath = IndexPath(row: 0, section: 100)
 		XCTAssertNil(dataSource.article(outOfBoundsIndexPath), "Nil should be returned when attempting to retrieve article with out-of-bounds index path.")
 		
-		let validIndexPath = NSIndexPath(forRow: 0, inSection: 1)
+		let validIndexPath = IndexPath(row: 0, section: 1)
 		XCTAssertEqual(dataSource.article(validIndexPath)?.title, dataSource.filteredSections[validIndexPath.section].articles[validIndexPath.row].title, "Article retrieved by index path should be the same as when accessing via filteredSections array.")
 	}
 	
 	func testIndexPathForArticle() {
 		let articleFromDataSource = dataSource.filteredSections[0].articles[1]
-		XCTAssertEqual(dataSource.indexPath(articleFromDataSource), NSIndexPath(forRow: 1, inSection: 0), "Index path for article retrieved from dataSource should match indices used to access via filteredSections array.")
+		XCTAssertEqual(dataSource.indexPath(articleFromDataSource), IndexPath(row: 1, section: 0), "Index path for article retrieved from dataSource should match indices used to access via filteredSections array.")
 		
 		let articleFromExternalSource = Sherpa.Article(dictionary: ArticleTests.dictionary)!
 		XCTAssertNil(dataSource.indexPath(articleFromExternalSource), "Nil should be returned when attempting to retrieve index path for article that doesn't exist in the data source.")
@@ -80,16 +80,16 @@ class DataSourceTests: XCTestCase {
 			dataSource.sectionTitle = nil
 			dataSource.filter = filter
 			
-			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), expectedNumberOfRows.count + 1, "Sections without articles matching the filter should not be visible (the Feedback section should always match).")
-			for (i, count) in (expectedNumberOfRows + [2]).enumerate() {
+			XCTAssertEqual(self.dataSource.numberOfSections(in: self.tableView), expectedNumberOfRows.count + 1, "Sections without articles matching the filter should not be visible (the Feedback section should always match).")
+			for (i, count) in (expectedNumberOfRows + [2]).enumerated() {
 				XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: i), count, "Articles that don't match the specified filter should not be visible.")
 			}
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count), 2, "The feedback section should always contain rows for each of the available feedback options.")
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 100), 0, "Out-of-bounds sections should always have zero rows.")
 			
 			dataSource.sectionTitle = "Example Section Title"
-			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), min(1, expectedNumberOfRows.count), "If a section title is specified, there should only be one section (with the feedback section removed).")
-			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 0), expectedNumberOfRows.reduce(0, combine: +), "All articles matching the specified query should be visible in the combined section.")
+			XCTAssertEqual(self.dataSource.numberOfSections(in: self.tableView), min(1, expectedNumberOfRows.count), "If a section title is specified, there should only be one section (with the feedback section removed).")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 0), expectedNumberOfRows.reduce(0, +), "All articles matching the specified query should be visible in the combined section.")
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 100), 0, "Out-of-bounds sections should always have zero rows.")
 		}
 	}
@@ -105,16 +105,16 @@ class DataSourceTests: XCTestCase {
 			dataSource.sectionTitle = nil
 			dataSource.query = query
 			
-			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), expectedNumberOfRows.count + 1, "Sections without articles matching the query should not be visible (the Feedback section should always match).")
-			for (i, count) in (expectedNumberOfRows + [2]).enumerate() {
+			XCTAssertEqual(self.dataSource.numberOfSections(in: self.tableView), expectedNumberOfRows.count + 1, "Sections without articles matching the query should not be visible (the Feedback section should always match).")
+			for (i, count) in (expectedNumberOfRows + [2]).enumerated() {
 				XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: i), count, "Articles that don't match the specified query should not be visible.")
 			}
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count), 2, "The feedback section should always contain rows for each of the available feedback options.")
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 100), 0, "Out-of-bounds sections should always have zero rows.")
 			
 			dataSource.sectionTitle = "Example Section Title"
-			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), min(1, expectedNumberOfRows.count), "If a section title is specified, there should only be one section (with the feedback section removed).")
-			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 0), expectedNumberOfRows.reduce(0, combine: +), "All articles matching the specified query should be visible in the combined section.")
+			XCTAssertEqual(self.dataSource.numberOfSections(in: self.tableView), min(1, expectedNumberOfRows.count), "If a section title is specified, there should only be one section (with the feedback section removed).")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 0), expectedNumberOfRows.reduce(0, +), "All articles matching the specified query should be visible in the combined section.")
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 100), 0, "Out-of-bounds sections should always have zero rows.")
 		}
 	}
@@ -130,16 +130,16 @@ class DataSourceTests: XCTestCase {
 			dataSource.sectionTitle = nil
 			dataSource.buildNumber = buildNumber
 			
-			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), expectedNumberOfRows.count + 1, "Sections without articles matching the build number should not be visible (the Feedback section should always match).")
-			for (i, count) in (expectedNumberOfRows + [2]).enumerate() {
+			XCTAssertEqual(self.dataSource.numberOfSections(in: self.tableView), expectedNumberOfRows.count + 1, "Sections without articles matching the build number should not be visible (the Feedback section should always match).")
+			for (i, count) in (expectedNumberOfRows + [2]).enumerated() {
 				XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: i), count, "Articles that don't match the specified build number should not be visible.")
 			}
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: expectedNumberOfRows.count), 2, "The feedback section should always contain rows for each of the available feedback options.")
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 100), 0, "Out-of-bounds sections should always have zero rows.")
 			
 			dataSource.sectionTitle = "Example Section Title"
-			XCTAssertEqual(self.dataSource.numberOfSectionsInTableView(self.tableView), min(1, expectedNumberOfRows.count), "If a section title is specified, there should only be one section (with the feedback section removed).")
-			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 0), expectedNumberOfRows.reduce(0, combine: +), "All articles matching the specified build number should be visible in the combined section.")
+			XCTAssertEqual(self.dataSource.numberOfSections(in: self.tableView), min(1, expectedNumberOfRows.count), "If a section title is specified, there should only be one section (with the feedback section removed).")
+			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 0), expectedNumberOfRows.reduce(0, +), "All articles matching the specified build number should be visible in the combined section.")
 			XCTAssertEqual(self.dataSource.tableView(self.tableView, numberOfRowsInSection: 100), 0, "Out-of-bounds sections should always have zero rows.")
 		}
 	}
@@ -147,9 +147,9 @@ class DataSourceTests: XCTestCase {
 	func testTableViewDataSource() {
 		let tableView = UITableView()
 		
-		XCTAssertEqual(dataSource.numberOfSectionsInTableView(tableView), document.sections.count + 1, "The number of table view sections should reflect the number of article sections, plus the feedback section.")
+		XCTAssertEqual(dataSource.numberOfSections(in: tableView), document.sections.count + 1, "The number of table view sections should reflect the number of article sections, plus the feedback section.")
 		
-		for (i, section) in document.sections.enumerate() {
+		for (i, section) in document.sections.enumerated() {
 			XCTAssertEqual(dataSource.tableView(tableView, numberOfRowsInSection: i), section.articles.count, "The number of table view rows for a section should reflect the number of articles in that section.")
 			XCTAssertEqual(dataSource.tableView(tableView, titleForHeaderInSection: i), section.title, "The title for a section's header should match that section's `title` property.")
 			XCTAssertEqual(dataSource.tableView(tableView, titleForFooterInSection: i), section.detail, "The title for a section's footer should match that section's `detail` property.")

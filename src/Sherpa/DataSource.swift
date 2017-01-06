@@ -35,14 +35,14 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 	
 	internal let document: Document
 	
-	internal let bundle: NSBundle
+	internal let bundle: Bundle
 	
-	internal init(tableView: UITableView, document: Document, bundle: NSBundle = .mainBundle()) {
+	internal init(tableView: UITableView, document: Document, bundle: Bundle = .main) {
 		self.tableView = tableView
 		self.document = document
 		self.bundle = bundle
 		
-		if let buildNumber = bundle.objectForInfoDictionaryKey("CFBundleVersion") as? String {
+		if let buildNumber = bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String {
 			self.buildNumber = Int(buildNumber)
 		}
 		
@@ -50,7 +50,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 		self.applyFilter()
 	}
 	
-	private var sections: [Section]! {
+	fileprivate var sections: [Section] {
 		get { return self.document.sections }
 	}
 	
@@ -74,7 +74,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 	
 	internal var filteredSections: [Section] = []
 	
-	private func applyFilter() {
+	fileprivate func applyFilter() {
 		var sections = self.sections
 		
 		if let query = self.query {
@@ -105,13 +105,13 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 	
 	// MARK: Accessing data
 	
-	internal func section(index: Int) -> Section? {
+	internal func section(_ index: Int) -> Section? {
 		if index < 0 || index >= self.filteredSections.count { return nil }
 		
 		return self.filteredSections[index]
 	}
 	
-	internal func article(indexPath: NSIndexPath) -> Article? {
+	internal func article(_ indexPath: IndexPath) -> Article? {
 		guard let section = self.section(indexPath.section) else { return nil }
 		
 		if indexPath.row < 0 || indexPath.row >= section.articles.count { return nil }
@@ -119,11 +119,11 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 		return section.articles[indexPath.row]
 	}
 	
-	internal func indexPath(article: Article) -> NSIndexPath? {
-		for (x, s) in self.filteredSections.enumerate() {
-			for (y, a) in s.articles.enumerate() {
+	internal func indexPath(_ article: Article) -> IndexPath? {
+		for (x, s) in self.filteredSections.enumerated() {
+			for (y, a) in s.articles.enumerated() {
 				if a.key == article.key && a.title == article.title && a.body == article.body {
-					return NSIndexPath(forRow: y, inSection: x)
+					return IndexPath(row: y, section: x)
 				}
 			}
 		}
@@ -133,15 +133,15 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 	
 	// MARK: Feedback
 	
-	private var allowFeedback: Bool {
+	fileprivate var allowFeedback: Bool {
 		get{ return self.sectionTitle == nil && self.document.feedback.count > 0 }
 	}
 	
-	private var indexOfFeedbackSection: Int? {
+	fileprivate var indexOfFeedbackSection: Int? {
 		get{ return self.allowFeedback ? self.filteredSections.count : nil }
 	}
 	
-	internal func feedback(indexPath: NSIndexPath) -> Feedback? {
+	internal func feedback(_ indexPath: IndexPath) -> Feedback? {
 		guard indexPath.section == self.indexOfFeedbackSection else { return nil }
 		
 		if indexPath.row < 0 || indexPath.row >= self.document.feedback.count { return nil }
@@ -151,7 +151,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 	
 	// MARK: Table view data source
 	
-	@objc func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+	@objc func numberOfSections(in tableView: UITableView) -> Int {
 		if self.allowFeedback {
 			return self.filteredSections.count + 1
 		}
@@ -159,7 +159,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 		return self.filteredSections.count
 	}
 	
-	@objc func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+	@objc func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		if section == self.indexOfFeedbackSection {
 			return self.document.feedback.count
 		}
@@ -167,7 +167,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 		return self.section(section)?.articles.count ?? 0
 	}
 	
-	@objc func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+	@objc func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		if section == self.indexOfFeedbackSection {
 			return "Feedback"
 		}
@@ -175,7 +175,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 		return self.section(section)?.title
 	}
 	
-	@objc func tableView(tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+	@objc func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
 		if section == self.indexOfFeedbackSection {
 			return nil
 		}
@@ -183,63 +183,67 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 		return self.section(section)?.detail
 	}
 	
-	@objc func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+	@objc func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell: UITableViewCell
 		
 		if let feedback = self.feedback(indexPath) {
 			let reuseIdentifier = "_SherpaFeedbackCell";
-			cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) ?? self.document.feedbackCellClass.init(style: .Value1, reuseIdentifier: reuseIdentifier)
+			cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier) ?? self.document.feedbackCellClass.init(style: .value1, reuseIdentifier: reuseIdentifier)
 			
 			cell.textLabel!.text = feedback.label
 			cell.detailTextLabel!.text = feedback.detail
 			
 			if feedback.viewController == nil {
-				cell.selectionStyle = .None
+				cell.selectionStyle = .none
 			}
 			else if self.document.feedbackCellClass === UITableViewCell.self {
-				cell.selectionStyle = .Default
+				cell.selectionStyle = .default
 				cell.textLabel!.textColor = self.document.tintColor
 			}
 		}
 			
 		else {
 			let reuseIdentifier = "_SherpaArticleCell";
-			cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier) ?? self.document.articleCellClass.init(style: .Default, reuseIdentifier: reuseIdentifier)
+			cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier) ?? self.document.articleCellClass.init(style: .default, reuseIdentifier: reuseIdentifier)
 			
 			guard let article = self.article(indexPath) else { return cell }
 			
 			if self.document.articleCellClass === UITableViewCell.self {
 				if #available(iOSApplicationExtension 9.0, *) {
-					cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleCallout)
+					cell.textLabel!.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.callout)
 				} else {
-					cell.textLabel!.font = UIFont.preferredFontForTextStyle(UIFontTextStyleBody)
+					cell.textLabel!.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.body)
 				}
-				cell.selectionStyle = .Default
+				cell.selectionStyle = .default
 				cell.textLabel!.textColor = self.document.tintColor
 			}
 			
-			cell.accessoryType = .DisclosureIndicator
+			cell.accessoryType = .disclosureIndicator
 			cell.textLabel!.numberOfLines = 0
 			
 			let attributedTitle = NSMutableAttributedString(string: article.title)
 			
 			if let query = self.query {
 				let foregroundColor = cell.textLabel!.textColor
-				let bold = cell.textLabel!.font.fontDescriptor().fontDescriptorWithSymbolicTraits(.TraitBold)
+				let bold = cell.textLabel!.font.fontDescriptor.withSymbolicTraits(.traitBold)
 				
 				var alpha: CGFloat = 0
-				foregroundColor.getRed(nil, green: nil, blue: nil, alpha: &alpha)
-				attributedTitle.addAttribute(NSForegroundColorAttributeName, value: foregroundColor.colorWithAlphaComponent(0.85), range: NSMakeRange(0, attributedTitle.length))
+				foregroundColor?.getRed(nil, green: nil, blue: nil, alpha: &alpha)
+				if let foregroundColor = foregroundColor?.withAlphaComponent(0.85) {
+					attributedTitle.addAttribute(NSForegroundColorAttributeName, value: foregroundColor, range: NSMakeRange(0, attributedTitle.length))
+				}
 				
 				var i = 0
 				while true {
 					let searchRange = NSMakeRange(i, article.title.characters.count-i)
-					let range = (article.title as NSString).rangeOfString(query, options: .CaseInsensitiveSearch, range: searchRange, locale: NSLocale.currentLocale())
+					let range = (article.title as NSString).range(of: query, options: .caseInsensitive, range: searchRange, locale: Locale.current)
 					
 					if range.location == NSNotFound { break }
 					
 					attributedTitle.addAttribute(NSFontAttributeName, value: UIFont(descriptor: bold!, size: 0.0), range: range)
-					attributedTitle.addAttribute(NSForegroundColorAttributeName, value: foregroundColor, range: range)
+					if let foregroundColor = foregroundColor {
+						attributedTitle.addAttribute(NSForegroundColorAttributeName, value: foregroundColor, range: range)
+					}
 					
 					i = range.location + range.length
 				}

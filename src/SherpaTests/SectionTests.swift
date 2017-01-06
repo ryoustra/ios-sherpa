@@ -45,14 +45,14 @@ class SectionTests: XCTestCase {
 				"build_min": 401,
 			]
 		]
-	]
+	] as [String : Any]
 	
 	func testInit() {
 		XCTAssertNotNil(Sherpa.Section(dictionary: SectionTests.dictionary), "Section should successfully initialize with valid dictionary.")
 		
 		var minimal = SectionTests.dictionary
-		minimal.removeValueForKey("title")
-		minimal.removeValueForKey("details")
+		minimal.removeValue(forKey: "title")
+		minimal.removeValue(forKey: "details")
 		XCTAssertNotNil(Sherpa.Section(dictionary: minimal), "Section should successfully initialize with only articles.")
 	}
 	
@@ -63,7 +63,7 @@ class SectionTests: XCTestCase {
 		let validTitle = Sherpa.Section(dictionary: dictionary)
 		XCTAssertNotNil(validTitle, "Section should successfully init from dictionary with a valid 'title' value.")
 		if let section = validTitle {
-			XCTAssertEqual(section.title, dictionary["title"], "Section title should match the 'title' value in the provided dictionary.")
+			XCTAssertEqual(section.title, "Section Title", "Section title should match the 'title' value in the provided dictionary.")
 		}
 		
 		dictionary["title"] = ""
@@ -80,7 +80,7 @@ class SectionTests: XCTestCase {
 			XCTAssertNil(section.title, "Section should translate an invalid 'title' value to nil.")
 		}
 		
-		dictionary.removeValueForKey("title")
+		dictionary.removeValue(forKey: "title")
 		let missingTitle = Sherpa.Section(dictionary: dictionary)
 		XCTAssertNotNil(missingTitle, "Section should successfully init from dictionary without a 'title' value.")
 		if let section = missingTitle {
@@ -95,7 +95,7 @@ class SectionTests: XCTestCase {
 		let validDetail = Sherpa.Section(dictionary: dictionary)
 		XCTAssertNotNil(validDetail, "Section should successfully init from dictionary with a valid 'detail' value.")
 		if let section = validDetail {
-			XCTAssertEqual(section.detail, dictionary["detail"], "Section detail should match the 'detail' value in the provided dictionary.")
+			XCTAssertEqual(section.detail, dictionary["detail"] as! String, "Section detail should match the 'detail' value in the provided dictionary.")
 		}
 		
 		dictionary["detail"] = ""
@@ -112,7 +112,7 @@ class SectionTests: XCTestCase {
 			XCTAssertNil(section.detail, "Section should translate an invalid 'detail' value to nil.")
 		}
 		
-		dictionary.removeValueForKey("detail")
+		dictionary.removeValue(forKey: "detail")
 		let missingDetail = Sherpa.Section(dictionary: dictionary)
 		XCTAssertNotNil(missingDetail, "Section should successfully init from dictionary without a 'detail' value.")
 		if let section = missingDetail {

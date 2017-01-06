@@ -26,9 +26,9 @@ import UIKit
 
 internal protocol ListViewControllerDelegate: class {
 	
-	func listViewController(listViewController: ListViewController, didSelectArticle article: Article)
+	func listViewController(_ listViewController: ListViewController, didSelectArticle article: Article)
 	
-	func listViewController(listViewController: ListViewController, didSelectFeedback feedback: Feedback)
+	func listViewController(_ listViewController: ListViewController, didSelectFeedback feedback: Feedback)
 	
 }
 
@@ -40,7 +40,7 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 	
 	// MARK: Instance life cycle
 	
-	internal private(set) var dataSource: DataSource!
+	internal fileprivate(set) var dataSource: DataSource!
 	
 	internal init(document: Document) {
 		super.init(nibName: nil, bundle: nil)
@@ -62,9 +62,9 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 	
 	// MARK: View life cycle
 	
-	private var searchController: UISearchController?
+	fileprivate var searchController: UISearchController?
 	
-	internal let tableView = UITableView(frame: CGRectZero, style: .Grouped)
+	internal let tableView = UITableView(frame: CGRect.zero, style: .grouped)
 	
 	override func loadView() {
 		self.view = self.tableView
@@ -86,12 +86,12 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 			searchController.searchResultsUpdater = self
 			searchController.searchBar.frame = CGRect(x: 0, y: 0, width: self.tableView.frame.width, height: 44.0)
 			searchController.searchBar.tintColor = self.dataSource.document.tintColor
-			searchController.searchBar.autoresizingMask = [.FlexibleWidth]
+			searchController.searchBar.autoresizingMask = [.flexibleWidth]
 			self.searchController = searchController
 			
 			// Sticking the searchBar inside a wrapper stops the tableview trying to be clever with the content size.
 			let headerView = UIView(frame: searchController.searchBar.frame)
-			headerView.autoresizingMask = [.FlexibleWidth]
+			headerView.autoresizingMask = [.flexibleWidth]
 			headerView.addSubview(searchController.searchBar)
 			self.tableView.tableHeaderView = headerView
 			
@@ -99,33 +99,33 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 		}
 	}
 	
-	override func viewWillAppear(animated: Bool) {
+	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		
 		if let indexPath = self.tableView.indexPathForSelectedRow {
-			self.tableView.deselectRowAtIndexPath(indexPath, animated: animated)
+			self.tableView.deselectRow(at: indexPath, animated: animated)
 		}
 		
-		if let searchController = self.searchController where searchController.active {
+		if let searchController = self.searchController, searchController.isActive {
 			self.navigationController?.setNavigationBarHidden(true, animated: false)
 		}
 		
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(onKeyboard(_:)), name: UIKeyboardWillShowNotification, object: nil)
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(onKeyboard(_:)), name: UIKeyboardWillHideNotification, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(onKeyboard(_:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(onKeyboard(_:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
 	}
 	
-	@objc private func onKeyboard(notification: NSNotification) {
+	@objc fileprivate func onKeyboard(_ notification: Notification) {
 		UIView.beginAnimations(nil, context: nil)
 		
-		if let rawValue = notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey]?.integerValue, let curve = UIViewAnimationCurve(rawValue: rawValue) {
+		if let rawValue = (notification.userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? NSNumber)?.intValue, let curve = UIViewAnimationCurve(rawValue: rawValue) {
 			UIView.setAnimationCurve(curve)
 		}
 		
-		if let duration = notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey]?.doubleValue {
+		if let duration = (notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue {
 			UIView.setAnimationDuration(duration)
 		}
 		
-		let keyboardOrigin = notification.userInfo?[UIKeyboardFrameEndUserInfoKey]?.CGRectValue.origin.y ?? 0
+		let keyboardOrigin = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue.origin.y ?? 0
 		
 		let contentInset = self.tableView.contentInset
 		let bottomInset = max(self.bottomLayoutGuide.length, self.tableView.frame.size.height - keyboardOrigin)
@@ -137,10 +137,10 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 	
 	// MARK: Search results updating
 	
-	internal func updateSearchResultsForSearchController(searchController: UISearchController) {
+	internal func updateSearchResults(for searchController: UISearchController) {
 		if !self.allowSearch { return }
 		
-		if searchController.active, let query = searchController.searchBar.text where query.characters.count > 0 {
+		if searchController.isActive, let query = searchController.searchBar.text, query.characters.count > 0 {
 			self.dataSource.query = query
 		}
 		else {
@@ -152,11 +152,11 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 
 	// MARK: Table view delegate
 	
-	func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+	func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
 		return 44
 	}
 	
-	func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		if let key = self.dataSource.feedback(indexPath) {
 			self.delegate?.listViewController(self, didSelectFeedback: key)
 		}
@@ -168,9 +168,9 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 
 	// MARK: Utilities
 	
-	internal func selectRowForArticle(article: Article) {
+	internal func selectRowForArticle(_ article: Article) {
 		if let indexPath = self.dataSource.indexPath(article) {
-			self.tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: .Middle)
+			self.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .middle)
 		}
 	}
 	

@@ -38,9 +38,9 @@ internal struct Article {
 	
 	let relatedKeys: [String]
 	
-	internal init?(dictionary: [String: AnyObject]) {
+	internal init?(dictionary: [String: Any]) {
 		// Key
-		if let string = dictionary["key"] as? String where !string.isEmpty {
+		if let string = dictionary["key"] as? String, !string.isEmpty {
 			key = string
 		}
 		else {
@@ -73,7 +73,7 @@ internal struct Article {
 		if let array = dictionary["related_articles"] as? [String] {
 			relatedKeys = array
 		}
-		else if let string = dictionary["related_articles"] as? String where !string.isEmpty {
+		else if let string = dictionary["related_articles"] as? String, !string.isEmpty {
 			relatedKeys = [string]
 		}
 		else {
@@ -88,25 +88,25 @@ internal struct Article {
 		}
 	}
 	
-	internal func matches(query: String) -> Bool {
+	internal func matches(_ query: String) -> Bool {
 		if query.isEmpty {
 			return true
 		}
 		
-		let lowercaseQuery = query.lowercaseString
+		let lowercaseQuery = query.lowercased()
 		
-		if self.title.lowercaseString.rangeOfString(lowercaseQuery) != nil {
+		if self.title.lowercased().range(of: lowercaseQuery) != nil {
 			return true
 		}
 			
-		else if self.body.lowercaseString.rangeOfString(lowercaseQuery) != nil {
+		else if self.body.lowercased().range(of: lowercaseQuery) != nil {
 			return true
 		}
 		
 		return false
 	}
 	
-	internal func matches(buildNumber: Int) -> Bool {
+	internal func matches(_ buildNumber: Int) -> Bool {
 		return buildNumber >= self.buildMin && buildNumber <= self.buildMax
 	}
 	

@@ -355,7 +355,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jellystyle.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = SherpaExample;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -376,7 +376,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jellystyle.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = SherpaExample;
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

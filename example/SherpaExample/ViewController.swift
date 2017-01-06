@@ -28,26 +28,26 @@ import Sherpa
 class ViewController: UIViewController {
 
 	@IBAction func openUserGuide() {
-		let guideURL = NSBundle.mainBundle().URLForResource("UserGuide", withExtension: "json")!
+		let guideURL = Bundle.main.url(forResource: "UserGuide", withExtension: "json")!
 		let viewController = SherpaViewController(fileAtURL: guideURL)
-		self.presentViewController(viewController, animated: true, completion: nil)
+		self.present(viewController, animated: true, completion: nil)
 	}
 	
 	@IBAction func openArticle() {
-		let guideURL = NSBundle.mainBundle().URLForResource("UserGuide", withExtension: "json")!
+		let guideURL = Bundle.main.url(forResource: "UserGuide", withExtension: "json")!
 		let viewController = SherpaViewController(fileAtURL: guideURL)
 		viewController.articleKey = "related-articles"
-		self.presentViewController(viewController, animated: true, completion: nil)
+		self.present(viewController, animated: true, completion: nil)
 	}
 	
 	@IBAction func pushUserGuide() {
-		let guideURL = NSBundle.mainBundle().URLForResource("UserGuide", withExtension: "json")!
+		let guideURL = Bundle.main.url(forResource: "UserGuide", withExtension: "json")!
 		let viewController = SherpaViewController(fileAtURL: guideURL)
 		self.navigationController?.pushViewController(viewController, animated: true)
 	}
 	
 	@IBAction func pushArticle() {
-		let guideURL = NSBundle.mainBundle().URLForResource("UserGuide", withExtension: "json")!
+		let guideURL = Bundle.main.url(forResource: "UserGuide", withExtension: "json")!
 		let viewController = SherpaViewController(fileAtURL: guideURL)
 		viewController.articleKey = "related-articles"
 		self.navigationController?.pushViewController(viewController, animated: true)
