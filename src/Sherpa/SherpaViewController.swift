@@ -36,6 +36,20 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 		return self.document.article(key) != nil
 	}
 	
+	//! Have an article matching the given key pushed into the navigation heirarchy, if possible.
+	open func open(articleForKey key: String, animated: Bool) {
+		guard let article = self.document.article(key) else {
+			return
+		}
+
+		self.listViewController.selectRowForArticle(article)
+		
+		let articleViewController = ArticleViewController(document: self.document, article: article)
+		articleViewController.delegate = self
+
+		self.sherpa_navigationController.pushViewController(articleViewController, animated: animated)
+	}
+	
 	// MARK: Allowing feedback
 	
 	//! Email address for receiving feedback.
@@ -186,16 +200,16 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 	
 	open override var navigationItem: UINavigationItem {
 		get {
-			return self.sherpa_activeViewController().navigationItem
+			return self.sherpa_activeViewController.navigationItem
 		}
 	}
 	
 	open override var childViewControllerForStatusBarHidden : UIViewController? {
-		return self.sherpa_activeViewController()
+		return self.sherpa_activeViewController
 	}
 	
 	open override var childViewControllerForStatusBarStyle : UIViewController? {
-		return self.sherpa_activeViewController()
+		return self.sherpa_activeViewController
 	}
 	
 	// MARK: Navigation controller delegate
@@ -212,23 +226,20 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 		let articleViewController = ArticleViewController(document: self.document, article: article)
 		articleViewController.delegate = self
 		
-		let navigationController = self.embeddedNavigationController ?? self.navigationController
-		navigationController!.pushViewController(articleViewController, animated: true)
+		self.sherpa_navigationController.pushViewController(articleViewController, animated: true)
 	}
 	
 	func listViewController(_ listViewController: ListViewController, didSelectFeedback feedback: Feedback) {
-		let navigationController = self.embeddedNavigationController ?? self.navigationController!
-		
 		guard let viewController = feedback.viewController else {
 			return
 		}
 
-		navigationController.present(viewController, animated: true, completion: nil)
+		self.sherpa_navigationController.present(viewController, animated: true, completion: nil)
 	}
 
 	// MARK: Utilities
 	
-	fileprivate func sherpa_activeViewController() -> UIViewController {
+	fileprivate var sherpa_activeViewController: UIViewController {
 		if let viewController = self.embeddedNavigationController {
 			return viewController
 		}
@@ -236,6 +247,10 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 			return viewController
 		}
 		return self.listViewController
+	}
+	
+	fileprivate var sherpa_navigationController: UINavigationController {
+		return self.embeddedNavigationController ?? self.navigationController!
 	}
 	
 	open func sherpa_dismiss() {
