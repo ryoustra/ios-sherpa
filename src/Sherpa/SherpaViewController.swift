@@ -30,6 +30,11 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 	
 	//! Key matching an article to be displayed.
 	open var articleKey: String? = nil
+
+	//! Determine if an article matching the given key is available.
+	open func contains(articleForKey key: String) -> Bool {
+		return self.document.article(key) != nil
+	}
 	
 	// MARK: Allowing feedback
 	
