@@ -95,7 +95,7 @@ class SectionTests: XCTestCase {
 		let validDetail = Sherpa.Section(dictionary: dictionary)
 		XCTAssertNotNil(validDetail, "Section should successfully init from dictionary with a valid 'detail' value.")
 		if let section = validDetail {
-			XCTAssertEqual(section.detail, dictionary["detail"] as! String, "Section detail should match the 'detail' value in the provided dictionary.")
+			XCTAssertEqual(section.detail, dictionary["detail"] as? String, "Section detail should match the 'detail' value in the provided dictionary.")
 		}
 		
 		dictionary["detail"] = ""
