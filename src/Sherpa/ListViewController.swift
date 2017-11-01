@@ -140,7 +140,7 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 	internal func updateSearchResults(for searchController: UISearchController) {
 		if !self.allowSearch { return }
 		
-		if searchController.isActive, let query = searchController.searchBar.text, query.characters.count > 0 {
+		if searchController.isActive, let query = searchController.searchBar.text, query.count > 0 {
 			self.dataSource.query = query
 		}
 		else {

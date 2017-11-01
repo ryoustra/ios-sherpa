@@ -235,7 +235,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 				
 				var i = 0
 				while true {
-					let searchRange = NSMakeRange(i, article.title.characters.count-i)
+					let searchRange = NSMakeRange(i, article.title.count-i)
 					let range = (article.title as NSString).range(of: query, options: .caseInsensitive, range: searchRange, locale: Locale.current)
 					
 					if range.location == NSNotFound { break }

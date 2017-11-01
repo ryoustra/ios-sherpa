@@ -48,7 +48,7 @@ internal class FeedbackEmail: NSObject, Feedback, MFMailComposeViewControllerDel
 	required init?(string: String) {
 		let regex = try! NSRegularExpression(pattern: "^\\s*((\"?([^\"]*)\"?|.*)\\s)?<?(.+?@.+?)>?\\s*$", options: [])
 		
-		if let match = regex.matches(in: string, options: [], range: NSRange(location: 0, length: string.characters.count)).first {
+		if let match = regex.matches(in: string, options: [], range: NSRange(location: 0, length: string.count)).first {
 			let nameRange = match.rangeAt(3)
 			self.name = nameRange.location != NSNotFound ? (string as NSString).substring(with: nameRange) : nil
 			
