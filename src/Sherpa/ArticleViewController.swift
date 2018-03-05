@@ -73,6 +73,7 @@ internal class ArticleViewController: ListViewController {
 		
 		self.bodyView.backgroundColor = UIColor.clear
 		self.bodyView.isEditable = false
+		self.bodyView.isScrollEnabled = false
 		self.bodyView.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.body)
 		self.bodyView.textColor = self.dataSource.document.articleTextColor
 		self.bodyView.tintColor = self.dataSource.document.tintColor
