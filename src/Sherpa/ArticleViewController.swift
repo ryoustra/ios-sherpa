@@ -59,15 +59,13 @@ internal class ArticleViewController: ListViewController {
 		self.navigationItem.title = nil
 		
 		self.contentView.preservesSuperviewLayoutMargins = true
-		self.contentView.translatesAutoresizingMaskIntoConstraints = false
-		
+
 		if #available(iOSApplicationExtension 9.0, *) {
 			self.titleLabel.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.title2)
 		} else {
 			self.titleLabel.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline)
 		}
 		self.titleLabel.textColor = self.dataSource.document.articleTextColor
-		self.titleLabel.translatesAutoresizingMaskIntoConstraints = false
 		self.titleLabel.numberOfLines = 0
 		self.contentView.addSubview(self.titleLabel)
 		
@@ -78,7 +76,6 @@ internal class ArticleViewController: ListViewController {
 		self.bodyView.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.body)
 		self.bodyView.textColor = self.dataSource.document.articleTextColor
 		self.bodyView.tintColor = self.dataSource.document.tintColor
-		self.bodyView.translatesAutoresizingMaskIntoConstraints = false
 		self.bodyView.textContainer.lineFragmentPadding = 0
 		self.bodyView.textContainerInset = UIEdgeInsets.zero
 		self.contentView.addSubview(self.bodyView)
@@ -92,9 +89,10 @@ internal class ArticleViewController: ListViewController {
 		self.navigationController?.setNavigationBarHidden(false, animated: false)
 	}
 	
-	override func viewDidLayoutSubviews() {
-		let header = self.contentView
-		if header?.superview == nil || header?.frame.width != header?.superview!.frame.width {
+	override func viewWillLayoutSubviews() {
+		super.viewWillLayoutSubviews()
+
+		if let header = self.contentView, header.superview == nil || header.frame.width != header.superview!.frame.width {
 			let margins = self.tableView.layoutMargins
 			let width = self.tableView.frame.width
 			
@@ -104,8 +102,8 @@ internal class ArticleViewController: ListViewController {
 			
 			self.titleLabel.frame = CGRect(x: margins.left, y: 30, width: maxSize.width, height: titleSize.height)
 			self.bodyView.frame = CGRect(x: margins.left, y: self.titleLabel.frame.maxY + 15, width: maxSize.width, height: bodySize.height)
-			header?.frame = CGRect(x: 0, y: 0, width: width, height: self.bodyView.frame.maxY)
-			
+			header.frame = CGRect(x: 0, y: 0, width: width, height: self.bodyView.frame.maxY)
+
 			self.tableView.tableHeaderView = header
 		}
 	}
