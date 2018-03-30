@@ -55,7 +55,7 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 	//! Email address for receiving feedback.
 	@available(*, deprecated)
 	open var feedbackEmail: String? {
-		get { return self.document.feedback.flatMap{ $0 as? FeedbackEmail }.first?.fullString }
+		get { return self.document.feedback.compactMap { $0 as? FeedbackEmail }.first?.fullString }
 		set(feedbackEmail) {
 			var feedback = self.document.feedback.filter{ !($0 is FeedbackEmail) }
 			
@@ -70,7 +70,7 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 	//! Twitter account handle for receiving feedback.
 	@available(*, deprecated)
 	open var feedbackTwitter: String? {
-		get { return self.document.feedback.flatMap{ $0 as? FeedbackTwitter }.first?.handle }
+		get { return self.document.feedback.compactMap { $0 as? FeedbackTwitter }.first?.handle }
 		set(feedbackTwitter) {
 			var feedback = self.document.feedback.filter{ !($0 is FeedbackTwitter) }
 			
@@ -253,7 +253,7 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 		return self.embeddedNavigationController ?? self.navigationController!
 	}
 	
-	open func sherpa_dismiss() {
+	@objc open func sherpa_dismiss() {
 		self.dismiss(animated: true, completion: nil)
 	}
 	

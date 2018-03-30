@@ -78,15 +78,15 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 		var sections = self.sections
 		
 		if let query = self.query {
-			sections = sections.flatMap({ $0.section(query) })
+			sections = sections.compactMap({ $0.section(query) })
 		}
 		
 		if let filter = self.filter {
-			sections = sections.flatMap({ $0.section(filter) })
+			sections = sections.compactMap({ $0.section(filter) })
 		}
 		
 		if let buildNumber = self.buildNumber {
-			sections = sections.flatMap({ $0.section(buildNumber) })
+			sections = sections.compactMap({ $0.section(buildNumber) })
 		}
 		
 		if let sectionTitle = self.sectionTitle {
@@ -230,7 +230,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 				var alpha: CGFloat = 0
 				foregroundColor?.getRed(nil, green: nil, blue: nil, alpha: &alpha)
 				if let foregroundColor = foregroundColor?.withAlphaComponent(0.85) {
-					attributedTitle.addAttribute(NSForegroundColorAttributeName, value: foregroundColor, range: NSMakeRange(0, attributedTitle.length))
+					attributedTitle.addAttribute(NSAttributedStringKey.foregroundColor, value: foregroundColor, range: NSMakeRange(0, attributedTitle.length))
 				}
 				
 				var i = 0
@@ -240,9 +240,9 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 					
 					if range.location == NSNotFound { break }
 					
-					attributedTitle.addAttribute(NSFontAttributeName, value: UIFont(descriptor: bold!, size: 0.0), range: range)
+					attributedTitle.addAttribute(NSAttributedStringKey.font, value: UIFont(descriptor: bold!, size: 0.0), range: range)
 					if let foregroundColor = foregroundColor {
-						attributedTitle.addAttribute(NSForegroundColorAttributeName, value: foregroundColor, range: range)
+						attributedTitle.addAttribute(NSAttributedStringKey.foregroundColor, value: foregroundColor, range: range)
 					}
 					
 					i = range.location + range.length

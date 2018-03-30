@@ -50,7 +50,7 @@ internal struct Section {
 		}
 		
 		// Articles
-		articles = (dictionary["articles"] as? [[String: Any]])?.map({ Article(dictionary: $0) }).flatMap({ $0 }) ?? []
+		articles = (dictionary["articles"] as? [[String: Any]])?.map({ Article(dictionary: $0) }).compactMap({ $0 }) ?? []
 		if articles.count == 0 {
 			return nil
 		}

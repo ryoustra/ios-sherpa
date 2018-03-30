@@ -60,7 +60,7 @@ class DocumentTests: XCTestCase {
 			}
 
 			let document = Sherpa.Document(dictionary: dictionary)
-			let feedback = document.feedback.flatMap { $0 as? FeedbackEmail }
+			let feedback = document.feedback.compactMap { $0 as? FeedbackEmail }
 
 			if let email = email {
 				XCTAssert(feedback.count == 1, "Document should contain a object for the feedback email if a valid value is provided.")
@@ -95,7 +95,7 @@ class DocumentTests: XCTestCase {
 			}
 			
 			let document = Sherpa.Document(dictionary: dictionary)
-			let feedback = document.feedback.flatMap { $0 as? FeedbackTwitter }
+			let feedback = document.feedback.compactMap { $0 as? FeedbackTwitter }
 			
 			if let handle = handle {
 				XCTAssert(feedback.count == 1, "Document should contain a object for the feedback Twitter handle if a valid value is provided.")
