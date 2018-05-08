@@ -95,13 +95,19 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 		get { return self.document.articleBackgroundColor }
 		set(articleBackgroundColor) { self.document.articleBackgroundColor = articleBackgroundColor }
 	}
-	
+
 	//! Text color for article pages.
 	open var articleTextColor: UIColor! {
 		get { return self.document.articleTextColor }
 		set(articleTextColor) { self.document.articleTextColor = articleTextColor }
 	}
-	
+
+	//! Text color for article pages.
+	open var articleCSS: String? {
+		get { return self.document.articleCSS }
+		set(articleCSS) { self.document.articleCSS = articleCSS }
+	}
+
 	//! Register the class used to display article rows in the table view.
 	@objc(registerTableViewCellClassForArticleRows:)
 	open func registerTableViewCellClass(forArticleRows cellClass: UITableViewCell.Type) {

@@ -33,7 +33,9 @@ internal class Document {
 	internal var articleBackgroundColor: UIColor = UIColor.white
 	
 	internal var articleTextColor: UIColor = UIColor.darkText
-	
+
+	internal var articleCSS: String?
+
 	internal var articleCellClass = UITableViewCell.self
 	
 	internal var feedbackCellClass = UITableViewCell.self

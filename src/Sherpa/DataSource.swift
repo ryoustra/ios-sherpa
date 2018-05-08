@@ -25,7 +25,6 @@
 import UIKit
 import MessageUI
 import Social
-import SafariServices
 
 internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate {
 	

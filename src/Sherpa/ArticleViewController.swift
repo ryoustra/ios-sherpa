@@ -23,6 +23,7 @@
 //
 
 import UIKit
+import SafariServices
 
 internal class ArticleViewController: ListViewController {
 	
@@ -35,10 +36,13 @@ internal class ArticleViewController: ListViewController {
 		
 		super.init(document: document)
 		
-		self.dataSource.sectionTitle = NSLocalizedString("Related", comment: "Title for table view section containing one or more related articles.")
-		self.dataSource.filter = { (article: Article) -> Bool in return article.key != nil && self.article.relatedKeys.contains(article.key!)  }
+		dataSource.sectionTitle = NSLocalizedString("Related", comment: "Title for table view section containing one or more related articles.")
+		dataSource.filter = { (article: Article) -> Bool in return article.key != nil && self.article.relatedKeys.contains(article.key!)  }
 		
-		self.allowSearch = false
+		allowSearch = false
+
+		bodyView.delegate = self
+		bodyView.loadHTMLString(prepareHTML, baseURL: nil)
 	}
 	
 	required init?(coder aDecoder: NSCoder) {
@@ -47,124 +51,210 @@ internal class ArticleViewController: ListViewController {
 	
 	// MARK: View life cycle
 	
-	internal let contentView: UIView! = UIView()
-	
-	internal let titleLabel: UILabel! = UILabel()
-	
-	internal let bodyView: UITextView! = UITextView()
+	internal let contentView: UIView = UIView()
+
+	internal let bodyView: UIWebView = UIWebView()
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		self.navigationItem.title = nil
+		navigationItem.title = nil
 		
-		self.contentView.preservesSuperviewLayoutMargins = true
+		contentView.preservesSuperviewLayoutMargins = true
 
-		if #available(iOSApplicationExtension 9.0, *) {
-			self.titleLabel.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.title2)
-		} else {
-			self.titleLabel.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline)
-		}
-		self.titleLabel.textColor = self.dataSource.document.articleTextColor
-		self.titleLabel.numberOfLines = 0
-		self.contentView.addSubview(self.titleLabel)
-		
-		self.titleLabel.text = self.article.title
-		
-		self.bodyView.backgroundColor = UIColor.clear
-		self.bodyView.isEditable = false
-		self.bodyView.isScrollEnabled = false
-		self.bodyView.font = UIFont.preferredFont(forTextStyle: UIFontTextStyle.body)
-		self.bodyView.textColor = self.dataSource.document.articleTextColor
-		self.bodyView.tintColor = self.dataSource.document.tintColor
-		self.bodyView.textContainer.lineFragmentPadding = 0
-		self.bodyView.textContainerInset = UIEdgeInsets.zero
-		self.contentView.addSubview(self.bodyView)
-		
-		self.bodyView.attributedText = self._applyAttributes(toString: self.article.body)
+		bodyView.backgroundColor = UIColor.clear
+		bodyView.scrollView.isScrollEnabled = false
+		bodyView.isOpaque = false
+		contentView.addSubview(bodyView)
 	}
 	
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		
-		self.navigationController?.setNavigationBarHidden(false, animated: false)
+		navigationController?.setNavigationBarHidden(false, animated: false)
 	}
 	
 	override func viewWillLayoutSubviews() {
 		super.viewWillLayoutSubviews()
 
-		if let header = self.contentView, header.superview == nil || header.frame.width != header.superview!.frame.width {
-			let margins = self.tableView.layoutMargins
-			let width = self.tableView.frame.width
-			
-			let maxSize = CGSize(width: width - margins.left - margins.right, height: CGFloat.greatestFiniteMagnitude)
-			let titleSize = self.titleLabel.sizeThatFits(maxSize)
-			let bodySize = self.bodyView.sizeThatFits(maxSize)
-			
-			self.titleLabel.frame = CGRect(x: margins.left, y: 30, width: maxSize.width, height: titleSize.height)
-			self.bodyView.frame = CGRect(x: margins.left, y: self.titleLabel.frame.maxY + 15, width: maxSize.width, height: bodySize.height)
-			header.frame = CGRect(x: 0, y: 0, width: width, height: self.bodyView.frame.maxY)
+		if contentView.superview == nil || contentView.frame.width != contentView.superview!.frame.width {
+			layoutHeaderView()
+		}
+	}
 
-			self.tableView.tableHeaderView = header
+	private func layoutHeaderView() {
+		let margins = tableView.layoutMargins
+		let width = tableView.frame.width
+
+		let maxSize = CGSize(width: width - margins.left - margins.right, height: CGFloat.greatestFiniteMagnitude)
+		let bodySize = bodyView.scrollView.contentSize
+
+		bodyView.frame = CGRect(x: margins.left, y: 30, width: maxSize.width, height: bodySize.height)
+		contentView.frame = CGRect(x: 0, y: 0, width: width, height: bodyView.frame.maxY)
+
+		tableView.tableHeaderView = contentView
+	}
+
+	fileprivate var prepareHTML: String {
+		let font = UIFont.preferredFont(forTextStyle: .body)
+		var css = """
+		body {margin: 0;\(self.css(for: font))}
+		img {max-width: 100%; opacity: 1;transition: opacity 0.3s;}
+		img[data-src] {opacity: 0;}
+		h1, h2, h3, h4, h5, h6 {font-weight: 500;line-height: 1.2;}
+		h1 {font-size: 1.6em;}
+		h2 {font-size: 1.4em;}
+		h3 {font-size: 1.2em;}
+		h4 {font-size: 1.0em;}
+		h5 {font-size: 0.8em;}
+		h6 {font-size: 0.6em;}
+		"""
+
+		if let tintColor = dataSource.document.tintColor ?? view.tintColor {
+			css += " a {color: \(self.css(for: tintColor));}"
+		}
+
+		if let articleCSS = dataSource.document.articleCSS {
+			css += " \(articleCSS)"
+		}
+
+		var string = article.body
+
+		var searchRange = Range(uncheckedBounds: (lower: string.startIndex, upper: string.endIndex))
+		while let range = string.range(of: "(<img[^>]*)( src=\")", options: .regularExpression, range: searchRange) {
+			string = string.replacingOccurrences(of: "src=\"", with: "data-src=\"", options: [], range: range)
+
+			searchRange = Range(uncheckedBounds: (lower: range.lowerBound, upper: string.endIndex))
+		}
+
+		return """
+		<html>
+			<head>
+				<meta charset="utf-8">
+				<style type="text/css">\(css)</style>
+				<style type="text/css">body {background-color: transparent !important;}</style>
+			</head>
+			<body><h1>\(article.title)</h1>\n\(paragraphs(for: string))</body>
+			<script type="text/javascript">
+				[].forEach.call(document.querySelectorAll('img[data-src]'), function(img) {
+					img.setAttribute('src', img.getAttribute('data-src'));
+					img.onload = function() {
+						img.removeAttribute('data-src');
+					};
+				});
+			</script>
+		</html>
+		"""
+	}
+
+	fileprivate func css(for color: UIColor) -> String {
+		var red: CGFloat = 0
+		var green: CGFloat = 0
+		var blue: CGFloat = 0
+		var alpha: CGFloat = 0
+
+		color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+
+		return "rgba(\(Int(red * 255)), \(Int(green * 255)), \(Int(blue * 255)), \(alpha))"
+	}
+
+	fileprivate func css(for font: UIFont) -> String {
+		var css = ""
+
+		css += "font-family: system-ui;"
+		css += "font-size: \(font.pointSize)px;"
+		css += "line-height: 1.4;"
+		css += "color: \(self.css(for: dataSource.document.articleTextColor));"
+
+		let symbolicTraits = font.fontDescriptor.symbolicTraits
+
+		if symbolicTraits.contains(.traitItalic) {
+			css += "font-style: italic;"
+		}
+
+		if symbolicTraits.contains(.traitBold) {
+			css += "font-weight: bold;"
+		}
+
+		if symbolicTraits.contains(.traitExpanded) {
+			css += "font-stretch: expanded;"
+		}
+		else if symbolicTraits.contains(.traitCondensed) {
+			css += "font-stretch: condensed;"
+		}
+
+		return css
+	}
+
+	fileprivate func paragraphs(for string: String) -> String {
+		var string = string.trimmingCharacters(in: .whitespacesAndNewlines)
+
+		guard string.range(of: "<(p|br)[/\\s>]", options: .regularExpression) == nil else {
+			return string
+		}
+
+		while let range = string.range(of: "\n") {
+			string.replaceSubrange(range, with: "<br/>")
+		}
+
+		return string
+	}
+
+}
+
+extension ArticleViewController: UIWebViewDelegate {
+
+	func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
+		guard let url = request.url, navigationType != .other else {
+			return true
+		}
+
+		guard #available(iOSApplicationExtension 11.0, *) else {
+			let selector = sel_registerName("openURL:")
+			var responder = self as UIResponder?
+			while let r = responder, !r.responds(to: selector) {
+				responder = r.next
+			}
+			_ = responder?.perform(selector, with: url)
+
+			return false
+		}
+
+		let configuration = SFSafariViewController.Configuration()
+		let viewController = SFSafariViewController(url: url, configuration: configuration)
+
+		self.present(viewController, animated: true, completion: nil)
+
+		return false
+	}
+
+	func webViewDidStartLoad(_ webView: UIWebView) {
+		continuouslyUpdateHeight(for: webView)
+	}
+
+	func webViewDidFinishLoad(_ webView: UIWebView) {
+		updateHeight(for: webView)
+	}
+
+	private func continuouslyUpdateHeight(for webView: UIWebView) {
+		updateHeight(for: webView)
+
+		guard webView.isLoading else {
+			return
+		}
+
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+			self?.continuouslyUpdateHeight(for: webView)
 		}
 	}
-	
-	@_semantics("optimize.sil.never")
-	fileprivate func _applyAttributes(toString string: String?) -> NSAttributedString? {
-		guard let string = string else {
-			return nil
+
+	private func updateHeight(for webView: UIWebView) {
+		guard let string = webView.stringByEvaluatingJavaScript(from: "document.body.scrollHeight"), let integer = Int(string) else {
+			return
 		}
-		
-		var mutable = string
-		
-		while let range = mutable.range(of: "\n") {
-			mutable.replaceSubrange(range, with: "<br />")
-		}
-		
-		guard let data = mutable.data(using: String.Encoding.unicode, allowLossyConversion: false) else {
-			return nil
-		}
-		
-		do {
-			let attributedText = try NSMutableAttributedString(data: data, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil)
-			
-			attributedText.beginEditing()
-			attributedText.enumerateAttributes(in: NSMakeRange(0,attributedText.length), options: [], using: { attributes, range, stop in
-				var mutable = attributes
-				
-				if let font = mutable[NSAttributedStringKey.font] as? UIFont {
-					let symbolicTraits = font.fontDescriptor.symbolicTraits
-					let descriptor = self.bodyView.font!.fontDescriptor.withSymbolicTraits(symbolicTraits)
-					
-					if font.familyName == "Times New Roman" {
-						mutable[NSAttributedStringKey.font] = UIFont(descriptor: descriptor!, size: self.bodyView.font!.pointSize)
-					}
-						
-					else {
-						mutable[NSAttributedStringKey.font] = font.withSize(self.bodyView.font!.pointSize)
-					}
-				}
-				
-				
-				if mutable[NSAttributedStringKey.link] != nil {
-					mutable[NSAttributedStringKey.foregroundColor] = self.bodyView.tintColor
-					mutable[NSAttributedStringKey.strokeColor] = self.bodyView.tintColor
-				}
-					
-				else {
-					mutable[NSAttributedStringKey.foregroundColor] = self.bodyView.textColor
-				}
-				
-				attributedText.setAttributes(mutable, range: range)
-			})
-			attributedText.endEditing()
-			
-			return attributedText
-		}
-			
-		catch {
-			return nil
-		}
+
+		webView.frame.size.height = CGFloat(integer)
+		layoutHeaderView()
 	}
-	
+
 }
