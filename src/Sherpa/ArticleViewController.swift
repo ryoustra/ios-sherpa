@@ -97,8 +97,11 @@ internal class ArticleViewController: ListViewController {
 
 	fileprivate var prepareHTML: String {
 		let font = UIFont.preferredFont(forTextStyle: .body)
+		let color = self.css(for: dataSource.document.articleTextColor)
+		let weight = font.fontDescriptor.symbolicTraits.contains(.traitBold) ? "bold" : "normal"
+
 		var css = """
-		body {margin: 0;\(self.css(for: font))}
+		body {margin: 0;font-family: -apple-system,system-ui,sans-serif;font-size: \(font.pointSize)px;line-height: 1.4;color: \(color);font-weight: \(weight);}
 		img {max-width: 100%; opacity: 1;transition: opacity 0.3s;}
 		img[data-src] {opacity: 0;}
 		h1, h2, h3, h4, h5, h6 {font-weight: 500;line-height: 1.2;}
@@ -156,34 +159,6 @@ internal class ArticleViewController: ListViewController {
 		color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
 
 		return "rgba(\(Int(red * 255)), \(Int(green * 255)), \(Int(blue * 255)), \(alpha))"
-	}
-
-	fileprivate func css(for font: UIFont) -> String {
-		var css = ""
-
-		css += "font-family: system-ui;"
-		css += "font-size: \(font.pointSize)px;"
-		css += "line-height: 1.4;"
-		css += "color: \(self.css(for: dataSource.document.articleTextColor));"
-
-		let symbolicTraits = font.fontDescriptor.symbolicTraits
-
-		if symbolicTraits.contains(.traitItalic) {
-			css += "font-style: italic;"
-		}
-
-		if symbolicTraits.contains(.traitBold) {
-			css += "font-weight: bold;"
-		}
-
-		if symbolicTraits.contains(.traitExpanded) {
-			css += "font-stretch: expanded;"
-		}
-		else if symbolicTraits.contains(.traitCondensed) {
-			css += "font-stretch: condensed;"
-		}
-
-		return css
 	}
 
 	fileprivate func paragraphs(for string: String) -> String {
