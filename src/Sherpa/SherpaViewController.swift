@@ -49,7 +49,27 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 
 		self.sherpa_navigationController.pushViewController(articleViewController, animated: animated)
 	}
-	
+
+	public static func openEmail(from fileURL: URL, presentingFrom presentingViewController: UIViewController, animated: Bool) {
+		let document = Document(fileAtURL: fileURL)
+
+		guard let feedback = document.feedback.first(where: { $0 is FeedbackEmail }), let viewController = feedback.viewController else {
+			return
+		}
+
+		presentingViewController.present(viewController, animated: animated, completion: nil)
+	}
+
+	public static func openTwitter(from fileURL: URL, presentingFrom presentingViewController: UIViewController, animated: Bool) {
+		let document = Document(fileAtURL: fileURL)
+
+		guard let feedback = document.feedback.first(where: { $0 is FeedbackTwitter }), let viewController = feedback.viewController else {
+			return
+		}
+
+		presentingViewController.present(viewController, animated: animated, completion: nil)
+	}
+
 	// MARK: Allowing feedback
 	
 	//! Email address for receiving feedback.
