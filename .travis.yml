@@ -1,4 +1,4 @@
-osx_image: xcode9.3beta
+osx_image: xcode10.1
 language: objective-c
 
 before_install:
@@ -16,6 +16,7 @@ env:
         - DESTINATION="OS=9.3,name=iPhone 6s"
         - DESTINATION="OS=10.3.1,name=iPhone 7"
         - DESTINATION="OS=11.3,name=iPhone 8"
+        - DESTINATION="OS=12.1,name=iPhone Xs"
 
 script:
     - set -o pipefail
