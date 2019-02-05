@@ -1,4 +1,4 @@
-# Sherpa
+![Sherpa](https://raw.githubusercontent.com/jellybeansoup/ios-sherpa/master/example/SherpaExample/Images.xcassets/logo.dataset/logo.svg?sanitize=true)
 
 A drop-in solution for displaying a user guide in an iOS app, based on a JSON template.
 
