@@ -56,7 +56,7 @@ If you have questions, I can be found on [Twitter](https://twitter.com/jellybean
 
 ## Released under the BSD License
 
-Copyright © 2017 Daniel Farrelly
+Copyright © 2019 Daniel Farrelly
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
