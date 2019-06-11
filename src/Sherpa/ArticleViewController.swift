@@ -23,6 +23,7 @@
 //
 
 import UIKit
+import WebKit
 import SafariServices
 
 internal class ArticleViewController: ListViewController {
@@ -41,7 +42,7 @@ internal class ArticleViewController: ListViewController {
 		
 		allowSearch = false
 
-		bodyView.delegate = self
+		bodyView.navigationDelegate = self
 		bodyView.loadHTMLString(prepareHTML, baseURL: nil)
 	}
 	
@@ -53,8 +54,10 @@ internal class ArticleViewController: ListViewController {
 	
 	internal let contentView: UIView = UIView()
 
-	internal let bodyView: UIWebView = UIWebView()
-	
+	internal let bodyView: WKWebView = WKWebView()
+
+	private var loadingObserver: NSKeyValueObservation?
+
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
@@ -66,6 +69,14 @@ internal class ArticleViewController: ListViewController {
 		bodyView.scrollView.isScrollEnabled = false
 		bodyView.isOpaque = false
 		contentView.addSubview(bodyView)
+
+		loadingObserver = bodyView.observe(\.isLoading) { webView, change in
+			guard change.newValue == false else {
+				return
+			}
+
+			self.updateHeight(for: webView)
+		}
 	}
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -134,6 +145,7 @@ internal class ArticleViewController: ListViewController {
 		<html>
 			<head>
 				<meta charset="utf-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 				<style type="text/css">\(css)</style>
 				<style type="text/css">body {background-color: transparent !important;}</style>
 			</head>
@@ -177,11 +189,12 @@ internal class ArticleViewController: ListViewController {
 
 }
 
-extension ArticleViewController: UIWebViewDelegate {
+extension ArticleViewController: WKNavigationDelegate {
 
-	func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebView.NavigationType) -> Bool {
-		guard let url = request.url, navigationType != .other else {
-			return true
+	func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+		guard let url = navigationAction.request.url, navigationAction.navigationType != .other else {
+			decisionHandler(.allow)
+			return
 		}
 
 		guard #available(iOSApplicationExtension 11.0, *) else {
@@ -192,7 +205,8 @@ extension ArticleViewController: UIWebViewDelegate {
 			}
 			_ = responder?.perform(selector, with: url)
 
-			return false
+			decisionHandler(.cancel)
+			return
 		}
 
 		let configuration = SFSafariViewController.Configuration()
@@ -200,18 +214,18 @@ extension ArticleViewController: UIWebViewDelegate {
 
 		self.present(viewController, animated: true, completion: nil)
 
-		return false
+		decisionHandler(.cancel)
 	}
 
-	func webViewDidStartLoad(_ webView: UIWebView) {
+	func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
 		continuouslyUpdateHeight(for: webView)
 	}
 
-	func webViewDidFinishLoad(_ webView: UIWebView) {
+	func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
 		updateHeight(for: webView)
 	}
 
-	private func continuouslyUpdateHeight(for webView: UIWebView) {
+	private func continuouslyUpdateHeight(for webView: WKWebView) {
 		updateHeight(for: webView)
 
 		guard webView.isLoading else {
@@ -223,13 +237,15 @@ extension ArticleViewController: UIWebViewDelegate {
 		}
 	}
 
-	private func updateHeight(for webView: UIWebView) {
-		guard let string = webView.stringByEvaluatingJavaScript(from: "document.body.scrollHeight"), let integer = Int(string) else {
-			return
-		}
+	private func updateHeight(for webView: WKWebView) {
+		webView.evaluateJavaScript("document.body.scrollHeight") { response, _ in
+			guard let number = response as? NSNumber else {
+				return
+			}
 
-		webView.frame.size.height = CGFloat(integer)
-		layoutHeaderView()
+			webView.frame.size.height = CGFloat(number.doubleValue)
+			self.layoutHeaderView()
+		}
 	}
 
 }
