@@ -93,6 +93,14 @@ internal class ArticleViewController: ListViewController {
 		}
 	}
 
+	override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+		super.traitCollectionDidChange(previousTraitCollection)
+
+		if #available(iOSApplicationExtension 10.0, *), traitCollection.preferredContentSizeCategory != previousTraitCollection?.preferredContentSizeCategory {
+			bodyView.loadHTMLString(prepareHTML, baseURL: nil)
+		}
+	}
+
 	private func layoutHeaderView() {
 		let margins = tableView.layoutMargins
 		let width = tableView.frame.width
