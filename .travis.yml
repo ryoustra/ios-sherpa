@@ -1,4 +1,4 @@
-osx_image: xcode10.2
+osx_image: xcode10.3
 language: objective-c
 
 before_install:
@@ -12,8 +12,6 @@ env:
         - SCHEME="Sherpa"
 
     matrix:
-        - DESTINATION="OS=8.4,name=iPhone 6"
-        - DESTINATION="OS=9.3,name=iPhone 6s"
         - DESTINATION="OS=10.3.1,name=iPhone 7"
         - DESTINATION="OS=11.3,name=iPhone 8"
         - DESTINATION="OS=12.1,name=iPhone Xs"
