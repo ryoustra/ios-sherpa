@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Sherpa  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+
+    <a title="Sherpa  Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="index.html">
+          Sherpa
+        </a>
+        
+      </p>
+    
+      <p class="header-col--secondary">
+        <form role="search" action="search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/jellybeansoup/ios-sherpa">
+            <img class="header-icon" src="img/gh.png"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="index.html">Sherpa Reference</a>
+      <img class="carat" src="img/carat.png" />
+      Sherpa  Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/SherpaViewController.html">SherpaViewController</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            
+            <p><img src="https://raw.githubusercontent.com/jellybeansoup/ios-sherpa/master/example/SherpaExample/Images.xcassets/logo.dataset/logo.svg?sanitize=true" alt="Sherpa"></p>
+
+<p>A drop-in solution for displaying a user guide in an iOS app, based on a JSON template.</p>
+
+<p><a href="https://travis-ci.org/jellybeansoup/ios-sherpa"><img src="https://travis-ci.org/jellybeansoup/ios-sherpa.svg?branch=master" alt="Build Status"></a>
+<a href="https://codecov.io/gh/jellybeansoup/ios-sherpa"><img src="https://codecov.io/gh/jellybeansoup/ios-sherpa/branch/master/graph/badge.svg" alt="Code Coverage"></a>
+<a href="https://cocoapods.org/pods/Sherpa"><img src="https://img.shields.io/cocoapods/v/Sherpa.svg" alt="CocoaPods Compatible"></a></p>
+<h2 id='features' class='heading'>Features</h2>
+
+<ul>
+<li>Compatible with iOS 8.4 and above.</li>
+<li>Provide a plain JSON file for content.</li>
+<li>Deep-link to articles for contextual help.</li>
+<li>User search with query highlighting.</li>
+<li>Built in feedback mechanisms for email and Twitter.</li>
+<li>Customize colors, and optionally provide a <code>UITableViewCell</code> subclass to use.</li>
+</ul>
+<h2 id='installation' class='heading'>Installation</h2>
+<h3 id='a-href-https-developer-apple-com-documentation-xcode-adding_package_dependencies_to_your_app-swift-package-manager-a-for-apple-platforms-only' class='heading'><a href="https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app">Swift Package Manager</a> (for Apple platforms only)</h3>
+
+<p>In Xcode, select <em>File</em> &gt; <em>Swift Packages</em> &gt; <em>Add Package Dependency</em> and enter the repository URL:</p>
+<pre class="highlight plaintext"><code>https://github.com/jellybeansoup/ios-sherpa
+</code></pre>
+<h3 id='a-href-http-cocoapods-org-cocoapods-a' class='heading'><a href="http://cocoapods.org/">CocoaPods</a></h3>
+
+<p>Add the following line to your <code>Podfile</code>:</p>
+<pre class="highlight plaintext"><code>pod 'Sherpa'
+</code></pre>
+<h3 id='a-href-https-github-com-carthage-carthage-carthage-a' class='heading'><a href="https://github.com/Carthage/Carthage">Carthage</a></h3>
+
+<p>Add the following line to your <code>Podfile</code>:</p>
+<pre class="highlight plaintext"><code>github "jellybeansoup/ios-sherpa"
+</code></pre>
+<h2 id='how-to-use' class='heading'>How to Use</h2>
+
+<p>Sherpa uses a JSON file as the source of its content, which allows you to provide a file in your app bundle, download a file from a server, or both! It handles parsing of the JSON for you, all you need to do is give it the local URL to the document, and it will handle the rest. You don&rsquo;t even need to wrap the view controller in a <code>UINavigationController</code>, as this is done automatically; just present the <code><a href="Classes/SherpaViewController.html">SherpaViewController</a></code> directly and you&rsquo;re good to go.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">viewController</span> <span class="o">=</span> <span class="kt">SherpaViewController</span><span class="p">(</span><span class="nv">fileAtURL</span><span class="p">:</span> <span class="n">fileURL</span><span class="p">)</span>
+<span class="k">self</span><span class="o">.</span><span class="nf">presentViewController</span><span class="p">(</span><span class="n">viewController</span><span class="p">,</span> <span class="nv">animated</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kc">nil</span><span class="p">)</span>
+</code></pre>
+
+<p>To deep link to a specific article for contextual help, you can optionally provide an <code>articleKey</code> that matches the key on the article you would like to link to. Sherpa will present with the selected article open, and allow users to navigate back to the full list of articles to find additional help if they want to.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">viewController</span> <span class="o">=</span> <span class="kt">SherpaViewController</span><span class="p">(</span><span class="nv">fileAtURL</span><span class="p">:</span> <span class="n">fileURL</span><span class="p">)</span>
+<span class="n">viewController</span><span class="o">.</span><span class="n">articleKey</span> <span class="o">=</span> <span class="s">"related-articles"</span>
+<span class="k">self</span><span class="o">.</span><span class="nf">presentViewController</span><span class="p">(</span><span class="n">viewController</span><span class="p">,</span> <span class="nv">animated</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kc">nil</span><span class="p">)</span>
+</code></pre>
+
+<p>If you&rsquo;d like to push Sherpa into an existing <code>UINavigationController</code> stack, this is handled gracefully without any additional configuration required. Simply push the <code><a href="Classes/SherpaViewController.html">SherpaViewController</a></code> directly.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">viewController</span> <span class="o">=</span> <span class="kt">SherpaViewController</span><span class="p">(</span><span class="nv">fileAtURL</span><span class="p">:</span> <span class="n">fileURL</span><span class="p">)</span>
+<span class="n">viewController</span><span class="o">.</span><span class="n">articleKey</span> <span class="o">=</span> <span class="s">"related-articles"</span>
+<span class="k">self</span><span class="o">.</span><span class="n">navigationController</span><span class="p">?</span><span class="o">.</span><span class="nf">pushViewController</span><span class="p">(</span><span class="n">viewController</span><span class="p">,</span> <span class="nv">animated</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span>
+</code></pre>
+
+<p>More information about setting up the JSON document can be found within <a href="https://raw.githubusercontent.com/jellybeansoup/ios-sherpa/master/example/SherpaExample/UserGuide.json">the example application&rsquo;s UserGuide.json file</a>. You can read this user guide and see the examples in action by taking the example application itself for a spin. CocoaPods makes this easy with the <code>pod try Sherpa</code> command, which can be run from Terminal if you have CocoaPods installed.</p>
+<h2 id='documentation' class='heading'>Documentation</h2>
+
+<p>You can <a href="https://jellybeansoup.github.io/ios-sherpa/">find documentation for this project here</a>. This documentation is automatically generated with <a href="https://github.com/realm/jazzy">jazzy</a> from a <a href="https://jellybeansoup.github.io/ios-sherpa/blob/master/.github/workflows/documentation.yml">GitHub Action</a> and hosted with <a href="https://pages.github.com/">GitHub Pages</a>.</p>
+
+<p>To generate documentation locally, run <code>make documentation</code> or <code>sh ./scripts/documentation.sh</code> from the repo&rsquo;s root directory. The output will be generated in the docs folder, and should <em>not</em> be included with commits (as the online documentation is automatically generated and updated).</p>
+<h2 id='get-in-touch' class='heading'>Get in Touch</h2>
+
+<p>If you have questions, I can be found on <a href="https://twitter.com/jellybeansoup">Twitter</a>, or you can get in touch via <a href="https://jellystyle.com/contact">email</a>.</p>
+<h2 id='released-under-the-bsd-license' class='heading'>Released under the BSD License</h2>
+
+<p>Copyright © 2019 Daniel Farrelly</p>
+
+<p>Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:</p>
+
+<ul>
+<li>Redistributions of source code must retain the above copyright notice, this list
+of conditions and the following disclaimer.</li>
+<li>Redistributions in binary form must reproduce the above copyright notice, this
+list of conditions and the following disclaimer in the documentation and/or
+other materials provided with the distribution.</li>
+</ul>
+
+<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &ldquo;AS IS&rdquo; AND 
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+
+          </div>
+        </section>
+
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2020 <a class="link" href="https://jellystyle.com" target="_blank" rel="external">Daniel Farrelly</a>. All rights reserved. (Last updated: 2020-02-15)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+    </section>
+  </body>
+</div>
+</html>
