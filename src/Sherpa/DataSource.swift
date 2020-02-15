@@ -208,7 +208,7 @@ internal class DataSource: NSObject, UITableViewDataSource, UITableViewDelegate 
 			guard let article = self.article(indexPath) else { return cell }
 			
 			if self.document.articleCellClass === UITableViewCell.self {
-				if #available(iOSApplicationExtension 9.0, *) {
+				if #available(iOS 9.0, *) {
 					cell.textLabel!.font = UIFont.preferredFont(forTextStyle: UIFont.TextStyle.callout)
 				} else {
 					cell.textLabel!.font = UIFont.preferredFont(forTextStyle: UIFont.TextStyle.body)

@@ -136,7 +136,7 @@ internal struct FeedbackTwitter: Feedback {
 			return viewController
 		}
 			
-		else if #available(iOSApplicationExtension 9.0, *) {
+		else if #available(iOS 9.0, *) {
 			let url = URL(string: "https://twitter.com/\(self.handle)")!
 			return SFSafariViewController(url: url)
 		}
