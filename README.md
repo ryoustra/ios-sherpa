@@ -35,7 +35,7 @@ pod 'Sherpa'
 
 ### [Carthage](https://github.com/Carthage/Carthage)
 
-Add the following line to your `Podfile`:
+Add the following line to your `Cartfile`:
 
 ```
 github "jellybeansoup/ios-sherpa"
