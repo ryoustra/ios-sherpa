@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "Sherpa",
-	platforms: [.iOS("8.4")],
+	platforms: [.iOS("11.0")],
     products: [
         .library(name: "Sherpa", targets: ["Sherpa"])
     ],

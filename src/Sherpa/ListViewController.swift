@@ -128,7 +128,7 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 		let keyboardOrigin = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue.origin.y ?? 0
 		
 		let contentInset = self.tableView.contentInset
-		let bottomInset = max(self.bottomLayoutGuide.length, self.tableView.frame.size.height - keyboardOrigin)
+		let bottomInset = max(self.view.safeAreaInsets.bottom, self.tableView.frame.size.height - keyboardOrigin)
 		
 		self.tableView.contentInset = UIEdgeInsets(top: contentInset.top, left: contentInset.left, bottom: bottomInset, right: contentInset.right)
 		

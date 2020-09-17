@@ -130,18 +130,8 @@ internal struct FeedbackTwitter: Feedback {
 	}
 
 	var viewController: UIViewController? {
-		if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeTwitter) {
-			let viewController = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
-			viewController?.setInitialText("@\(self.handle) ")
-			return viewController
-		}
-			
-		else if #available(iOS 9.0, *) {
-			let url = URL(string: "https://twitter.com/\(self.handle)")!
-			return SFSafariViewController(url: url)
-		}
-		
-		return nil
+		let url = URL(string: "https://twitter.com/\(self.handle)")!
+		return SFSafariViewController(url: url)
 	}
 	
 }

@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.license      = { :type => 'BSD', :file => 'LICENSE' }
   s.author       = { "Daniel Farrelly" => "daniel@jellystyle.com" }
   s.source       = { :git => "https://github.com/jellybeansoup/ios-sherpa.git", :tag => "v#{s.version}" }
-  s.ios.deployment_target = '8.4'
+  s.ios.deployment_target = '11.0'
   s.source_files = "src/Sherpa/*.{swift,h}"
   s.pod_target_xcconfig = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES' }
 end
