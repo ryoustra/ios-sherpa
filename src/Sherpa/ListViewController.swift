@@ -24,7 +24,7 @@
 
 import UIKit
 
-internal protocol ListViewControllerDelegate: class {
+internal protocol ListViewControllerDelegate: AnyObject {
 	
 	func listViewController(_ listViewController: ListViewController, didSelectArticle article: Article)
 	
