@@ -82,7 +82,7 @@ jobs:
         sonar-scanner \
           -Dsonar.host.url=https://sonarcloud.io \
         	-Dsonar.organization=jellybeansoup \
-        	-Dsonar.projectKey=jellybeansoup_ios-sherpa \
+        	-Dsonar.projectKey=jellybeansoup-ios-sherpa \
         	-Dsonar.login=${SONAR_TOKEN} \
           -Dsonar.sources=. \
         	-Dsonar.swift.coverage.reportPaths="${GITHUB_WORKSPACE}/merged.lcov" \
