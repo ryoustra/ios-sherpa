@@ -3,7 +3,7 @@
 A drop-in solution for displaying a user guide in an iOS app, based on a JSON template.
 
 [![Unit Tests](https://github.com/jellybeansoup/ios-sherpa/actions/workflows/unit-tests.yml/badge.svg?branch=main)](https://github.com/jellybeansoup/ios-sherpa/actions/workflows/unit-tests.yml)
-[![Code Coverage](https://codecov.io/gh/jellybeansoup/ios-sherpa/branch/main/graph/badge.svg)](https://codecov.io/gh/jellybeansoup/ios-sherpa)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jellybeansoup-ios-sherpa&metric=alert_status)](https://sonarcloud.io/dashboard?id=jellybeansoup-ios-sherpa)
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/Sherpa.svg)](https://cocoapods.org/pods/Sherpa)
 
 ## Features
