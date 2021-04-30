@@ -84,6 +84,7 @@ jobs:
         	-Dsonar.organization=jellybeansoup \
         	-Dsonar.projectKey=jellybeansoup_ios-sherpa \
         	-Dsonar.login=${SONAR_TOKEN} \
+          -Dsonar.sources=. \
         	-Dsonar.swift.coverage.reportPaths="${GITHUB_WORKSPACE}/merged.lcov" \
           -Dsonar.cfamily.build-wrapper-output.bypass=true \
           -Dsonar.c.file.suffixes=- \
