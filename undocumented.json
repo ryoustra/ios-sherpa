@@ -1,152 +1,173 @@
 {
   "warnings": [
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/ArticleViewController.swift",
+      "line": 202,
+      "symbol": "ArticleViewController.webView(_:decidePolicyFor:decisionHandler:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/ArticleViewController.swift",
+      "line": 228,
+      "symbol": "ArticleViewController.webView(_:didCommit:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/ArticleViewController.swift",
+      "line": 232,
+      "symbol": "ArticleViewController.webView(_:didFinish:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 27,
       "symbol": "SherpaViewController",
       "symbol_kind": "source.lang.swift.decl.class",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 32,
       "symbol": "SherpaViewController.articleKey",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 35,
       "symbol": "SherpaViewController.contains(articleForKey:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 40,
       "symbol": "SherpaViewController.open(articleForKey:animated:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 53,
       "symbol": "SherpaViewController.openEmail(from:presentingFrom:animated:)",
       "symbol_kind": "source.lang.swift.decl.function.method.static",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 63,
       "symbol": "SherpaViewController.openTwitter(from:presentingFrom:animated:)",
       "symbol_kind": "source.lang.swift.decl.function.method.static",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 77,
       "symbol": "SherpaViewController.feedbackEmail",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 92,
       "symbol": "SherpaViewController.feedbackTwitter",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 108,
       "symbol": "SherpaViewController.tintColor",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 114,
       "symbol": "SherpaViewController.articleBackgroundColor",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 120,
       "symbol": "SherpaViewController.articleTextColor",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 126,
       "symbol": "SherpaViewController.articleCSS",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 133,
       "symbol": "SherpaViewController.registerTableViewCellClass(forArticleRows:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 139,
       "symbol": "SherpaViewController.registerTableViewCellClass(forFeedbackRows:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 161,
       "symbol": "SherpaViewController.init(coder:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 176,
       "symbol": "SherpaViewController.viewDidLoad()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 227,
       "symbol": "SherpaViewController.navigationItem",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 233,
       "symbol": "SherpaViewController.childForStatusBarHidden",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 237,
       "symbol": "SherpaViewController.childForStatusBarStyle",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 243,
       "symbol": "SherpaViewController.navigationController(_:willShow:animated:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
+      "file": "/Users/runner/work/ios-sherpa/ios-sherpa/src/Sherpa/SherpaViewController.swift",
       "line": 282,
       "symbol": "SherpaViewController.sherpa_dismiss()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     }
   ],
-  "source_directory": "/Users/runner/runners/2.165.2/work/ios-sherpa/ios-sherpa"
+  "source_directory": "/Users/runner/work/ios-sherpa/ios-sherpa"
 }
