@@ -1,9 +1,9 @@
-![Sherpa](https://raw.githubusercontent.com/jellybeansoup/ios-sherpa/master/example/SherpaExample/Images.xcassets/logo.dataset/logo.svg?sanitize=true)
+![Sherpa](https://raw.githubusercontent.com/jellybeansoup/ios-sherpa/main/example/SherpaExample/Images.xcassets/logo.dataset/logo.svg?sanitize=true)
 
 A drop-in solution for displaying a user guide in an iOS app, based on a JSON template.
 
-[![Build Status](https://travis-ci.org/jellybeansoup/ios-sherpa.svg?branch=master)](https://travis-ci.org/jellybeansoup/ios-sherpa)
-[![Code Coverage](https://codecov.io/gh/jellybeansoup/ios-sherpa/branch/master/graph/badge.svg)](https://codecov.io/gh/jellybeansoup/ios-sherpa)
+[![Unit Tests](https://github.com/jellybeansoup/ios-sherpa/actions/workflows/unit-tests.yml/badge.svg?branch=main)](https://github.com/jellybeansoup/ios-sherpa/actions/workflows/unit-tests.yml)
+[![Code Coverage](https://codecov.io/gh/jellybeansoup/ios-sherpa/branch/main/graph/badge.svg)](https://codecov.io/gh/jellybeansoup/ios-sherpa)
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/Sherpa.svg)](https://cocoapods.org/pods/Sherpa)
 
 ## Features
@@ -66,11 +66,11 @@ viewController.articleKey = "related-articles"
 self.navigationController?.pushViewController(viewController, animated: true)
 ```
 
-More information about setting up the JSON document can be found within [the example application's UserGuide.json file](https://raw.githubusercontent.com/jellybeansoup/ios-sherpa/master/example/SherpaExample/UserGuide.json). You can read this user guide and see the examples in action by taking the example application itself for a spin. CocoaPods makes this easy with the `pod try Sherpa` command, which can be run from Terminal if you have CocoaPods installed.
+More information about setting up the JSON document can be found within [the example application's UserGuide.json file](https://raw.githubusercontent.com/jellybeansoup/ios-sherpa/main/example/SherpaExample/UserGuide.json). You can read this user guide and see the examples in action by taking the example application itself for a spin. CocoaPods makes this easy with the `pod try Sherpa` command, which can be run from Terminal if you have CocoaPods installed.
 
 ## Documentation
 
-You can [find documentation for this project here](https://jellybeansoup.github.io/ios-sherpa/). This documentation is automatically generated with [jazzy](https://github.com/realm/jazzy) from a [GitHub Action](https://jellybeansoup.github.io/ios-sherpa/blob/master/.github/workflows/documentation.yml) and hosted with [GitHub Pages](https://pages.github.com/).
+You can [find documentation for this project here](https://jellybeansoup.github.io/ios-sherpa/). This documentation is automatically generated with [jazzy](https://github.com/realm/jazzy) from a [GitHub Action](https://jellybeansoup.github.io/ios-sherpa/blob/main/.github/workflows/documentation.yml) and hosted with [GitHub Pages](https://pages.github.com/).
 
 To generate documentation locally, run `make documentation` or `sh ./scripts/documentation.sh` from the repo's root directory. The output will be generated in the docs folder, and should _not_ be included with commits (as the online documentation is automatically generated and updated).
 
