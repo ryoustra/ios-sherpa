@@ -77,11 +77,7 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 		
 		if self.allowSearch {
 			let searchController = UISearchController(searchResultsController: nil)
-			if #available(iOS 9.1, *) {
-				searchController.obscuresBackgroundDuringPresentation = false
-			} else {
-				searchController.dimsBackgroundDuringPresentation = false
-			}
+			searchController.obscuresBackgroundDuringPresentation = false
 			searchController.delegate = self
 			searchController.searchResultsUpdater = self
 			searchController.searchBar.frame = CGRect(x: 0, y: 0, width: self.tableView.frame.width, height: 44.0)

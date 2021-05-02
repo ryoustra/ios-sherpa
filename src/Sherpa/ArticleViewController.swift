@@ -96,7 +96,7 @@ internal class ArticleViewController: ListViewController {
 	override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
 		super.traitCollectionDidChange(previousTraitCollection)
 
-		if #available(iOS 10.0, *), traitCollection.preferredContentSizeCategory != previousTraitCollection?.preferredContentSizeCategory {
+		if traitCollection.preferredContentSizeCategory != previousTraitCollection?.preferredContentSizeCategory {
 			bodyView.loadHTMLString(prepareHTML, baseURL: nil)
 		}
 	}
@@ -202,18 +202,6 @@ extension ArticleViewController: WKNavigationDelegate {
 	func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 		guard let url = navigationAction.request.url, navigationAction.navigationType != .other else {
 			decisionHandler(.allow)
-			return
-		}
-
-		guard #available(iOS 11.0, *) else {
-			let selector = sel_registerName("openURL:")
-			var responder = self as UIResponder?
-			while let r = responder, !r.responds(to: selector) {
-				responder = r.next
-			}
-			_ = responder?.perform(selector, with: url)
-
-			decisionHandler(.cancel)
 			return
 		}
 
