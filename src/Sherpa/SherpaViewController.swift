@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Daniel Farrelly
+// Copyright © 2021 Daniel Farrelly
 //
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -28,15 +28,20 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 	
 	// MARK: Deep-linking
 	
-	//! Key matching an article to be displayed.
+	/// Key matching an article to be displayed.
 	open var articleKey: String? = nil
 
-	//! Determine if an article matching the given key is available.
+	/// Determine if an article matching the given key is available.
+	/// - Parameter key: String matching an article within the document.
+	/// - Returns: Flag indicating that an article matching the given `key` exists.
 	open func contains(articleForKey key: String) -> Bool {
 		return self.document.article(key) != nil
 	}
 	
-	//! Have an article matching the given key pushed into the navigation heirarchy, if possible.
+	/// Have an article matching the given key pushed into the navigation hierarchy, if possible.
+	/// - Parameters:
+	///   - key: String matching an article within the document.
+	///   - animated: Flag indicating whether the view controller transition should be animated.
 	open func open(articleForKey key: String, animated: Bool) {
 		guard let article = self.document.article(key) else {
 			return
@@ -50,6 +55,11 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 		self.sherpa_navigationController.pushViewController(articleViewController, animated: animated)
 	}
 
+	/// Opens a screen for composing an email to the address from the document at the given `fileURL`.
+	/// - Parameters:
+	///   - fileURL: The file URL for the document to retrieve the Twitter account details from.
+	///   - presentingViewController: The view controller to present from.
+	///   - animated: Flag indicating whether the view controller transition should be animated.
 	public static func openEmail(from fileURL: URL, presentingFrom presentingViewController: UIViewController, animated: Bool) {
 		let document = Document(fileAtURL: fileURL)
 
@@ -60,6 +70,11 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 		presentingViewController.present(viewController, animated: animated, completion: nil)
 	}
 
+	/// Opens the Twitter handle from the document at the given `fileURL`.
+	/// - Parameters:
+	///   - fileURL: The file URL for the document to retrieve the Twitter account details from.
+	///   - presentingViewController: The view controller to present from.
+	///   - animated: Flag indicating whether the view controller transition should be animated.
 	public static func openTwitter(from fileURL: URL, presentingFrom presentingViewController: UIViewController, animated: Bool) {
 		let document = Document(fileAtURL: fileURL)
 
@@ -72,7 +87,7 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 
 	// MARK: Allowing feedback
 	
-	//! Email address for receiving feedback.
+	/// Email address for receiving feedback.
 	@available(*, deprecated)
 	open var feedbackEmail: String? {
 		get { return self.document.feedback.compactMap { $0 as? FeedbackEmail }.first?.fullString }
@@ -87,7 +102,7 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 		}
 	}
 	
-	//! Twitter account handle for receiving feedback.
+	/// Twitter account handle for receiving feedback.
 	@available(*, deprecated)
 	open var feedbackTwitter: String? {
 		get { return self.document.feedback.compactMap { $0 as? FeedbackTwitter }.first?.handle }
@@ -104,37 +119,39 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 	
 	// MARK: Customising appearance
 	
-	//! Tint color used for indicating links.
+	/// Tint color used for indicating links.
 	open var tintColor: UIColor! {
 		get { return self.document.tintColor }
 		set(tintColor) { self.document.tintColor = tintColor }
 	}
 	
-	//! Background color for article pages.
+	/// Background color for article pages.
 	open var articleBackgroundColor: UIColor! {
 		get { return self.document.articleBackgroundColor }
 		set(articleBackgroundColor) { self.document.articleBackgroundColor = articleBackgroundColor }
 	}
 
-	//! Text color for article pages.
+	/// Text color for article pages.
 	open var articleTextColor: UIColor! {
 		get { return self.document.articleTextColor }
 		set(articleTextColor) { self.document.articleTextColor = articleTextColor }
 	}
 
-	//! Text color for article pages.
+	/// Text color for article pages.
 	open var articleCSS: String? {
 		get { return self.document.articleCSS }
 		set(articleCSS) { self.document.articleCSS = articleCSS }
 	}
 
-	//! Register the class used to display article rows in the table view.
+	/// Register the class used to display article rows in the table view.
+	/// - Parameter cellClass: The cell class to use for displaying article rows.
 	@objc(registerTableViewCellClassForArticleRows:)
 	open func registerTableViewCellClass(forArticleRows cellClass: UITableViewCell.Type) {
 		self.document.articleCellClass = cellClass
 	}
 	
-	//! Register the class used to display feedback rows in the table view.
+	/// Register the class used to display feedback rows in the table view.
+	/// - Parameter cellClass: The cell class to use for displaying feedback rows.
 	@objc(registerTableViewCellClassForFeedbackRows:)
 	open func registerTableViewCellClass(forFeedbackRows cellClass: UITableViewCell.Type) {
 		self.document.feedbackCellClass = cellClass
@@ -142,11 +159,11 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 	
 	// MARK: Instance life cycle
 	
-	//! The Sherpa document.
+	/// The Sherpa document.
 	fileprivate let document: Document
 	
 	/// Creates a `SherpaViewController` instance for the file at the given file URL.
-	/// @param fileURL The local URL for the underlying JSON document containing the content.
+	/// - Parameter fileURL The local URL for the underlying JSON document containing the content.
 	public init(fileAtURL fileURL: URL) {
 		let document = Document(fileAtURL: fileURL)
 		
@@ -164,13 +181,13 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 	
 	// MARK: View controller
 	
-	//! View controller for displaying the list of available articles.
+	/// View controller for displaying the list of available articles.
 	fileprivate let listViewController: ListViewController
 	
-	//! View controller for displaying a deep-linked article.
+	/// View controller for displaying a deep-linked article.
 	fileprivate var articleViewController: ArticleViewController?
 	
-	//! Embedded navigation controller for modal presentation.
+	/// Embedded navigation controller for modal presentation.
 	fileprivate var embeddedNavigationController: UINavigationController?
 	
 	open override func viewDidLoad() {

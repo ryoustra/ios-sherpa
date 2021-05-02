@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Daniel Farrelly
+// Copyright © 2021 Daniel Farrelly
 //
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -24,8 +24,8 @@
 
 @import UIKit;
 
-//! Project version number for Test.
+/// Project version number for Test.
 extern double SherpaVersionNumber;
 
-//! Project version string for Test.
+/// Project version string for Test.
 extern const unsigned char SherpaVersionString[];
