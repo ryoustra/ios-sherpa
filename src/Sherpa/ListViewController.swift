@@ -84,13 +84,13 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 			searchController.searchBar.tintColor = self.dataSource.document.tintColor
 			searchController.searchBar.autoresizingMask = [.flexibleWidth]
 			self.searchController = searchController
-			
+
 			// Sticking the searchBar inside a wrapper stops the tableview trying to be clever with the content size.
 			let headerView = UIView(frame: searchController.searchBar.frame)
 			headerView.autoresizingMask = [.flexibleWidth]
 			headerView.addSubview(searchController.searchBar)
 			self.tableView.tableHeaderView = headerView
-			
+
 			self.definesPresentationContext = true;
 		}
 	}
@@ -111,24 +111,41 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 	}
 	
 	@objc fileprivate func onKeyboard(_ notification: Notification) {
-		UIView.beginAnimations(nil, context: nil)
-		
-		if let rawValue = (notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? NSNumber)?.intValue, let curve = UIView.AnimationCurve(rawValue: rawValue) {
-			UIView.setAnimationCurve(curve)
+		guard let userInfo = notification.userInfo else {
+			return
 		}
-		
-		if let duration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue {
-			UIView.setAnimationDuration(duration)
+
+		let curve: UIView.AnimationCurve
+		if let integer = (userInfo[UIResponder.keyboardAnimationCurveUserInfoKey] as? NSNumber)?.intValue, let value = UIView.AnimationCurve(rawValue: integer) {
+			curve = value
 		}
-		
-		let keyboardOrigin = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue.origin.y ?? 0
-		
-		let contentInset = self.tableView.contentInset
-		let bottomInset = max(self.view.safeAreaInsets.bottom, self.tableView.frame.size.height - keyboardOrigin)
-		
-		self.tableView.contentInset = UIEdgeInsets(top: contentInset.top, left: contentInset.left, bottom: bottomInset, right: contentInset.right)
-		
-		UIView.commitAnimations()
+		else {
+			curve = .linear
+		}
+
+		let duration = (userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
+		let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue ?? .zero
+
+		let bottomInset: CGFloat
+		if keyboardFrame.maxY >= UIScreen.main.bounds.height {
+			let convertedFrame = tableView.convert(keyboardFrame, from: UIScreen.main.coordinateSpace)
+			bottomInset = max(0, tableView.bounds.size.height - (tableView.safeAreaInsets.top + tableView.safeAreaInsets.bottom) - convertedFrame.origin.y)
+		}
+		else {
+			bottomInset = 0
+		}
+
+		let animator = UIViewPropertyAnimator(duration: duration, curve: curve) {
+			self.tableView.contentInset.bottom = bottomInset
+			if #available(iOS 11.1, *) {
+				self.tableView.verticalScrollIndicatorInsets.bottom = bottomInset
+			}
+			else {
+				self.tableView.scrollIndicatorInsets.bottom = bottomInset
+			}
+		}
+
+		animator.startAnimation()
 	}
 	
 	// MARK: Search results updating
