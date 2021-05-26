@@ -85,12 +85,9 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 			searchController.searchBar.autoresizingMask = [.flexibleWidth]
 			self.searchController = searchController
 
-			// Sticking the searchBar inside a wrapper stops the tableview trying to be clever with the content size.
-			let headerView = UIView(frame: searchController.searchBar.frame)
-			headerView.autoresizingMask = [.flexibleWidth]
-			headerView.addSubview(searchController.searchBar)
-			self.tableView.tableHeaderView = headerView
-
+			self.navigationItem.searchController = searchController
+			self.navigationItem.hidesSearchBarWhenScrolling = false
+			
 			self.definesPresentationContext = true;
 		}
 	}
