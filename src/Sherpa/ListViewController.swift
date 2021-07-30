@@ -57,7 +57,7 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 	}
 	
 	deinit{
-		self.searchController?.view.removeFromSuperview()
+		self.searchController?.viewIfLoaded?.removeFromSuperview()
 	}
 	
 	// MARK: View life cycle
