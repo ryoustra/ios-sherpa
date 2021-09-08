@@ -39,6 +39,8 @@ internal class Document {
 	internal var articleCellClass = UITableViewCell.self
 	
 	internal var feedbackCellClass = UITableViewCell.self
+    
+    internal var allowSearch = true
 	
 	// MARK: Feedback points.
 	

@@ -39,8 +39,6 @@ internal class ArticleViewController: ListViewController {
 		
 		dataSource.sectionTitle = NSLocalizedString("Related", comment: "Title for table view section containing one or more related articles.")
 		dataSource.filter = { (article: Article) -> Bool in return article.key != nil && self.article.relatedKeys.contains(article.key!)  }
-		
-		allowSearch = false
 
 		bodyView.navigationDelegate = self
 		bodyView.loadHTMLString(prepareHTML, baseURL: nil)
@@ -195,6 +193,9 @@ internal class ArticleViewController: ListViewController {
 		return string
 	}
 
+    override func allowSearch() -> Bool {
+        return false
+    }
 }
 
 extension ArticleViewController: WKNavigationDelegate {

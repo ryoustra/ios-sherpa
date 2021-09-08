@@ -35,9 +35,7 @@ internal protocol ListViewControllerDelegate: AnyObject {
 internal class ListViewController: UIViewController, UITableViewDelegate, UISearchControllerDelegate, UISearchResultsUpdating {
 	
 	internal weak var delegate: ListViewControllerDelegate?
-	
-	internal var allowSearch: Bool = true
-	
+		
 	// MARK: Instance life cycle
 	
 	internal fileprivate(set) var dataSource: DataSource!
@@ -75,7 +73,7 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 		
 		self.navigationItem.title = NSLocalizedString("User Guide", comment: "Title for view controller listing user guide articles.")
 		
-		if self.allowSearch {
+        if self.allowSearch() {
 			let searchController = UISearchController(searchResultsController: nil)
 			searchController.obscuresBackgroundDuringPresentation = false
 			searchController.delegate = self
@@ -147,8 +145,12 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 	
 	// MARK: Search results updating
 	
+    internal func allowSearch() -> Bool {
+        return dataSource.document.allowSearch
+    }
+    
 	internal func updateSearchResults(for searchController: UISearchController) {
-		if !self.allowSearch { return }
+        if !self.allowSearch() { return }
 		
 		if searchController.isActive, let query = searchController.searchBar.text, query.count > 0 {
 			self.dataSource.query = query

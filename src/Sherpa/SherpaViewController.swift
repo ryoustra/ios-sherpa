@@ -157,6 +157,10 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 		self.document.feedbackCellClass = cellClass
 	}
 	
+    open var allowSearch: Bool {
+        get { return self.document.allowSearch }
+        set(allowSearch) { self.document.allowSearch = allowSearch }
+    }
 	// MARK: Instance life cycle
 	
 	/// The Sherpa document.
