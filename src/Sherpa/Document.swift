@@ -40,6 +40,8 @@ internal class Document {
 	
 	internal var feedbackCellClass = UITableViewCell.self
     
+    internal var titleText: String = NSLocalizedString("User Guide", comment: "Title for view controller listing user guide articles.")
+    
     internal var allowSearch = true
 	
 	// MARK: Feedback points.

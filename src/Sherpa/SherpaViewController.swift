@@ -156,6 +156,12 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 	open func registerTableViewCellClass(forFeedbackRows cellClass: UITableViewCell.Type) {
 		self.document.feedbackCellClass = cellClass
 	}
+    
+    // MARK: Customising header - title and search
+    open var titleText: String {
+        get { return self.document.titleText }
+        set(titleText) { self.document.titleText = titleText }
+    }
 	
     open var allowSearch: Bool {
         get { return self.document.allowSearch }
@@ -177,6 +183,7 @@ open class SherpaViewController: UIViewController, UINavigationControllerDelegat
 		super.init(nibName: nil, bundle: nil)
 
 		self.listViewController.delegate = self
+        self.listViewController.title = titleText
 	}
 	
 	public required init?(coder aDecoder: NSCoder) {

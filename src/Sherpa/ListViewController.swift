@@ -71,7 +71,7 @@ internal class ListViewController: UIViewController, UITableViewDelegate, UISear
 	override internal func viewDidLoad() {
 		super.viewDidLoad()
 		
-		self.navigationItem.title = NSLocalizedString("User Guide", comment: "Title for view controller listing user guide articles.")
+        self.navigationItem.title = self.dataSource.document.titleText
 		
         if self.allowSearch() {
 			let searchController = UISearchController(searchResultsController: nil)
